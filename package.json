@@ -1,0 +1,27 @@
+{
+  "name": "winnetoujs",
+  "version": "1.0.0",
+  "description": "The indie javascript constructor",
+  "main": "src/winnetou.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cedrosdev/winnetoujs.git"
+  },
+  "keywords": [
+    "javascript",
+    "winnetou",
+    "winnetoujs",
+    "win",
+    "framework",
+    "frontend"
+  ],
+  "author": "Cedros Development",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cedrosdev/winnetoujs/issues"
+  },
+  "homepage": "https://github.com/cedrosdev/winnetoujs#readme"
+}
