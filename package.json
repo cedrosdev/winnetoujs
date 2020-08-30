@@ -4,7 +4,9 @@
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-fs": "node build.js",
+    "postinstall": "npm run-script build-fs"
   },
   "repository": {
     "type": "git",
