@@ -664,10 +664,12 @@ export class Winnetou {
    * @param next_ callback to app start.
    */
 
-  async lang(next_) {
+  async lang(instance, next_) {
     if (!window.localStorage.getItem("lang")) return next_();
 
-    let This = this;
+    let This = instance;
+
+    
 
     /**
      * O problema do fetch é que ele precisa saber o caminho relativo para poder obter as informações do config, porém neste ponto ainda não sabemos o caminho relativo, pois também é uma variável do config.
@@ -716,14 +718,15 @@ export class Winnetou {
           let frases = el[0].childNodes;
           frases.forEach(item => {
             if (item.nodeName != "#text") {
-              This.strings[item.nodeName] = item.textContent;
+              This[item.nodeName] = item.textContent;
+              
             }
           });
         } catch (e) {
           console.log(
             "O arquivo de tradução ",
             `${Config.folderName}/translations/${defaultLang}.xml`,
-            " parece estar vazio ou incorreto."
+            " parece estar vazio ou incorreto.",e.message
           );
         }
 
@@ -762,3 +765,5 @@ export class Winnetou {
 }
 
 export const W = new Winnetou();
+
+
