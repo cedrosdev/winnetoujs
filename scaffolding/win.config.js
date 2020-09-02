@@ -1,9 +1,10 @@
 export default {
   constructosPath: "./constructos",
+  constructosOut: "./js/constructos",
   entry: "./js/app.js",
   out: "./release",
   folderName: "/",
-  defaultLang: "en-us",
   sass: "./sass",
-  css: "./css",
+  icons: "./icons",
+  defaultLang: "en-us",
 };

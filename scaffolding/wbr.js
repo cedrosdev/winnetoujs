@@ -4,30 +4,706 @@
  * Winnetou Bundle Release  =
  * ==========================
  *
- * Todo:
- * Precisa ser com Promise.all para executar em paralelo
+ * MIT License
+ *
+ * Copyright 2020 Cedros Development https://winnetoujs.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
+/**
+ * Todo:
+ *
+ * ==> quando define algo no win.config.js e
+ *      a pasta não existe
+ *      acontece um erro, tem que tratar
+ *      esses error
+ * ==> [ok] icons ainda não é promise.all
+ * ==> [ok] webpack option, usar webpack na chamada?
+ * ==> Configuração de saída
+ *    --> targets
+ * ==> Poder importar do win.config.js as configs
+ *      para o webpack
+ * ==> map
+ * ==> script loads if necessary
+ * https://webpack.js.org/guides/lazy-loading/
+ * vou usar isso, importantíssimo
+ * https://dzone.com/articles/lazy-loading-es2015-modules-in-the-browser
+ * https://webpack.js.org/guides/code-splitting/
+ */
+
+// REQUIRES ====================================================
+
 const fs = require("fs-extra");
-
-// const { default: Config } = require("./win.config.js");
-
 const path = require("path");
 const recursive = require("recursive-readdir");
 const htmlParser = require("node-html-parser");
-const { default: Matcher } = require("node-html-parser/dist/matcher");
 const beautify = require("js-beautify").js;
+const prettify = require("html-prettify");
 const escapeStringRegexp = require("escape-string-regexp");
 const xml = require("xml-parse");
 const sass = require("sass");
 const UglifyCss = require("uglifycss");
+const { exit } = require("process");
+const package = require("winnetoujs/package.json");
+const watch = require("node-watch");
+const webpack = require("webpack");
 
-var idList = [];
+// ARGUMENTS ===================================================
 
-var Config;
+if (process.argv.length === 2) initializer();
+else {
+  process.argv.forEach(function (val, index, array) {
+    if (index === 2) {
+      switch (val) {
+        case "--version":
+          console.log(package.version);
+          exit();
+          break;
 
-// Inicia o programa
+        case "--v":
+          console.log(package.version);
+          exit();
+          break;
+
+        case "-version":
+          console.log(package.version);
+          exit();
+          break;
+
+        case "-v":
+          console.log(package.version);
+          exit();
+          break;
+
+        case "--webpack":
+          webpackBundleRelease();
+          break;
+
+        case "-webpack":
+          webpackBundleRelease();
+          break;
+
+        case "":
+          initializer();
+          break;
+      }
+    }
+  });
+}
+
+// GLOBAL VARIABLES =============================================
+
+let idList = [],
+  promisesCss = [],
+  Config,
+  promisesConstructos = [],
+  promisesIcons = [],
+  errorsCount = 0,
+  warningCount = 0,
+  fileCache = [],
+  fileLastMod = [],
+  init = new Date().getTime(),
+  finish,
+  res,
+  transpileComplete = false,
+  transpileIconsComplete = false;
+
+// DRAW METHODS ===============================================
+
+// #region
+
+const drawLine = (size = 80) => {
+  let line = "";
+  for (let i = 0; i < size; i++) {
+    if (i == 1) line += " ";
+    else if (i == size - 2) line += " ";
+    else line += "=";
+  }
+  console.log(line);
+};
+/**
+ * Draw string line
+ * @param  {string} [text] string to be printed
+ * @param  {object} [params]
+ * @param {('cyan'|'yellow'|'green'|'red'|'error'|'bright'|'dim'|'warning')} [params.color] string color
+ * @param {number} [params.size] line size, default 80
+ * @param {('add'|'addError'|'change')} [params.type] string style type
+ */
+const drawText = (text = "", params) => {
+  let color = "";
+
+  if (params?.color) {
+    switch (params.color) {
+      case "cyan":
+        color = "\x1b[36m";
+        break;
+
+      case "yellow":
+        color = "\x1b[33m";
+        break;
+
+      case "green":
+        color = "\x1b[32m";
+        break;
+
+      case "red":
+        color = "\x1b[31m";
+        break;
+
+      case "error":
+        color = "\x1b[1m\x1b[5m\x1b[41m\x1b[37m";
+        break;
+
+      case "warning":
+        color = "\x1b[1m\x1b[33m";
+        break;
+
+      case "bright":
+        color = "\x1b[1m";
+        break;
+
+      case "dim":
+        color = "\x1b[2m";
+        break;
+    }
+  }
+
+  let line = "= " + color + text + "\x1b[0m";
+
+  if (params?.type === "add") {
+    line =
+      "= \x1b[42m\x1b[37m success \x1b[0m " +
+      color +
+      text +
+      "\x1b[0m";
+    text = " success  " + text;
+  }
+
+  if (params?.type === "change") {
+    line =
+      "= \x1b[45m\x1b[37m changed \x1b[0m " +
+      color +
+      text +
+      "\x1b[0m";
+    text = " changed  " + text;
+  }
+
+  if (params?.type === "addError") {
+    line =
+      "= \x1b[5m\x1b[43m\x1b[37m fail \x1b[0m " +
+      color +
+      text +
+      "\x1b[0m";
+    text = " fail  " + text;
+  }
+
+  let tamanho = text.length + 2;
+
+  let size = params?.size || 80;
+
+  for (let i = 0; i < size - tamanho; i++) {
+    if (i == size - tamanho - 1) line += "=";
+    else line += " ";
+  }
+
+  console.log(line);
+};
+
+const drawTextBlock = (text, params) => {
+  let arr = text.match(/.{1,74}/g);
+  arr.forEach(item => {
+    drawText(item, params);
+  });
+};
+
+const drawBlankLine = () => {
+  drawText();
+};
+
+const drawSpace = () => {
+  console.log("\n");
+};
+
+/**
+ * Draw error
+ * @param {string} text error string
+ */
+const drawError = text => {
+  errorsCount++;
+  drawLine();
+  drawBlankLine();
+  drawText(" Bundle Error ", { color: "error" });
+  drawBlankLine();
+  drawTextBlock(text);
+  drawBlankLine();
+  drawLine();
+  drawBlankLine();
+};
+
+const drawWarning = text => {
+  warningCount++;
+  drawLine();
+  drawBlankLine();
+  drawText("Warning", { color: "warning" });
+  drawBlankLine();
+  drawTextBlock(text);
+  drawBlankLine();
+  drawLine();
+};
+
+const drawWelcome = () => {
+  // console.clear();
+  drawLine();
+  drawBlankLine();
+  drawBlankLine();
+  drawText("W I N N E T O U J S ", { color: "bright" });
+  drawBlankLine();
+  drawText(
+    "T h e  i n d i e  j a v a s c r i p t  c o n s t r u c t o r",
+    { color: "dim" }
+  );
+  drawBlankLine();
+  drawText("WinnetouJs.org", { color: "yellow" });
+
+  drawBlankLine();
+  drawBlankLine();
+  drawLine();
+  drawBlankLine();
+  drawText("Find online help and docs", { color: "dim" });
+  drawText("https://winnetoujs.org/docs");
+  drawBlankLine();
+  drawText("Fork on GitHub", { color: "dim" });
+  drawText("https://github.com/cedrosdev/WinnetouJs.git");
+  drawBlankLine();
+  drawText("(c) 2020 Cedros Development (https://cedrosdev.com)", {
+    color: "dim",
+  });
+
+  drawBlankLine();
+  drawLine();
+  drawBlankLine();
+};
+
+/**
+ * Draw add
+ * @param {string} text add string
+ */
+const drawAdd = text => {
+  drawText(text, { type: "add", color: "green" });
+  drawBlankLine();
+};
+
+const drawChange = text => {
+  drawText(text, { type: "change", color: "green" });
+  drawBlankLine();
+};
+
+const drawAddError = text => {
+  errorsCount++;
+
+  drawText(text, { type: "addError", color: "cyan" });
+  drawBlankLine();
+};
+
+const drawHtmlMin = text => {
+  console.log("> [html minifield] " + text);
+};
+
+const drawEnd = text => {
+  console.log("> [Bundle Release Finished] " + text);
+};
+
+const drawFinal = () => {
+  drawLine();
+  drawBlankLine();
+  drawText("All tasks completed");
+  drawBlankLine();
+  if (errorsCount > 0) {
+    drawText("... with " + errorsCount + " errors");
+    drawBlankLine();
+  }
+  if (warningCount > 0) {
+    drawText("... with " + warningCount + " warnings");
+    drawBlankLine();
+  }
+
+  drawLine();
+  drawSpace();
+};
+
+drawWelcome();
+
+// #endregion
+
+// WEBPACK METHODS ============================================
+
+/**
+ * TODO:
+ * browser compatibility lazy load
+ */
+
+async function webpackBundleRelease() {
+  await config();
+  configTest();
+
+  const compiler = webpack({
+    entry: Config.entry,
+    output: {
+      chunkFilename: "[name].bundle.js",
+      filename: "winnetouBundle.min.js",
+      path: path.resolve(__dirname, Config.out),
+      publicPath: path.join(Config.out, "/"),
+    },
+    mode: "production",
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                [
+                  "@babel/preset-env",
+                  {
+                    targets:
+                      "last 2 Chrome versions, last 2 Firefox versions",
+                  },
+                ],
+              ],
+              plugins: [
+                "@babel/plugin-proposal-optional-chaining",
+                "@babel/plugin-proposal-nullish-coalescing-operator",
+                [
+                  "@babel/plugin-transform-runtime",
+                  {
+                    regenerator: true,
+                  },
+                ],
+                "@babel/plugin-proposal-class-properties",
+              ],
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  compiler.run((e, s) => {
+    console.log(e, s.compilation.errors, s.compilation.warnings);
+  });
+}
+
+// WBR METHODS ================================================
+/**
+ * Read file from cache with fallback to filesystem
+ * @param  {string} filePath path of the file
+ * @returns promise with data
+ */
+function readFileCache(filePath) {
+  return new Promise((resolve, reject) => {
+    let lastMod = fs.statSync(filePath).mtime.toString();
+
+    if (fileCache[filePath]) {
+      // exists
+      // verify last mod
+
+      if (lastMod == fileLastMod[filePath]) {
+        // same last modification
+        // there is no alterations
+
+        return resolve(fileCache[filePath]);
+      }
+    }
+
+    // don't exists
+
+    fs.readFile(filePath, "utf-8", function (err, data) {
+      fileCache[filePath] = data;
+      fileLastMod[filePath] = lastMod;
+      return resolve(data);
+    });
+  });
+}
+
+/**
+ * List of errors
+ * @param {object} Err
+ */
+const Err = {
+  /**
+   * Cod e001
+   * Duplicated constructo error
+   * @param  {string} id
+   * @param  {string} filePath
+   * @param  {string} originalFile
+   */
+  e001(id, filePath, originalFile) {
+    drawWarning(
+      "Error code: e001\n" +
+        `The constructo [[${id}]] of file "${filePath}" is duplicated. The original file is "${originalFile}".`
+    );
+  },
+  /**
+   * Cod e002
+   * Transpile constructo error
+   * @param  {string} e
+   */
+  e002(e) {
+    drawError(
+      "Error Code: e002\n" +
+        "Transpile constructo error. Original Message: " +
+        e
+    );
+  },
+  /**
+   * Cod 003
+   * win.config.js
+   */
+  e003() {
+    drawError(
+      "Error Code: 003\n" +
+        `"./win.config.js" not found or misconfigured. Default config will be used.`
+    );
+  },
+  e004() {
+    drawError(
+      "Error Code: 004\n" + `Fatal error when creating the css bundle`
+    );
+  },
+};
+
+function configTest() {
+  if (!Config.out) {
+    drawWarning(
+      "win.config.js misconfigured. Not found 'out' parameter. Using default './release'"
+    );
+    Config.out = "./release";
+  }
+}
+
+function time() {
+  finish = new Date().getTime();
+
+  res = finish - init;
+
+  drawText("in " + res + "ms", { color: "dim" });
+}
+
+async function config() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await fs.readFile("./win.config.js", "utf-8");
+      Config = fixedJson(data);
+      return resolve();
+    } catch (e) {
+      Config = {
+        constructosPath: "./constructos",
+        entry: "./js/app.js",
+        out: "./release",
+        folderName: "/",
+      };
+      Err.e003();
+      return resolve();
+    }
+  });
+}
+
+async function initializer() {
+  await config();
+
+  configTest();
+
+  if (Config?.css || Config?.sass) await css();
+
+  if (Config?.icons || Config?.coloredIcons) await icons();
+  else transpileIconsComplete = true;
+
+  if (Config?.defaultLang) translate();
+
+  await constructos();
+
+  time();
+
+  drawFinal();
+
+  watchFiles();
+}
+
+async function constructos(name) {
+  return new Promise(async (resolve, reject) => {
+    if (name) {
+      promisesConstructos.push(transpileConstructo(name));
+      drawAdd(name);
+      return resolve(await execPromisesConstructos());
+    }
+
+    const constructosPath = Config.constructosPath;
+
+    recursive(constructosPath, async (err, files) => {
+      recursive("./node_modules", async (err2, files2) => {
+        files2 = files2
+          .filter(x => x.includes("win-"))
+          .filter(x => x.includes(".htm") || x.includes(".html"));
+
+        if (files2.length > 0) {
+          try {
+            files = files.concat(files2);
+          } catch (e) {
+            console.log("e :>> ", e);
+          }
+        }
+
+        for (let index in files) {
+          try {
+            let file = files[index];
+
+            if (typeof file === "string") {
+              let ext = path.parse(path.join(__dirname, file)).ext;
+              // apenas se for html ou htm
+              if (ext == ".html" || ext == ".htm") {
+                promisesConstructos.push(transpileConstructo(file));
+                drawAdd(file);
+              }
+            }
+          } catch (e) {
+            Err.e002(e.message);
+          }
+        }
+
+        return resolve(await execPromisesConstructos());
+      });
+    });
+  });
+}
+
+function execPromisesConstructos() {
+  return new Promise((resolve, reject) => {
+    Promise.all(promisesConstructos).then(async data => {
+      /**
+       * data[0].method
+       * data[0].constructosList
+       * data [0].filePath
+       */
+
+      for (let c = 0; c < data.length; c++) {
+        let item = data[c];
+
+        let out = `import { Winnetou } from "../../node_modules/winnetoujs/src/winnetou.js";\n\n`;
+        out += item.class;
+        out += "\n\n";
+        out += item.exports.join("\n");
+
+        let resultadoFinal = beautify(out, {
+          indent_size: 2,
+          space_in_empty_paren: true,
+        });
+
+        let fileName = path.parse(item.filePath).name;
+
+        let pathOut = path.join(
+          Config.constructosOut,
+          `${fileName}.js`
+        );
+
+        await fs.outputFile(pathOut, resultadoFinal);
+      }
+
+      transpileComplete = true;
+
+      return resolve();
+    });
+  });
+}
+
+function watchFiles() {
+  let refresh = name => {
+    drawChange(name);
+    idList = [];
+    promisesConstructos = [];
+    promisesCss = [];
+    promisesIcons = [];
+    errorsCount = 0;
+    warningCount = 0;
+    init = new Date().getTime();
+  };
+
+  if (Config.defaultLang) {
+    // lang watcher
+
+    // @ts-ignore
+    watch(`./translations`, { recursive: true }, async function (
+      evt,
+      name
+    ) {
+      refresh(name);
+      await translate();
+      time();
+      drawFinal();
+    });
+  }
+
+  if (Config.constructosPath) {
+    // constructors watcher
+
+    // @ts-ignore
+    watch(
+      Config.constructosPath,
+      { recursive: true },
+      async function (evt, name) {
+        if (transpileComplete && transpileIconsComplete) {
+          transpileComplete = false;
+
+          refresh(name);
+          await constructos(name);
+          time();
+          drawFinal();
+        }
+      }
+    );
+  }
+
+  if (Config.icons || Config.coloredIcons) {
+    // icons watcher
+
+    let folders = [];
+    if (Config.icons) folders.push(Config.icons);
+    if (Config.coloredIcons) folders.push(Config.coloredIcons);
+
+    // @ts-ignore
+    watch(folders, { recursive: true }, async function (evt, name) {
+      refresh(name);
+      transpileComplete = false;
+      transpileIconsComplete = false;
+      await icons();
+      await constructos();
+      time();
+      drawFinal();
+    });
+  }
+
+  if (Config.sass || Config.css) {
+    // css watcher
+
+    let folders = [];
+    if (Config.sass) folders.push(Config.sass);
+    if (Config.css) folders.push(Config.css);
+
+    // @ts-ignore
+    watch(folders, { recursive: true }, async function (evt, name) {
+      refresh(name);
+      await css();
+      time();
+      drawFinal();
+    });
+  }
+}
 
 function fixedJson(badJSON) {
   let a = badJSON
@@ -62,124 +738,169 @@ function fixedJson(badJSON) {
   return JSON.parse(`{${a}}`);
 }
 
-fs.readFile("./win.config.js", "utf-8", (err, data) => {
-  Config = fixedJson(data);
-  main();
+async function icons() {
+  return new Promise(async (resolve, reject) => {
+    let constructoIcons = "";
 
-  // inicia o css
-  if (Config?.css || Config?.sass) {
-    mainCss();
-  }
-});
+    const iconsPath = Config.icons;
 
-function l(a, b) {
-  return;
-  a || b ? console.log("\n============") : null;
-  a ? console.dir(a) : null;
-  b ? console.log(b) : null;
-  a || b ? console.log("============") : null;
-}
+    if (iconsPath) {
+      let files = await recursive(iconsPath);
 
-/**
- * Create Constructos class from source constructos folder.
- */
-async function main() {
-  const constructosPath = Config.constructosPath;
+      // aqui tenho o path do icone
+      // preciso saber das subpastas
 
-  let resultado = "";
-  let constructos = [];
-
-  recursive(constructosPath, async (err, files) => {
-    recursive("./node_modules", async (err2, files2) => {
-      files2 = files2
-        .filter(x => x.includes("win-"))
-        .filter(x => x.includes(".htm") || x.includes(".html"));
-
-      if (files2.length > 0) {
-        try {
-          files = files.concat(files2);
-        } catch (e) {
-          console.log("e :>> ", e);
-        }
+      for (let c = 0; c < files.length; c++) {
+        promisesIcons.push(transpileIcon(files[c]));
       }
+    }
 
-      for (let file in files) {
-        try {
-          let arquivo = files[file];
+    const coloredIconsPath = Config.coloredIcons;
 
-          if (typeof arquivo === "string") {
-            let ext = path.parse(path.join(__dirname, arquivo)).ext;
-            // apenas se for html ou htm
-            if (ext == ".html" || ext == ".htm") {
-              let constructoMethods = await transformarConstructo(
-                arquivo
-              );
-              resultado += constructoMethods.method;
-              constructos.push(constructoMethods.constructosList);
-            }
+    if (coloredIconsPath) {
+      let files = await recursive(coloredIconsPath);
+      for (let c = 0; c < files.length; c++) {
+        promisesIcons.push(transpileColoredIcon(files[c]));
+      }
+    }
+
+    Promise.all(promisesIcons).then(async res => {
+      // console.log("res :>> ", res);
+
+      // tenho que trabalhar o res
+      // e separar por arquivos
+
+      let splitter = [];
+      splitter["icons"] = [];
+
+      res.forEach(item => {
+        if (typeof item == "object") {
+          // do stuff
+
+          let s = item.iconPath.split("/");
+
+          if (s.length > 2) {
+            if (!splitter[s[1]]) splitter[s[1]] = [];
+            splitter[s[1]].push(item.symbol);
+          } else {
+            splitter["icons"].push(item.symbol);
           }
-        } catch (e) {
-          console.log("Winnetou error", e.message);
         }
-      }
-
-      // tradução
-      let translate_;
-      if (Config?.defaultLang) {
-        translate_ = await translate();
-      }
-
-      let resultadoFinal = `
-        import {WinnetouBase} from  "./node_modules/winnetoujs/src/_winnetouBase.js";
-
-        /**
-         * WinnetouJs Main Class
-         * 
-         */
-        //@ts-ignore
-        class _Winnetou extends WinnetouBase {
-          constructor(){
-            super();
-
-            ${translate_.res}
-
-            /**
-             * Object containing all available constructos. 
-             * @private */
-            this.Constructos = {
-              ${constructos.filter(x => x.length > 0).join(",")}
-            }
-          }
-
-            ${resultado}
-          
-        }
-
-        // @ts-ignore
-        export const Winnetou = new _Winnetou();
-        // @ts-ignore
-        export const Constructos = Winnetou.Constructos;
-        /**
-         * Object containing all available constructos. 
-        ${translate_.jsdoc}
-        */
-        // @ts-ignore
-        export const Strings = Winnetou.strings;
-
-    `;
-
-      resultadoFinal = beautify(resultadoFinal, {
-        indent_size: 2,
-        space_in_empty_paren: true,
       });
 
-      // agora tenho a class Constructos pronta na variável resultadoFinal
-      // agora tenho que salvar o arquivo
+      let finalPromise = [];
 
-      await fs.outputFile("./winnetou.js", resultadoFinal);
+      Object.keys(splitter).forEach(key => {
+        finalPromise.push(
+          fs.outputFile(
+            path.join(
+              Config.constructosPath,
+              `_icons${key != "icons" ? "_" + key : ""}.html`
+            ),
+            prettify(splitter[key].join("\n"))
+          )
+        );
+      });
 
-      console.log("\n\n\nConstructos Class gerado com sucesso.");
+      // await fs.outputFile(
+      //   path.join(Config.constructosPath, "_icons.html"),
+      //   prettify(res.join("\n"))
+      // );
+      Promise.all(finalPromise).then(res => {
+        transpileIconsComplete = true;
+        return resolve();
+      });
     });
+  });
+}
+
+async function transpileIcon(iconPath) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // let xmlString = fs.readFileSync(iconPath, "utf8");
+
+      let xmlString = await readFileCache(iconPath);
+
+      let regPath = /[a-zA-Z]+/g;
+
+      let id = iconPath.match(regPath);
+
+      id = id.filter(x => x != "svg");
+
+      id = id.join("_");
+
+      let regVb = new RegExp('viewBox="(.*?)"', "gis");
+
+      let reg = new RegExp("<svg(.*?)>(.*?)</svg>", "is");
+
+      if (xmlString) {
+        let viewBox = xmlString.match(regVb);
+
+        let arr = xmlString.match(reg);
+
+        let symbol = `
+      <winnetou description="Create an icon **${id}**">
+      <svg ${viewBox} id="[[${id}]]" class="winIcons {{?class%Class for the icon}}">`;
+
+        let cleanFill = arr[2].replace("fill", "data-fill");
+
+        symbol += cleanFill;
+
+        symbol += `</svg></winnetou>`;
+
+        drawAdd(iconPath);
+        return resolve({ symbol, iconPath });
+      } else {
+        return reject();
+      }
+    } catch (e) {
+      drawAddError(iconPath);
+      return resolve("");
+    }
+  });
+}
+
+async function transpileColoredIcon(iconPath) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let xmlString = await readFileCache(iconPath);
+
+      let regPath = /[a-zA-Z]+/g;
+
+      let id = iconPath.match(regPath);
+
+      id = id.filter(x => x != "svg");
+
+      id = id.join("_");
+
+      let regVb = new RegExp('viewBox="(.*?)"', "gis");
+
+      let reg = new RegExp("<svg(.*?)>(.*?)</svg>", "is");
+
+      if (xmlString) {
+        let viewBox = xmlString.match(regVb);
+
+        let arr = xmlString.match(reg);
+
+        let symbol = `
+      <winnetou description="Create an colored icon **${id}**">
+      <svg ${viewBox} id="[[${id}]]" class="winColoredIcons {{?class%Class for the colored icon}}">`;
+
+        let cleanFill = arr[2];
+
+        symbol += cleanFill;
+
+        symbol += `</svg></winnetou>`;
+
+        drawAdd(iconPath);
+        return resolve({ symbol, iconPath });
+      } else {
+        return reject();
+      }
+    } catch (e) {
+      drawAddError(iconPath);
+      return resolve("");
+    }
   });
 }
 
@@ -193,8 +914,8 @@ async function translate() {
       return reject({ err: "erro" });
     }
 
-    if (Config.folderName === "/") Config.folderName = "";
-    Config.folderName = path.join(
+    // if (Config.folderName === "/") Config.folderName = "";
+    let folderName = path.join(
       __dirname,
       Config.folderName,
       "/translations"
@@ -204,7 +925,7 @@ async function translate() {
     let jsdoc = "";
 
     fs.readFile(
-      `${Config.folderName}/${Config.defaultLang}.xml`,
+      `${folderName}/${Config.defaultLang}.xml`,
       "utf-8",
       function (err, data) {
         let trad = xml.parse(data)[0].childNodes;
@@ -224,84 +945,87 @@ async function translate() {
 
         let res = `
         
-          /**
-           * Object containing the strings taken from the translation file    
-           * @private       
-          */
           this.strings = {
             ${strings}
           }
         
         `;
 
-        return resolve({ res, jsdoc });
+        let resFinal = `
+        import { Winnetou } from "../node_modules/winnetoujs/src/winnetou.js";
+        class Strings_ extends Winnetou{
+          constructor(){
+            super();
+            ${res}
+          }
+        }
+        const S=new Strings_();
+
+        /**
+         * Object containing the strings taken from the translation file${jsdoc}
+        */
+        // @ts-ignore
+        export const Strings = S.strings;
+
+        `;
+
+        fs.outputFile(
+          "./js/_strings.js",
+          beautify(resFinal, {
+            indent_size: 2,
+            space_in_empty_paren: true,
+          }),
+          function (err) {
+            drawAdd("Strings");
+            return resolve({ res, jsdoc });
+          }
+        );
       }
     );
   });
 }
-
 /**
- * Vai ler o arquivo html e transformar em um método js
- * que será colocado dentro da classe Constructos
- * @param  {string} arquivo caminho do arquivo
- * @returns **Promise** código js do método
+ * Transpile constructo html to WinnetouJs Class
+ * @param  {string} filePath
  */
-async function transformarConstructo(arquivo) {
+async function transpileConstructo(filePath) {
   return new Promise((resolve, reject) => {
     try {
-      fs.readFile(arquivo, "utf-8", function (err, data) {
-        if (err) return reject(err);
-
+      readFileCache(filePath).then(data => {
         // transforma o html em método
         let dom = htmlParser.parse(data);
-        let componentes = dom.querySelectorAll("winnetou");
-        let retornoTotal = "";
+        let components = dom.querySelectorAll("winnetou");
+        let finalReturn = "";
         let constructos = [];
 
-        Array.from(componentes).forEach(componente => {
-          let descri = componente.getAttribute("description");
-          let constructo = componente.innerHTML;
+        Array.from(components).forEach(component => {
+          let descri = component.getAttribute("description");
+          let constructo = component.innerHTML;
           let jsdoc =
             "\n\n// ========================================\n\n\n";
           jsdoc += "\n\n/**\n";
           jsdoc += `\t* ${descri || ""}\n`;
-          let elementsObrigatorio = false;
+          let requiredElement = false;
           let jsdoc2 = "";
-
-          l("descri", descri);
-
-          // todo:
-          // [ok] lógica dos ids
-          // ao chamar o método da classe Constructos tem que criar o
-          // id automaticamente, win-simpleDiv-1
 
           let id = constructo.match(/\[\[\s?(.*?)\s?\]\]/)[1];
           let pureId = id + "-win-${identifier}";
 
-          //verifica se o id é repetido
-          let verifica = idList.filter(data => data.id === id);
+          let verify = idList.filter(data => data.id === id);
 
-          if (verifica.length > 0) {
-            console.log(
-              `O constructo ${id} do arquivo ${arquivo} está duplicado`
-            );
-
-            console.log(
-              `Arquivo original: ${verifica[0].arquivo}\n\n`
-            );
-            throw new Error("id-001");
+          //duplicated constructo
+          if (verify.length > 0) {
+            Err.e001(id, filePath, verify[0].file);
           }
 
           idList.push({
-            arquivo,
+            file: filePath,
             id,
           });
 
           // ===========================================
           // ids replace ===============================
           // ===========================================
-
-          // Isso aqui para retornar os ids
 
           var regId = /\[\[\s*?(.*?)\s*?\]\]/g;
           var matchIds = constructo.match(regId);
@@ -329,67 +1053,45 @@ async function transformarConstructo(arquivo) {
           // elements replace ==========================
           // ===========================================
 
-          // tenho que achar todos os elements dentro do constructo
           let regex = new RegExp("{{\\s*?(.*?)\\s*?}}", "g");
 
           let matches = constructo.match(regex);
 
           if (matches) {
             matches.forEach(match => {
-              //match contem o element puro
-              //match = "{{texto % Texto a ser apresentado na simpleDiv}}"
-
-              //obtem o element => el = 'texto % pipipipopopo'
               let el = match.replace("{{", "");
               el = el.replace("}}", "");
 
-              // verifica se tem comentario o jsdoc
               let elArr = el.split("%");
 
-              // verifica se o element é obrigatório ou opcional
-              let obrigatorio = false;
+              let required = false;
               if (elArr[0].indexOf("?") != -1) {
-                // é opcional
-                // quando tem o ? antes do element
-                // quer dizer que o mesmo é opcional
-                obrigatorio = false;
+                required = false;
               } else {
-                // é obrigatorio
-                obrigatorio = true;
-                elementsObrigatorio = true;
+                required = true;
+                requiredElement = true;
               }
 
-              //remove o ? do element e aplica o trim
-              // agora temos o element => el = 'texto'
-              // e o comentario jsdoc em comentario
               el = elArr[0].replace("?", "").trim();
-              let comentario = elArr[1] || "";
-
-              // todo:
-              // [ok] Comentário jsdoc
-
-              l(el);
-              l(obrigatorio ? "obrigatorio" : "opcional", comentario);
+              let commentary = elArr[1] || "";
 
               jsdoc2 += `\t* @param {any${
-                obrigatorio ? "" : "="
-              }} elements.${el} ${comentario.trim()}\n`;
+                required ? "" : "="
+              }} elements.${el} ${commentary.trim()}\n`;
 
-              // transforma o match em uma regexp aceitável
               let escapedString = escapeStringRegexp(match);
 
-              // faz o replace no constructo
               constructo = constructo.replace(
                 new RegExp(escapedString, "g"),
-                "${elements." +
+                "${(elements?." +
                   el +
-                  (obrigatorio ? "" : ' || ""') +
-                  "}"
+                  (required ? "" : ' || ""') +
+                  ")}"
               );
             });
           }
 
-          if (elementsObrigatorio)
+          if (requiredElement)
             jsdoc += "\t* @param {object} elements\n";
           else jsdoc += "\t* @param {object} [elements]\n";
 
@@ -397,37 +1099,66 @@ async function transformarConstructo(arquivo) {
 
           jsdoc += "\t* @param {object} [options]\n";
           jsdoc += "\t* @param {any=} options.identifier\n";
-          jsdoc += "\t* @private\n";
+
           jsdoc += "\t*/\n";
 
-          // agora tenho que transformar o componente em método
-          let retorno =
+          let _return =
+            `/**@private */
+          class ${id}_ extends Winnetou {` +
             jsdoc +
-            id +
-            " = (elements, options) => {" +
+            " constructo = (elements, options) => {" +
             "\n\nlet identifier = this._getIdentifier(options?options.identifier || 'notSet':'notSet');" +
             "\n\nelements = this._test(identifier,'" +
             id +
             "',`" +
             pureId +
             "`,elements);" +
-            "\n\nreturn {code:`" +
+            "let component;" +
+            "let obj = {" +
+            "code(elements) {" +
+            "return `" +
             constructo +
-            "`," +
+            "`" +
+            "}," +
+            `
+            
+          /**
+           * Create Winnetou Constructo        
+           * @param  {string} output The node or list of nodes where the component will be created
+           * @param  {object} [options] Options to control how the construct is inserted. Optional.
+           * @param  {boolean} [options.clear] Clean the node before inserting the construct
+           * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+           */
+            
+            ` +
+            '"create":(output,options) => {' +
+            "this.create(component,output, options);" +
+            "return {" +
             ids +
-            "}}" +
-            " ";
+            "}" +
+            "}" + // create close
+            "}" + // closes let obj
+            "component = obj.code(elements);" +
+            "return obj;" +
+            // -------------------------
+            "}" + // constructo close
+            // ---------------------------
+            "}"; // class close
+          // ---------------------------
 
-          retornoTotal += retorno;
-          constructos.push(`${id}: this.${id}`);
+          finalReturn += _return;
+          constructos.push(
+            `export const ${id} = new ${id}_().constructo;`
+          );
         });
 
         return resolve({
-          method: beautify(retornoTotal, {
+          class: beautify(finalReturn, {
             indent_size: 2,
             space_in_empty_paren: true,
           }),
-          constructosList: constructos,
+          exports: constructos,
+          filePath,
         });
       });
     } catch (e) {
@@ -436,37 +1167,49 @@ async function transformarConstructo(arquivo) {
   });
 }
 
-let promisesCss = [];
-async function mainCss() {
-  if (Config.sass) {
-    recursive(Config.sass, async (err, files) => {
-      console.log("files :>> ", files);
-      files.forEach(file => {
-        promisesCss.push(transpileSass(file));
-      });
-      css();
-    });
-  }
+async function css() {
+  return new Promise((resolve, reject) => {
+    if (Config.sass) {
+      recursive(Config.sass, async (err, files) => {
+        for (let c = 0; c < files.length; c++) {
+          try {
+            promisesCss.push(await transpileSass(files[c]));
+            drawAdd(files[c]);
+          } catch (e) {
+            drawAddError(files[c]);
+            drawText("Sass transpile error.");
+            drawTextBlock(e.message);
+            drawBlankLine();
+          }
+        }
 
-  function css() {
-    if (Config.css) {
-      // vai ler o diretório do css
-      recursive(Config.css, async (err, files) => {
-        files.forEach(file => {
-          promisesCss.push(getData(file));
-        });
-        exec_();
+        css_();
       });
-    } else {
-      exec_();
     }
-  }
+
+    async function css_() {
+      if (Config.css) {
+        recursive(Config.css, async (err, files) => {
+          for (let c = 0; c < files.length; c++) {
+            promisesCss.push(transpileCss(files[c]));
+            drawAdd(files[c]);
+          }
+
+          return resolve(await execPromisesCss());
+        });
+      } else {
+        return resolve(await execPromisesCss());
+      }
+    }
+  });
 }
 
-function exec_() {
-  Promise.all(promisesCss).then(data => {
-    // data contem um array com todo o meu css
-    data.push(`    
+function execPromisesCss() {
+  return new Promise((resolve, reject) => {
+    Promise.all(promisesCss)
+      .then(data => {
+        // data contem um array com todo o meu css
+        data.push(`    
     * {
     -webkit-overflow-scrolling: touch;
       }   
@@ -475,17 +1218,23 @@ function exec_() {
       }                
     `);
 
-    let result = UglifyCss.processString(data.join("\n"));
+        let result = UglifyCss.processString(data.join("\n"));
 
-    fs.outputFile(
-      Config.out + "/bundleWinnetouStyles.min.css",
-      result,
-      function (err) {
-        if (err) {
-        }
-        console.log("CSS and SASS ok");
-      }
-    );
+        fs.outputFile(
+          Config.out + "/winnetouBundle.min.css",
+          result,
+          function (err) {
+            if (err) {
+              Err.e004();
+            }
+            return resolve();
+          }
+        );
+      })
+      .catch(e => {
+        Err.e004();
+        return resolve();
+      });
   });
 }
 
@@ -503,7 +1252,7 @@ async function transpileSass(file) {
   });
 }
 
-async function getData(file) {
+async function transpileCss(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file, function (err, data) {
       if (err) return reject(err);
