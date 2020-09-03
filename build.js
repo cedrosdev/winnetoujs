@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const ncp = require("ncp").ncp;
 var errorsCount = 0,
   warningCount = 0,
   promises = [];
@@ -237,31 +238,14 @@ drawBlankLine();
 
 // COPY METHODS ===============================================
 
-const p1 = path.join(__dirname, "/scaffolding/package.json");
-const p2 = path.join(__dirname, "/scaffolding/wbr.js");
-const p3 = path.join(__dirname, "/scaffolding/win.config.js");
-const dest1 = path.join(__dirname, "../../package.json");
-const dest2 = path.join(__dirname, "../../wbr.js");
-const dest3 = path.join(__dirname, "../../win.config.js");
-
-promises.push(copy(p1, dest1, "package.json"));
-promises.push(copy(p2, dest2, "wbr.js"));
-promises.push(copy(p3, dest3, "win.config.js"));
-
-Promise.all(promises).then(res => {
-  drawFinal();
+//@ts-ignore
+ncp.limit = 16;
+ 
+ncp( path.join(__dirname, "./scaffolding"), path.join(__dirname, "../../"), function (err) {
+ if (err) {
+   return drawError(err);
+ }
+ drawAdd('Scaffolding complete');
+ drawFinal();
 });
 
-// Promisify copies
-
-function copy(origin, destiny, name) {
-  return new Promise((resolve, reject) => {
-    fs.copyFile(origin, destiny, err => {
-      if (err) return reject(err);
-      else {
-        drawAdd(name);
-        return resolve();
-      }
-    });
-  });
-}
