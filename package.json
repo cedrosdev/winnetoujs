@@ -1,8 +1,13 @@
 {
   "name": "winnetoujs",
-  "version": "1.0.11",
+
+  "version": "1.0.12",
+
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
+  "dependencies": {
+    "ncp": "^2.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-fs": "node build.js",
@@ -25,5 +30,5 @@
   "bugs": {
     "url": "https://github.com/cedrosdev/winnetoujs/issues"
   },
-  "homepage": "https://github.com/cedrosdev/winnetoujs#readme"
+  "homepage": "https://winnetoujs.org"
 }
