@@ -1,6 +1,6 @@
 {
   "name": "winnetoujs",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
   "scripts": {
