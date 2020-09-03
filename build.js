@@ -27,7 +27,7 @@ const drawLine = (size = 80) => {
 const drawText = (text = "", params) => {
   let color = "";
 
-  if (params?.color) {
+  if (params && params.color) {
     switch (params.color) {
       case "cyan":
         color = "\x1b[36m";
@@ -65,7 +65,7 @@ const drawText = (text = "", params) => {
 
   let line = "= " + color + text + "\x1b[0m";
 
-  if (params?.type === "add") {
+  if (params && params.type === "add") {
     line =
       "= \x1b[42m\x1b[37m success \x1b[0m " +
       color +
@@ -74,7 +74,7 @@ const drawText = (text = "", params) => {
     text = " success  " + text;
   }
 
-  if (params?.type === "change") {
+  if (params && params.type === "change") {
     line =
       "= \x1b[45m\x1b[37m changed \x1b[0m " +
       color +
@@ -83,7 +83,7 @@ const drawText = (text = "", params) => {
     text = " changed  " + text;
   }
 
-  if (params?.type === "addError") {
+  if (params && params.type === "addError") {
     line =
       "= \x1b[5m\x1b[43m\x1b[37m fail \x1b[0m " +
       color +
@@ -94,7 +94,7 @@ const drawText = (text = "", params) => {
 
   let tamanho = text.length + 2;
 
-  let size = params?.size || 80;
+  let size = params ? params.size || 80 : 80;
 
   for (let i = 0; i < size - tamanho; i++) {
     if (i == size - tamanho - 1) line += "=";
