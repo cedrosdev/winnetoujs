@@ -10,8 +10,10 @@
     "recursive-readdir": "^2.2.2",
     "sass": "^1.26.10",
     "uglifycss": "0.0.29",
-    "xml-parse": "^0.4.0",
-    "winnetoujs": "^1.0.9"
+    "win-animate": "^1.0.5",
+    "win-slidescreen": "^1.0.7",
+    "winnetoujs": "^1.0.13",
+    "xml-parse": "^0.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",

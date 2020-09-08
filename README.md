@@ -1,3 +1,3 @@
 # winnetoujs
 
-The indie javascript constructor
+The indie javascript constructor.

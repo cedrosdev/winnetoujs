@@ -1,16 +1,10 @@
-/**
- * WinnetouJs Base Class
- */
-
-// const Config = require("./win.config.json");
-
 import Config from "../../../win.config.js";
 
-export class Winnetou {
+class Winnetou_ {
   constructor() {
     /**
      * Incrementally id when no specific identifier is given
-     * @protected
+     *
      * @type {number}
      */
     this.constructoId = 0;
@@ -25,7 +19,7 @@ export class Winnetou {
 
     /**
      * List of constructos that are subscribed to the mutable listener
-     * @protected
+     *
      * @type {array}
      */
     this.usingMutable = [];
@@ -118,99 +112,6 @@ export class Winnetou {
     }
   }
 
-  /**
-   * @protected
-   *
-   */
-  _test(identifier, id, pureId, elements) {
-    if (elements) {
-      let retorno = JSON.parse(JSON.stringify(elements));
-      Object.keys(elements).forEach(item => {
-        if (typeof elements[item] === "object") {
-          // é mutable
-          // precisa registrar este constructo para ser alterado
-          // pelo setMutable
-          // não devo usar variáveis e sim localstorage
-          // sabemos que variáveis não são confiáveis
-
-          //atualiza o elements para retornar atualizado
-          let mutable = elements[item].mutable;
-          let val = this.getMutable(mutable) || "";
-
-          // agora tenho que salvar o constructo
-          if (!this.usingMutable[elements[item].mutable])
-            this.usingMutable[elements[item].mutable] = [];
-
-          let obj = {
-            identifier,
-            id,
-            pureId,
-            elements,
-          };
-
-          // apenas faz o push caso o pureId ainda não exista
-
-          if (
-            this.usingMutable[elements[item].mutable].filter(
-              x => x.pureId == pureId
-            ).length > 0
-          ) {
-            // do nothing
-          } else {
-            this.usingMutable[elements[item].mutable].push(obj);
-          }
-
-          retorno[item] = val;
-        }
-      });
-
-      return retorno;
-    } else {
-      return elements;
-    }
-  }
-
-  /**
-   * @protected
-   * @param  {string=} identifier
-   */
-  _getIdentifier(identifier) {
-    if (identifier != "notSet") return identifier;
-    else return ++this.constructoId;
-  }
-
-  /**
-   * Create Winnetou Constructo
-   * @param  {string} component The component to be inserted
-   * @param  {string} output The node or list of nodes where the component will be created
-   * @param  {object} [options] Options to control how the construct is inserted. Optional.
-   * @param  {boolean} [options.clear] Clean the node before inserting the construct
-   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
-   */
-  create(component, output, options) {
-    let frag = document
-      .createRange()
-      .createContextualFragment(component);
-
-    let el = document.querySelectorAll(output);
-
-    /**
-     * Isso para não precisar
-     * usar o # quando se tem o id
-     */
-    if (el.length === 0) {
-      el = document.querySelectorAll("#" + output);
-    }
-
-    el.forEach(item => {
-      // options
-      if (options && options.clear) item.innerHTML = "";
-      // @ts-ignore
-      if (options && options.reverse) item.prependChild(frag);
-      else item.appendChild(frag);
-    });
-  }
-
   destroy(component) {
     try {
       this.select(component).remove();
@@ -233,17 +134,27 @@ export class Winnetou {
     }
 
     if (this.usingMutable[mutable]) {
+      /**
+       * if the mutable has constructos
+       * copy array to tmpArr
+       */
       let tmpArr = this.usingMutable[mutable];
 
       this.usingMutable[mutable] = [];
 
       tmpArr.forEach(item => {
+        /**
+         * go through the tmpArr to handle constructos
+         */
         let old_ = document.getElementById(item.pureId);
 
+        let a = new item.method().constructo;
+
         let new_ = document.createRange().createContextualFragment(
-          this[item.id](item.elements, {
-            identifier: item.identifier,
-          }).code
+          // this[item.id](item.elements, {
+          //   identifier: item.identifier,
+          // }).code
+          a(item.elements).constructoString()
         );
 
         this.replace(new_, old_);
@@ -284,11 +195,13 @@ export class Winnetou {
 
     const obj = {
       /**
-       * @param {string} selector
+       * @param {any} selector
        */
       getEl(selector) {
         if (el) return el;
-        else {
+        if (typeof selector == "object") {
+          return [selector];
+        } else {
           //
           if (selector.includes(" ")) {
             return document.querySelectorAll(selector);
@@ -356,6 +269,7 @@ export class Winnetou {
         return this;
       },
       /**
+       * Changes the css of constructo or DOM component
        * @param {string | number} property
        * @param {string | number} value
        */
@@ -550,7 +464,7 @@ export class Winnetou {
 
         let correctMatch = true;
         let paramStore = [];
-        for (let j = 1; j < root.length; j++) {
+        for (let j = 0; j < root.length; j++) {
           if (root[j] !== splittedUrl[j]) {
             correctMatch = false;
             if (root[j].includes(":")) {
@@ -600,7 +514,7 @@ export class Winnetou {
    * Method for handle events
    * @param  {string} eventName
    * @param  {string} elementSelector
-   * @param  {function} handler
+   * @param  {object} handler
    */
   on(eventName, elementSelector, handler) {
     // Todo:
@@ -614,11 +528,7 @@ export class Winnetou {
     );
 
     if (test.length > 0) {
-      // console.log(
-      //   `O evento global << ${eventName} >> já foi declarado para o objeto << ${elementSelector} >>, para evitar duplicações use o mesmo bloco de código para implementar novas funções, se for o caso.`,
-      //   "\n\n",
-      //   "Chamada de função:\n" + handler
-      // );
+      // dispara novamente o addEventListener
       return;
     }
     this.storedEvents.push({
@@ -628,18 +538,18 @@ export class Winnetou {
     });
 
     function eventHandler(e) {
-      for (
-        var target = e.target;
-        target && target != this;
-        // @ts-ignore
-        target = target.parentNode
-      ) {
-        // @ts-ignore
-        if (target.matches(elementSelector)) {
-          handler(target);
-          break;
+      // @ts-ignore
+      if (!e.target.matches(elementSelector)) {
+        let elementSelectorId = "#" + elementSelector;
+        try {
+          if (!e.target.matches(elementSelectorId)) {
+            return;
+          }
+        } catch (e) {
+          return;
         }
       }
+      handler(e.target);
     }
 
     document.addEventListener(eventName, eventHandler);
@@ -664,12 +574,10 @@ export class Winnetou {
    * @param next_ callback to app start.
    */
 
-  async lang(instance, next_) {
+  async lang(class_, next_) {
     if (!window.localStorage.getItem("lang")) return next_();
 
-    let This = instance;
-
-    
+    let This = class_;
 
     /**
      * O problema do fetch é que ele precisa saber o caminho relativo para poder obter as informações do config, porém neste ponto ainda não sabemos o caminho relativo, pois também é uma variável do config.
@@ -719,14 +627,14 @@ export class Winnetou {
           frases.forEach(item => {
             if (item.nodeName != "#text") {
               This[item.nodeName] = item.textContent;
-              
             }
           });
         } catch (e) {
           console.log(
             "O arquivo de tradução ",
             `${Config.folderName}/translations/${defaultLang}.xml`,
-            " parece estar vazio ou incorreto.",e.message
+            " parece estar vazio ou incorreto.",
+            e.message
           );
         }
 
@@ -764,6 +672,4 @@ export class Winnetou {
   }
 }
 
-export const W = new Winnetou();
-
-
+export const Winnetou = new Winnetou_();
