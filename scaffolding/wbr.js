@@ -16,27 +16,6 @@
  *
  */
 
-/**
- * Todo:
- *
- * ==> quando define algo no win.config.js e
- *      a pasta não existe
- *      acontece um erro, tem que tratar
- *      esses error
- * ==> [ok] icons ainda não é promise.all
- * ==> [ok] webpack option, usar webpack na chamada?
- * ==> Configuração de saída
- *    --> targets
- * ==> Poder importar do win.config.js as configs
- *      para o webpack
- * ==> map
- * ==> script loads if necessary
- * https://webpack.js.org/guides/lazy-loading/
- * vou usar isso, importantíssimo
- * https://dzone.com/articles/lazy-loading-es2015-modules-in-the-browser
- * https://webpack.js.org/guides/code-splitting/
- */
-
 // REQUIRES ====================================================
 
 const fs = require("fs-extra");
@@ -361,6 +340,7 @@ async function webpackBundleRelease() {
       publicPath: path.join(Config.out, "/"),
     },
     mode: "production",
+    devtool: "source-map",
     module: {
       rules: [
         {
@@ -395,8 +375,21 @@ async function webpackBundleRelease() {
     },
   });
 
+  drawText("Initializing webpack winnetou bundle, please wait.");
+  drawBlankLine();
+
   compiler.run((e, s) => {
-    console.log(e, s.compilation.errors, s.compilation.warnings);
+    if (e) {
+      drawError(e.message);
+    }
+    if (s.compilation.errors.length > 0) {
+      drawError(s.compilation.errors.toString());
+    }
+    if (s.compilation.warnings.length > 0) {
+      drawWarning(s.compilation.warnings.toString());
+    }
+    drawAdd("Bundle Release Finished");
+    drawFinal();
   });
 }
 
@@ -547,7 +540,14 @@ async function constructos(name) {
     const constructosPath = Config.constructosPath;
 
     recursive(constructosPath, async (err, files) => {
+      if (err) {
+        drawError(err.message);
+      }
       recursive("./node_modules", async (err2, files2) => {
+        if (err2) {
+          drawError(err2.message);
+          return resolve();
+        }
         files2 = files2
           .filter(x => x.includes("win-"))
           .filter(x => x.includes(".htm") || x.includes(".html"));
@@ -595,7 +595,11 @@ function execPromisesConstructos() {
       for (let c = 0; c < data.length; c++) {
         let item = data[c];
 
-        let out = `import { Winnetou } from "../../node_modules/winnetoujs/src/winnetou.js";\n\n`;
+        let out = `
+        import { Winnetou } from "../../node_modules/winnetoujs/src/winnetou.js";
+        import { Constructos } from "../../node_modules/winnetoujs/src/constructos.js";
+
+        \n\n`;
         out += item.class;
         out += "\n\n";
         out += item.exports.join("\n");
@@ -637,36 +641,40 @@ function watchFiles() {
   if (Config.defaultLang) {
     // lang watcher
 
-    // @ts-ignore
-    watch(`./translations`, { recursive: true }, async function (
-      evt,
-      name
-    ) {
-      refresh(name);
-      await translate();
-      time();
-      drawFinal();
-    });
+    try {
+      // @ts-ignore
+      watch(`./translations`, { recursive: true }, async function (
+        evt,
+        name
+      ) {
+        refresh(name);
+        await translate();
+        time();
+        drawFinal();
+      });
+    } catch (e) {}
   }
 
   if (Config.constructosPath) {
     // constructors watcher
 
-    // @ts-ignore
-    watch(
-      Config.constructosPath,
-      { recursive: true },
-      async function (evt, name) {
-        if (transpileComplete && transpileIconsComplete) {
-          transpileComplete = false;
+    try {
+      // @ts-ignore
+      watch(
+        Config.constructosPath,
+        { recursive: true },
+        async function (evt, name) {
+          if (transpileComplete && transpileIconsComplete) {
+            transpileComplete = false;
 
-          refresh(name);
-          await constructos(name);
-          time();
-          drawFinal();
+            refresh(name);
+            await constructos(name);
+            time();
+            drawFinal();
+          }
         }
-      }
-    );
+      );
+    } catch (e) {}
   }
 
   if (Config.icons || Config.coloredIcons) {
@@ -676,16 +684,18 @@ function watchFiles() {
     if (Config.icons) folders.push(Config.icons);
     if (Config.coloredIcons) folders.push(Config.coloredIcons);
 
-    // @ts-ignore
-    watch(folders, { recursive: true }, async function (evt, name) {
-      refresh(name);
-      transpileComplete = false;
-      transpileIconsComplete = false;
-      await icons();
-      await constructos();
-      time();
-      drawFinal();
-    });
+    try {
+      // @ts-ignore
+      watch(folders, { recursive: true }, async function (evt, name) {
+        refresh(name);
+        transpileComplete = false;
+        transpileIconsComplete = false;
+        await icons();
+        await constructos();
+        time();
+        drawFinal();
+      });
+    } catch (e) {}
   }
 
   if (Config.sass || Config.css) {
@@ -695,13 +705,15 @@ function watchFiles() {
     if (Config.sass) folders.push(Config.sass);
     if (Config.css) folders.push(Config.css);
 
-    // @ts-ignore
-    watch(folders, { recursive: true }, async function (evt, name) {
-      refresh(name);
-      await css();
-      time();
-      drawFinal();
-    });
+    try {
+      // @ts-ignore
+      watch(folders, { recursive: true }, async function (evt, name) {
+        refresh(name);
+        await css();
+        time();
+        drawFinal();
+      });
+    } catch (e) {}
   }
 }
 
@@ -743,12 +755,15 @@ async function icons() {
     let constructoIcons = "";
 
     const iconsPath = Config.icons;
+    let files;
 
     if (iconsPath) {
-      let files = await recursive(iconsPath);
-
-      // aqui tenho o path do icone
-      // preciso saber das subpastas
+      try {
+        files = await recursive(iconsPath);
+      } catch (e) {
+        drawError(e.message);
+        return resolve();
+      }
 
       for (let c = 0; c < files.length; c++) {
         promisesIcons.push(transpileIcon(files[c]));
@@ -928,6 +943,10 @@ async function translate() {
       `${folderName}/${Config.defaultLang}.xml`,
       "utf-8",
       function (err, data) {
+        if (err) {
+          drawError(err.message);
+          return resolve();
+        }
         let trad = xml.parse(data)[0].childNodes;
 
         trad.forEach(item => {
@@ -945,7 +964,7 @@ async function translate() {
 
         let res = `
         
-          this.strings = {
+        Winnetou.strings = {
             ${strings}
           }
         
@@ -953,19 +972,15 @@ async function translate() {
 
         let resFinal = `
         import { Winnetou } from "../node_modules/winnetoujs/src/winnetou.js";
-        class Strings_ extends Winnetou{
-          constructor(){
-            super();
+       
             ${res}
-          }
-        }
-        const S=new Strings_();
+          
 
         /**
          * Object containing the strings taken from the translation file${jsdoc}
         */
         // @ts-ignore
-        export const Strings = S.strings;
+        export const Strings =  Winnetou.strings;
 
         `;
 
@@ -1083,7 +1098,7 @@ async function transpileConstructo(filePath) {
 
               constructo = constructo.replace(
                 new RegExp(escapedString, "g"),
-                "${(elements?." +
+                "${(elements_?." +
                   el +
                   (required ? "" : ' || ""') +
                   ")}"
@@ -1104,18 +1119,14 @@ async function transpileConstructo(filePath) {
 
           let _return =
             `/**@private */
-          class ${id}_ extends Winnetou {` +
+          class ${id}_ extends Constructos {` +
             jsdoc +
             " constructo = (elements, options) => {" +
             "\n\nlet identifier = this._getIdentifier(options?options.identifier || 'notSet':'notSet');" +
-            "\n\nelements = this._test(identifier,'" +
-            id +
-            "',`" +
-            pureId +
-            "`,elements);" +
+            "\n\nlet elementsToString = this._mutableToString(elements);" +
             "let component;" +
             "let obj = {" +
-            "code(elements) {" +
+            "code(elements_) {" +
             "return `" +
             constructo +
             "`" +
@@ -1135,10 +1146,21 @@ async function transpileConstructo(filePath) {
             "this.create(component,output, options);" +
             "return {" +
             ids +
+            "code: obj.code(elementsToString)," +
             "}" +
             "}" + // create close
+            ",constructoString: () => obj.code(elementsToString)" +
             "}" + // closes let obj
-            "component = obj.code(elements);" +
+            "component = obj.code(elementsToString);" +
+            " this._saveUsingMutable(\
+              `" +
+            pureId +
+            "`,\
+              elements,\
+              " +
+            id +
+            "_\
+            );" +
             "return obj;" +
             // -------------------------
             "}" + // constructo close
@@ -1171,6 +1193,11 @@ async function css() {
   return new Promise((resolve, reject) => {
     if (Config.sass) {
       recursive(Config.sass, async (err, files) => {
+        if (err) {
+          drawError(err.message);
+          css_();
+          return;
+        }
         for (let c = 0; c < files.length; c++) {
           try {
             promisesCss.push(await transpileSass(files[c]));
@@ -1190,6 +1217,10 @@ async function css() {
     async function css_() {
       if (Config.css) {
         recursive(Config.css, async (err, files) => {
+          if (err) {
+            drawError(err.message);
+            return resolve();
+          }
           for (let c = 0; c < files.length; c++) {
             promisesCss.push(transpileCss(files[c]));
             drawAdd(files[c]);
