@@ -5,6 +5,5 @@ export default {
   out: "./release",
   folderName: "/",
   sass: "./sass",
-  icons: "./icons",
   defaultLang: "en-us",
 };
