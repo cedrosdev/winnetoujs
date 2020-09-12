@@ -101,10 +101,10 @@ Pull requests are welcome
 
 * **Kaue Sedrez** - *Initial work* - [GitHub](https://github.com/kauesedrez)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/cedrosdev/winnetoujs/contributors) who participated in this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/cedrosdev/winnetoujs/LICENSE.md) file for details
 
 
