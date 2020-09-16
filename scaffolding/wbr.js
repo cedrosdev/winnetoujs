@@ -301,7 +301,7 @@ const drawEnd = text => {
 const drawFinal = () => {
   drawLine();
   drawBlankLine();
-  drawText("All tasks completed");
+  drawText("All tasks completed.");
   drawBlankLine();
   if (errorsCount > 0) {
     drawText("... with " + errorsCount + " errors");
@@ -470,6 +470,11 @@ const Err = {
       "Error Code: 004\n" + `Fatal error when creating the css bundle`
     );
   },
+  e005() {
+    drawError(
+      "Error Code: 005\n" + `The constructos folder does not exists`
+    );
+  },
 };
 
 function configTest() {
@@ -478,6 +483,38 @@ function configTest() {
       "win.config.js misconfigured. Not found 'out' parameter. Using default './release'"
     );
     Config.out = "./release";
+  }
+
+  if (!Config.constructosPath) {
+    drawWarning(
+      "win.config.js misconfigured. Not found 'constructosPath' parameter. Using default './constructos'"
+    );
+    Config.constructosPath = "./constructos";
+  }
+
+  if (!Config.constructosOut) {
+    drawWarning(
+      "win.config.js misconfigured. Not found 'constructosOut' parameter. Using default './js/constructos'"
+    );
+    Config.constructosOut = "./js/constructos";
+  }
+
+  if (!Config.folderName) {
+    drawWarning(
+      "win.config.js misconfigured. Not found 'folderName' parameter. Using default '/'"
+    );
+    Config.folderName = "/";
+  }
+
+  if (!Config.entry) {
+    drawWarning(
+      "win.config.js misconfigured. Not found 'entry' parameter. Using default './js/app.js'"
+    );
+    Config.entry = "./js/app.js";
+  }
+
+  if (!fs.existsSync(Config.constructosPath)) {
+    Err.e005();
   }
 }
 
@@ -498,6 +535,7 @@ async function config() {
     } catch (e) {
       Config = {
         constructosPath: "./constructos",
+        constructosOut: "./js/constructos",
         entry: "./js/app.js",
         out: "./release",
         folderName: "/",
@@ -930,11 +968,7 @@ async function translate() {
     }
 
     // if (Config.folderName === "/") Config.folderName = "";
-    let folderName = path.join(
-      __dirname,
-      Config.folderName,
-      "/translations"
-    );
+    let folderName = path.join(__dirname, "/translations");
 
     let strings = "";
     let jsdoc = "";
@@ -964,24 +998,15 @@ async function translate() {
 
         let res = `
         
-        Winnetou.strings = {
+        export default Winnetou.strings = {
             ${strings}
           }
         
         `;
 
         let resFinal = `
-        import { Winnetou } from "../node_modules/winnetoujs/src/winnetou.js";
-       
-            ${res}
-          
-
-        /**
-         * Object containing the strings taken from the translation file${jsdoc}
-        */
-        // @ts-ignore
-        export const Strings =  Winnetou.strings;
-
+        import { Winnetou } from "../node_modules/winnetoujs/src/winnetou.js";       
+        ${res}
         `;
 
         fs.outputFile(

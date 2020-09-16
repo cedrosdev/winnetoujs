@@ -52,9 +52,6 @@ class Winnetou_ {
     /**@type {object} */
     this.strings = {};
 
-    /**
-     * POPSTATE NATIVO
-     */
     document.addEventListener("keydown", event => {
       if (event.which === 27) {
         history.go(-1);
@@ -94,10 +91,6 @@ class Winnetou_ {
       //   : null;
     }
 
-    /**
-     * TEMAS
-     */
-
     let theme = window.localStorage.getItem("theme");
     if (theme) {
       theme = JSON.parse(theme);
@@ -105,18 +98,7 @@ class Winnetou_ {
       Object.keys(theme).forEach(function (item) {
         root.style.setProperty(item, theme[item]);
       });
-
-      // tema alterado carregado
     } else {
-      // tema default carregado
-    }
-  }
-
-  destroy(component) {
-    try {
-      this.select(component).remove();
-    } catch (e) {
-      // throw winnetou error
     }
   }
 
@@ -150,12 +132,11 @@ class Winnetou_ {
 
         let a = new item.method().constructo;
 
-        let new_ = document.createRange().createContextualFragment(
-          // this[item.id](item.elements, {
-          //   identifier: item.identifier,
-          // }).code
-          a(item.elements).constructoString()
-        );
+        let new_ = document
+          .createRange()
+          .createContextualFragment(
+            a(item.elements).constructoString()
+          );
 
         this.replace(new_, old_);
       });
@@ -237,76 +218,115 @@ class Winnetou_ {
           }
         }
       },
+      /**
+       * remove constructo from the DOM
+       */
       remove() {
         el.forEach(item => {
           item.remove();
         });
+
         return this;
       },
-      html(texto) {
+      /**
+       * set inner html of constructo
+       * @param {string} htmlContentString the html string to be inserted
+       */
+      html(htmlContentString) {
         el.forEach(item => {
-          item.innerHTML = texto;
+          item.innerHTML = htmlContentString;
         });
         return this;
       },
+      /**
+       * get the inner html of constructo
+       */
       getHtml() {
         return el[0].innerHTML;
       },
+      /**
+       * get inner text of constructo
+       */
       getText() {
         return el[0].textContent;
       },
-      append(texto) {
+      /**
+       * append html to the end of constructo's html
+       * @param {string} htmlContentString the html string to be inserted
+       */
+      append(htmlContentString) {
         el.forEach(item => {
-          item.innerHTML += texto;
+          item.innerHTML += htmlContentString;
         });
         return this;
       },
-      prepend(texto) {
+      /**
+       * prepend html to the start of constructo's html
+       * @param {string} htmlContentString the html string to be inserted
+       */
+      prepend(htmlContentString) {
         // el.innerHTML = texto + el.innerHTML;
         el.forEach(item => {
-          item.innerHTML = texto + item.innerHTML;
+          item.innerHTML = htmlContentString + item.innerHTML;
         });
         return this;
       },
       /**
        * Changes the css of constructo or DOM component
-       * @param {string | number} property
-       * @param {string | number} value
+       * @tutorial https://www.w3schools.com/JSREF/dom_obj_style.asp
+       * @param {string | number} property The Style object represents an individual style statement.
+       * @param {string | number} value The value. If it is a number, winnetou will assume that it's a short hand to 'px'.
        */
       css(property, value) {
+        let valueString = value;
         el.forEach(item => {
-          try {
-            // @ts-ignore
-            if (typeof value == "number") value += "px";
-            item.style[property] = value;
-          } catch (e) {}
+          if (typeof value == "number") valueString = value + "px";
+          item.style[property] = valueString;
         });
         return this;
       },
-      toggleClass(classe) {
+      /**
+       * Add the class if not added yet, remove the class if already added.
+       * @param {string} className name of class
+       */
+      toggleClass(className) {
         el.forEach(item => {
-          item.classList.toggle(classe);
+          item.classList.toggle(className);
         });
         return this;
       },
-      addClass(classe) {
+      /**
+       * Add a class
+       * @param {string} className name of class
+       */
+      addClass(className) {
         el.forEach(item => {
-          item.classList.add(classe);
+          item.classList.add(className);
         });
         return this;
       },
-      removeClass(classe) {
+      /**
+       * Removes a class
+       * @param {string} className name of class
+       */
+      removeClass(className) {
         el.forEach(item => {
-          item.classList.remove(classe);
+          item.classList.remove(className);
         });
         return this;
       },
+      /**
+       * Hide a constructo
+       */
       hide() {
         el.forEach(item => {
           item.classList.add("winnetou_display_none");
         });
         return this;
       },
+      /**
+       * Show a constructo
+       */
       show() {
         el.forEach(item => {
           item.classList.remove("winnetou_display_none");
@@ -317,24 +337,46 @@ class Winnetou_ {
         });
         return this;
       },
+      /**
+       * Get width of a constructo
+       */
       getWidth() {
         return el[0].getBoundingClientRect().width;
       },
+      /**
+       * Get height of a constructo
+       */
       getHeight() {
         return el[0].getBoundingClientRect().height;
       },
+      /**
+       * Get left of a constructo
+       */
       getLeft() {
         return el[0].offsetLeft;
       },
+      /**
+       * Get top of a constructo
+       */
       getTop() {
         return el[0].offsetTop;
       },
+      /**
+       * Get global position of a constructo
+       */
       getGlobalPosition() {
         return el[0].getBoundingClientRect();
       },
+      /**
+       * Get value of a constructo
+       */
       getVal() {
         return el[0].value;
       },
+      /**
+       * Sets a value to a constructo, also fire a change event
+       * @param {string} value The value.
+       */
       setVal(value) {
         el.forEach(item => {
           item.value = value;
@@ -346,18 +388,33 @@ class Winnetou_ {
         });
         return this;
       },
+      /**
+       * Sets an attr to a constructo
+       * @param  {string} attr name of attribute
+       * @param  {string} value the values
+       */
       setAttr(attr, value) {
         el.forEach(item => {
           item.setAttribute(attr, value);
         });
         return this;
       },
+      /**
+       * Gets the attr
+       * @param  {string} attr attribute name
+       */
       getAttr(attr) {
         return el[0].getAttribute(attr);
       },
+      /**
+       * Returns checked property of a constructo
+       */
       isChecked() {
         return el[0].checked;
       },
+      /**
+       * Gets the file of a constructo
+       */
       getFile() {
         return el[0].files[0];
       },
@@ -450,7 +507,6 @@ class Winnetou_ {
       let splittedUrl = url.split("/");
       let size = splittedUrl.length;
 
-      // vai verificar nas paramRoutes quais tem size == 2 e comparar
       let filter = this.paramRoutes.filter(
         data => data.size === size
       );
@@ -473,8 +529,6 @@ class Winnetou_ {
             } else {
               correctMatch = false;
               break;
-              // aqui ja deveria interromper o for J
-              // pois nao pode ter nenhum correctMatch false
             }
           }
         }
@@ -497,7 +551,12 @@ class Winnetou_ {
     try {
       this.routes["/404"]();
     } catch (e) {
-      document.write("Not Found");
+      this.select("body").prepend(`
+      
+      <p onclick="Winnetou.select('.winnetouNotFoundDefault').hide()" style="width:100%;padding:15px;color:white;background-color:red;cursor:pointer;" class='winnetouNotFoundDefault'>
+        Page not found. Click to close.
+      </p>
+      `);
     }
   }
 
@@ -512,14 +571,11 @@ class Winnetou_ {
 
   /**
    * Method for handle events
-   * @param  {string} eventName
-   * @param  {string} elementSelector
-   * @param  {object} handler
+   * @param  {string} eventName Name of event, eg. "keyup"
+   * @param  {string} elementSelector DOM selector, id, class or tag
+   * @param  {object} handler, function to be called when trigger event, eg. e=>{}
    */
   on(eventName, elementSelector, handler) {
-    // Todo:
-    // dá para dar um JSON.stringify aqui e guardar a função
-
     let test = this.storedEvents.filter(
       data =>
         data.eventName === eventName &&
@@ -528,7 +584,6 @@ class Winnetou_ {
     );
 
     if (test.length > 0) {
-      // dispara novamente o addEventListener
       return;
     }
     this.storedEvents.push({
@@ -555,6 +610,8 @@ class Winnetou_ {
     document.addEventListener(eventName, eventHandler);
   }
   /**
+   * On touch devices sets event handler to touchstart
+   * fallbacks to click
    * @param  {string} selector
    * @param  {function} callback
    */
@@ -579,22 +636,6 @@ class Winnetou_ {
 
     let This = class_;
 
-    /**
-     * O problema do fetch é que ele precisa saber o caminho relativo para poder obter as informações do config, porém neste ponto ainda não sabemos o caminho relativo, pois também é uma variável do config.
-     * Preciso de uma forma eficiênte de ler a configuração
-     * o WBR, winnetouBase e webpack.js irão ler este arquivo
-     * na verdade o webpack deve ser um comando dentro do wbr
-     * COMO PASSAR PARÂMETROS VIA LINHA DE COMANDO PARA UM SCRIPT NODEJS?
-     * Então vão ser o wbr e o _winnetouBase.js que irão ler as configs.
-     * É muita incongruência entre o node e o browser
-     * isso não era pra acontecer. ¬¬
-     * so se eu tivesse dois arquivos de configuração distintos, muita mão
-     */
-
-    // let Config = await fetch("./js/win.config.json").then(res =>
-    //   res.json()
-    // );
-
     if (!Config?.folderName) {
       console.error(
         "WinnetouJs Translation Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
@@ -613,9 +654,9 @@ class Winnetou_ {
     xhttp.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 404) {
         console.log(
-          "\nO arquivo ",
+          "\nThe file ",
           `${Config.folderName}/translations/${defaultLang}.xml`,
-          "não foi encontrado"
+          "are not found"
         );
       }
 
@@ -631,9 +672,9 @@ class Winnetou_ {
           });
         } catch (e) {
           console.log(
-            "O arquivo de tradução ",
+            "The translation file ",
             `${Config.folderName}/translations/${defaultLang}.xml`,
-            " parece estar vazio ou incorreto.",
+            " seens to be empty or incorrect.",
             e.message
           );
         }
