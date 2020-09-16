@@ -6,13 +6,6 @@ export class Constructos {
       let retorno = JSON.parse(JSON.stringify(elements));
       Object.keys(elements).forEach(item => {
         if (typeof elements[item] === "object") {
-          // é mutable
-          // precisa registrar este constructo para ser alterado
-          // pelo setMutable
-          // não devo usar variáveis e sim localstorage
-          // sabemos que variáveis não são confiáveis
-
-          //atualiza o elements para retornar atualizado
           let mutable = elements[item].mutable;
           let val =
             Winnetou.getMutable(mutable) ||
@@ -43,8 +36,6 @@ export class Constructos {
             elements,
             method,
           };
-
-          // apenas faz o push caso o pureId ainda não exista
 
           if (
             Winnetou.usingMutable[elements[item].mutable].filter(
@@ -104,10 +95,6 @@ export class Constructos {
 
       let el = document.querySelectorAll(output);
 
-      /**
-       * Isso para não precisar
-       * usar o # quando se tem o id
-       */
       if (el.length === 0) {
         el = document.querySelectorAll("#" + output);
       }
