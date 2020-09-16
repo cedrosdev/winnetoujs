@@ -28,7 +28,7 @@ The basis of a Winnetou application are the constructos, which are html files wh
 ```javascript
 
 import { h1 } from "./constructos/componentsTest.js";
-h1({ text: "Welcomo to your first WinnetouJs App" }).create("#app");
+h1({ text: "Welcome to your first WinnetouJs App" }).create("#app");
 
 ```
 
@@ -51,6 +51,13 @@ After you have the latest version of the node and npm properly installed, instal
 ```
 npm i winnetoujs
 ```
+
+You can add WinnetouJs to an existing project. To do this, copy the updated wbr to your main folder from "node_modules / winnetoujs". To start a new project use winnetou scaffolding with the command below:
+
+```
+node ./node_modules/winnetoujs/build
+```
+
 The node will create the basic skeleton of a WinnetouJs web application automatically. We warn you to start a winnetoujs project in an empty folder as this process can overwrite pre-existing files.
 
 Now install the Winnetou dependencies.
