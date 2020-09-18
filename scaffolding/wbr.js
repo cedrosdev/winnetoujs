@@ -401,7 +401,12 @@ async function webpackBundleRelease() {
  */
 function readFileCache(filePath) {
   return new Promise((resolve, reject) => {
-    let lastMod = fs.statSync(filePath).mtime.toString();
+    let lastMod;
+    try {
+      lastMod = fs.statSync(filePath).mtime.toString();
+    } catch (e) {
+      return reject(e);
+    }
 
     if (fileCache[filePath]) {
       // exists
@@ -565,11 +570,22 @@ async function initializer() {
   drawFinal();
 
   watchFiles();
+
+  // check constructos integrity in background
+  constructosIntegrity();
 }
 
 async function constructos(name) {
   return new Promise(async (resolve, reject) => {
     if (name) {
+      // test if file name exists
+      if (!fs.existsSync(name)) {
+        drawWarning(`File ${name} deleted.`);
+        drawFinal();
+        // check constructos integrity in background
+        constructosIntegrity();
+        return;
+      }
       promisesConstructos.push(transpileConstructo(name));
       drawAdd(name);
       return resolve(await execPromisesConstructos());
@@ -662,6 +678,57 @@ function execPromisesConstructos() {
       return resolve();
     });
   });
+}
+
+function constructosIntegrity() {
+  /**
+   * Will read all constructos in folder and node_modules
+   * and compares with output js to delete obsoletes.
+   */
+
+  const constructosPath = Config.constructosPath;
+  const constructosOut = Config.constructosOut;
+
+  recursive(constructosPath, async (err, files) => {
+    if (err) {
+      drawError(err.message);
+    }
+    recursive("./node_modules", async (err2, files2) => {
+      if (err2) files2 = [];
+      files2 = files2
+        .filter(x => x.includes("win-"))
+        .filter(x => x.includes(".htm") || x.includes(".html"));
+
+      if (files2.length > 0) {
+        try {
+          files = files.concat(files2);
+        } catch (e) {
+          console.log("e :>> ", e);
+        }
+      }
+
+      files = files.map(x => path.parse(x).name);
+
+      recursive(constructosOut, async (err3, jsFiles) => {
+        jsFiles = jsFiles.map(x => path.parse(x).name);
+
+        let diff = diffArray(files, jsFiles);
+
+        diff = diff.map(x =>
+          path.join("./", constructosOut, x + ".js")
+        );
+
+        diff.forEach(item => {
+          fs.unlink(item, e => {});
+        });
+      });
+    });
+  });
+}
+function diffArray(arr1, arr2) {
+  return arr1
+    .concat(arr2)
+    .filter(val => !(arr1.includes(val) && arr2.includes(val)));
 }
 
 function watchFiles() {
