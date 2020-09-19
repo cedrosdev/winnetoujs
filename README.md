@@ -52,7 +52,9 @@ After you have the latest version of the node and npm properly installed, instal
 npm i winnetoujs
 ```
 
-You can add WinnetouJs to an existing project. To do this, copy the updated wbr to your main folder from "node_modules / winnetoujs". To start a new project use winnetou scaffolding with the command below:
+If you are creating a new project and node_modules folder and wbr.js don't show up, run `npm init -y` and try again.
+
+You can add WinnetouJs to an existing project. To start a new project use winnetou scaffolding with the command below:
 
 ```
 node ./node_modules/winnetoujs/build
