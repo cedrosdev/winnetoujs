@@ -593,18 +593,28 @@ class Winnetou_ {
     });
 
     function eventHandler(e) {
+      let elementSelectorId = "#" + elementSelector;
       // @ts-ignore
-      if (!e.target.matches(elementSelector)) {
-        let elementSelectorId = "#" + elementSelector;
+      if (!e.target.closest(elementSelector)) {
         try {
-          if (!e.target.matches(elementSelectorId)) {
+          if (!e.target.closest(elementSelectorId)) {
             return;
           }
         } catch (e) {
           return;
         }
       }
-      handler(e.target);
+      console.log("e.path :>> ", e.target, e.path, elementSelector);
+
+      e.path.forEach(item => {
+        try {
+          if (item.matches(elementSelector)) {
+            handler(item);
+          } else if (item.matches(elementSelectorId)) {
+            handler(item);
+          }
+        } catch (e) {}
+      });
     }
 
     document.addEventListener(eventName, eventHandler);
