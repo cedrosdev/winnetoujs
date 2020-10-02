@@ -604,7 +604,6 @@ class Winnetou_ {
           return;
         }
       }
-      console.log("e.path :>> ", e.target, e.path, elementSelector);
 
       e.path.forEach(item => {
         try {

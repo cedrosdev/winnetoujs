@@ -1228,7 +1228,7 @@ async function transpileConstructo(filePath) {
             
           /**
            * Create Winnetou Constructo        
-           * @param  {string} output The node or list of nodes where the component will be created
+           * @param  {object|string} output The node or list of nodes where the component will be created
            * @param  {object} [options] Options to control how the construct is inserted. Optional.
            * @param  {boolean} [options.clear] Clean the node before inserting the construct
            * @param  {boolean} [options.reverse] Place the construct in front of other constructs
