@@ -725,6 +725,7 @@ function constructosIntegrity() {
     });
   });
 }
+
 function diffArray(arr1, arr2) {
   return arr1
     .concat(arr2)
@@ -1231,6 +1232,7 @@ async function transpileConstructo(filePath) {
            * @param  {object} [options] Options to control how the construct is inserted. Optional.
            * @param  {boolean} [options.clear] Clean the node before inserting the construct
            * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+           * @param {object} [options.vdom] Winnetou.vdom() fragment
            */
             
             ` +

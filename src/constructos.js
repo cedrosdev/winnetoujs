@@ -63,10 +63,11 @@ export class Constructos {
   /**
    * Create Winnetou Constructo
    * @param  {string} component The component to be inserted
-   * @param  {string} output The node or list of nodes where the component will be created
+   * @param  {string | object} output The node or list of nodes where the component will be created
    * @param  {object} [options] Options to control how the construct is inserted. Optional.
    * @param  {boolean} [options.clear] Clean the node before inserting the construct
    * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   * @param {object} [options.vdom] Winnetou.vdom() fragment
    */
 
   create(component, output, options) {
@@ -93,21 +94,40 @@ export class Constructos {
         .createRange()
         .createContextualFragment(component);
 
-      let el = document.querySelectorAll(output);
+      if (typeof output !== "object") {
+        let el;
 
-      if (el.length === 0) {
-        el = document.querySelectorAll("#" + output);
-      }
+        if (options && options.vdom) {
+          el = options.vdom.querySelectorAll(output);
 
-      el.forEach(item => {
-        // options
-        if (options && options.clear) item.innerHTML = "";
-        // @ts-ignore
-        if (options && options.reverse) item.prepend(frag);
-        else {
-          item.appendChild(frag);
+          if (el.length === 0) {
+            el = options.vdom.querySelectorAll("#" + output);
+          }
+        } else {
+          el = document.querySelectorAll(output);
+
+          if (el.length === 0) {
+            el = document.querySelectorAll("#" + output);
+          }
         }
-      });
+
+        el.forEach(item => {
+          // options
+          if (options && options.clear) item.innerHTML = "";
+          // @ts-ignore
+          if (options && options.reverse) item.prepend(frag);
+          else {
+            item.appendChild(frag);
+          }
+        });
+      } else {
+        if (options && options.clear) output.innerHTML = "";
+        // @ts-ignore
+        if (options && options.reverse) output.prepend(frag);
+        else {
+          output.appendChild(frag);
+        }
+      }
     }
   }
 }
