@@ -721,6 +721,28 @@ class Winnetou_ {
 
     window.localStorage.setItem("theme", JSON.stringify(theme));
   }
+
+  vdom() {
+    return document.createDocumentFragment();
+  }
+
+  create(frag, output, options) {
+    let el = document.querySelectorAll(output);
+
+    if (el.length === 0) {
+      el = document.querySelectorAll("#" + output);
+    }
+
+    el.forEach(item => {
+      // options
+      if (options && options.clear) item.innerHTML = "";
+      // @ts-ignore
+      if (options && options.reverse) item.prepend(frag);
+      else {
+        item.appendChild(frag);
+      }
+    });
+  }
 }
 
 export const Winnetou = new Winnetou_();
