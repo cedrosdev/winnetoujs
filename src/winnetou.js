@@ -106,10 +106,10 @@ class Winnetou_ {
    * Sets the value of passed winnetou mutable
    * @param {string} mutable string that represents a winnetou mutable
    * @param {string} value string value to be associated to mutable
-   * @param {boolean=} localStorage bool to save the state on the machine at the user, true by default
+   * @param {"notPersistent"|boolean} [localStorage] bool to save the state on the machine at the user, true by default. Use 'notPersistent' to be clear (and verbose).
    */
   setMutable(mutable, value, localStorage = true) {
-    if (localStorage) {
+    if (localStorage && localStorage !== "notPersistent") {
       window.localStorage.setItem(`mutable_${mutable}`, value);
     } else {
       this.mutable[mutable] = value;
@@ -129,6 +129,8 @@ class Winnetou_ {
          * go through the tmpArr to handle constructos
          */
         let old_ = document.getElementById(item.pureId);
+
+        if (old_ == null) return;
 
         let a = new item.method().constructo;
 
