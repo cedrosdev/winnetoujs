@@ -115,6 +115,8 @@ class Winnetou_ {
       this.mutable[mutable] = value;
     }
 
+    console.log("this.mutable :>> ", this.mutable);
+
     if (this.usingMutable[mutable]) {
       /**
        * if the mutable has constructos
