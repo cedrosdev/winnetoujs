@@ -151,10 +151,19 @@ class Winnetou_ {
    * @returns {string} value or null if not exists
    */
   getMutable(mutable) {
-    let local_mutable =
-      window.localStorage.getItem(`mutable_${mutable}`) || null;
-    if (!local_mutable) local_mutable = this.mutable[mutable] || null;
-    return local_mutable;
+    if (
+      window.localStorage.getItem(`mutable_${mutable}`) ||
+      window.localStorage.getItem(`mutable_${mutable}`) === ""
+    ) {
+      return window.localStorage.getItem(`mutable_${mutable}`);
+    } else if (
+      this.mutable[mutable] ||
+      this.mutable[mutable] === ""
+    ) {
+      return this.mutable[mutable];
+    } else {
+      return null;
+    }
   }
 
   /**
