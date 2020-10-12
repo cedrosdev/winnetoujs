@@ -7,9 +7,13 @@ export class Constructos {
       Object.keys(elements).forEach(item => {
         if (typeof elements[item] === "object") {
           let mutable = elements[item].mutable;
-          let val =
-            Winnetou.getMutable(mutable) ||
-            `Mutable "${mutable}" not initialized yet.`;
+
+          let val;
+
+          Winnetou.getMutable(mutable) ||
+          Winnetou.getMutable(mutable) === ""
+            ? (val = Winnetou.getMutable(mutable))
+            : (val = `Mutable "${mutable}" not initialized yet.`);
 
           /**
            * change mutable to string
