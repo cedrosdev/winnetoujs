@@ -5,7 +5,10 @@ export class Constructos {
     if (elements) {
       let retorno = JSON.parse(JSON.stringify(elements));
       Object.keys(elements).forEach(item => {
-        if (typeof elements[item] === "object") {
+        if (
+          typeof elements[item] === "object" &&
+          elements[item] !== null
+        ) {
           let mutable = elements[item].mutable;
 
           let val;
@@ -31,7 +34,10 @@ export class Constructos {
   _saveUsingMutable(pureId, elements, method) {
     if (elements) {
       Object.keys(elements).forEach(item => {
-        if (typeof elements[item] === "object") {
+        if (
+          typeof elements[item] === "object" &&
+          elements[item] !== null
+        ) {
           if (!Winnetou.usingMutable[elements[item].mutable])
             Winnetou.usingMutable[elements[item].mutable] = [];
 
