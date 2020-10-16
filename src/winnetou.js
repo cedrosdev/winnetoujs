@@ -124,7 +124,6 @@ class Winnetou_ {
 
       this.usingMutable[mutable] = [];
 
-      console.log("tmpArr :>> ", tmpArr);
       tmpArr.forEach(item => {
         /**
          * go through the tmpArr to handle constructos
