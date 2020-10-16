@@ -322,11 +322,6 @@ drawWelcome();
 
 // WEBPACK METHODS ============================================
 
-/**
- * TODO:
- * browser compatibility lazy load
- */
-
 async function webpackBundleRelease() {
   await config();
   configTest();
@@ -1233,6 +1228,7 @@ async function transpileConstructo(filePath) {
            * @param  {boolean} [options.clear] Clean the node before inserting the construct
            * @param  {boolean} [options.reverse] Place the construct in front of other constructs
            * @param {object} [options.vdom] Winnetou.vdom() fragment
+           * @param {boolean} [options.replace] Replace a constructo
            */
             
             ` +
