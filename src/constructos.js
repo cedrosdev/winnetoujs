@@ -78,6 +78,7 @@ export class Constructos {
    * @param  {boolean} [options.clear] Clean the node before inserting the construct
    * @param  {boolean} [options.reverse] Place the construct in front of other constructs
    * @param {object} [options.vdom] Winnetou.vdom() fragment
+   * @param {boolean} [options.replace] Replace a constructo
    */
 
   create(component, output, options) {
@@ -122,7 +123,12 @@ export class Constructos {
         }
 
         el.forEach(item => {
-          // options
+          if (options && options.replace) {
+            Winnetou.replace(frag, item);
+            console.log("entrei no replace");
+            return;
+          }
+
           if (options && options.clear) item.innerHTML = "";
           // @ts-ignore
           if (options && options.reverse) item.prepend(frag);

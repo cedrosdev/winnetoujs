@@ -337,7 +337,7 @@ async function webpackBundleRelease() {
       chunkFilename: "[name].bundle.js",
       filename: "winnetouBundle.min.js",
       path: path.resolve(__dirname, Config.out),
-      publicPath: path.join(Config.folderName, Config.out, "/"),
+      publicPath: path.join(Config.out, "/"),
     },
     mode: "production",
     devtool: "source-map",
@@ -1233,6 +1233,7 @@ async function transpileConstructo(filePath) {
            * @param  {boolean} [options.clear] Clean the node before inserting the construct
            * @param  {boolean} [options.reverse] Place the construct in front of other constructs
            * @param {object} [options.vdom] Winnetou.vdom() fragment
+           * @param {boolean} [options.replace] Replace a constructo
            */
             
             ` +
