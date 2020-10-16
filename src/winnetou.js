@@ -137,7 +137,7 @@ class Winnetou_ {
         let new_ = document
           .createRange()
           .createContextualFragment(
-            a(item.elements).constructoString()
+            a(item.elements, item.options).constructoString()
           );
 
         this.replace(new_, old_);

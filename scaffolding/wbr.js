@@ -1246,7 +1246,7 @@ async function transpileConstructo(filePath) {
               `" +
             pureId +
             "`,\
-              elements,\
+              elements,options,\
               " +
             id +
             "_\

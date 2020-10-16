@@ -31,7 +31,7 @@ export class Constructos {
     }
   }
 
-  _saveUsingMutable(pureId, elements, method) {
+  _saveUsingMutable(pureId, elements, options, method) {
     if (elements) {
       Object.keys(elements).forEach(item => {
         if (
@@ -44,6 +44,7 @@ export class Constructos {
           let obj = {
             pureId,
             elements,
+            options,
             method,
           };
 
