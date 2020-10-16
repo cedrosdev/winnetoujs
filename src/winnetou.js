@@ -124,6 +124,7 @@ class Winnetou_ {
 
       this.usingMutable[mutable] = [];
 
+      console.log("tmpArr :>> ", tmpArr);
       tmpArr.forEach(item => {
         /**
          * go through the tmpArr to handle constructos
@@ -137,7 +138,7 @@ class Winnetou_ {
         let new_ = document
           .createRange()
           .createContextualFragment(
-            a(item.elements).constructoString()
+            a(item.elements, item.options).constructoString()
           );
 
         this.replace(new_, old_);
