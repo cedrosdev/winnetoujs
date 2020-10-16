@@ -322,11 +322,6 @@ drawWelcome();
 
 // WEBPACK METHODS ============================================
 
-/**
- * TODO:
- * browser compatibility lazy load
- */
-
 async function webpackBundleRelease() {
   await config();
   configTest();
@@ -337,7 +332,7 @@ async function webpackBundleRelease() {
       chunkFilename: "[name].bundle.js",
       filename: "winnetouBundle.min.js",
       path: path.resolve(__dirname, Config.out),
-      publicPath: path.join(Config.out, "/"),
+      publicPath: path.join(Config.folderName, Config.out, "/"),
     },
     mode: "production",
     devtool: "source-map",
