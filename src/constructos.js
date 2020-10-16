@@ -84,7 +84,11 @@ export class Constructos {
   create(component, output, options) {
     let frag;
 
-    if (component.match(/\<tr|\<td/)) {
+    if (
+      component.match(
+        /^\s*?<tr|^\s*?<td|^\s*?<table|^\s*?<th|^\s*?<tbody|^\s*?<thead|^\s*?<tfoot/
+      )
+    ) {
       let el = document.querySelectorAll(output);
       if (el.length === 0) {
         el = document.querySelectorAll("#" + output);
@@ -125,7 +129,7 @@ export class Constructos {
         el.forEach(item => {
           if (options && options.replace) {
             Winnetou.replace(frag, item);
-            console.log("entrei no replace");
+
             return;
           }
 
