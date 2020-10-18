@@ -199,12 +199,12 @@ class Winnetou_ {
             return document.querySelectorAll(selector);
           }
           //
-          else if (selector.includes("#")) {
+          else if (selector.match(/^\#/)) {
             selector = selector.replace("#", "");
             return [document.getElementById(selector)];
           }
           //
-          else if (selector.includes(".")) {
+          else if (selector.match(/^\./)) {
             selector = selector.replace(".", "");
             return Array.from(
               document.getElementsByClassName(selector)
