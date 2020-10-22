@@ -1,3 +1,4 @@
+//@ts-ignore
 import Config from "../../../win.config.js";
 
 class Winnetou_ {
@@ -581,31 +582,61 @@ class Winnetou_ {
   }
 
   /**
-   * Method for handle events
+   * Method for handle events.
+   * This method will add an event listener to entire document
+   * associating elementSelector to the event.
+   * In this way the construct can be created after the creation
+   * of the event listener which will still fire correctly.
+   *
+   *
    * @param  {string} eventName Name of event, eg. "keyup"
    * @param  {string} elementSelector DOM selector, id, class or tag
-   * @param  {object} handler, function to be called when trigger event, eg. e=>{}
+   * @param  {function} callback function to be called when trigger event, eg. e=>{}
+   * @param  {object} [options]
+   * @param  {Array.<string>} [options.remove] Array of child elements that will not be activated by the action trigger.
    */
-  on(eventName, elementSelector, handler) {
+  on(eventName, elementSelector, callback, options) {
+    /**
+     * This will test event to be not duplicated.
+     * this.storedEvents contains all events created by winnetoujs.
+     * If it already exists then return, exiting algorithm.
+     */
     let test = this.storedEvents.filter(
       data =>
         data.eventName === eventName &&
         data.elementSelector === elementSelector &&
-        data.handler === handler.toString()
+        data.callback === callback.toString()
     );
-
+    // if test filter returned a result, then exit.
     if (test.length > 0) {
       return;
     }
+    // else continue and store the event
     this.storedEvents.push({
       eventName,
       elementSelector,
-      handler: handler.toString(),
+      callback: callback.toString(),
     });
 
+    // and finally add the event listener to document, associating 'eventHandler'.
+    document.addEventListener(eventName, eventHandler);
+
+    /**
+     * This function will be stored in EventListener with
+     * provided elementSelector
+     * @param {any} e EventListener
+     */
     function eventHandler(e) {
+      // if elementSelector is an id but without #
       let elementSelectorId = "#" + elementSelector;
-      // @ts-ignore
+
+      /**
+       * https://developer.mozilla.org/pt-BR/docs/Web/API/Element/closest
+       *
+       * First the algorithm will search if the clicked element (e.target)
+       * owns an element that matches elementSelector
+       * if not, exits.
+       */
       if (!e.target.closest(elementSelector)) {
         try {
           if (!e.target.closest(elementSelectorId)) {
@@ -616,34 +647,83 @@ class Winnetou_ {
         }
       }
 
-      e.path.forEach(item => {
+      // boolean that controls if callback function
+      // can be fired
+      let shouldContinue = true;
+
+      /**
+       * e.path contains all child elements of trigger
+       * element, so it will be scanned.
+       */
+      for (let c = 0; c < e.path.length; c++) {
+        // item now is the deepest element
+        let item = e.path[c];
+
+        /**
+         * if options.remove was provided
+         * needs to check if a child element
+         * must be excluded
+         */
+        if (options && options.remove) {
+          // remove scan
+          for (let w = 0; w < options.remove.length; w++) {
+            try {
+              // if match, switch control to false
+              if (item.matches(options.remove[w])) {
+                shouldContinue = false;
+              }
+
+              // if not match, try an selector id (#id)
+              if (item.matches("#" + options.remove[w])) {
+                shouldContinue = false;
+              }
+            } catch (e) {}
+          }
+        }
+
+        /**
+         * check if item matches elementSelector
+         */
         try {
           if (item.matches(elementSelector)) {
-            handler(item);
+            /**
+             * if match, trigger the stored callback
+             * providing the element as parameter (item)
+             * if shouldContinue is true
+             */
+            shouldContinue && callback(item);
           } else if (item.matches(elementSelectorId)) {
-            handler(item);
+            /**
+             * if not match, try forcing id selector (#id)
+             */
+            shouldContinue && callback(item);
           }
         } catch (e) {}
-      });
+      }
     }
-
-    document.addEventListener(eventName, eventHandler);
   }
   /**
    * On touch devices sets event handler to touchstart
    * fallbacks to click
-   * @param  {string} selector
-   * @param  {function} callback
+   * @param  {string} selector DOM selector, id, class or tag
+   * @param  {function} callback function to be called when trigger event, eg. e=>{}
+   * @param  {object} [options]
+   * @param  {Array.<string>} [options.remove]
    */
-  click(selector, callback) {
+  click(selector, callback, options) {
     var clickHandler =
       "ontouchstart" in document.documentElement
         ? "touchstart"
         : "click";
 
-    this.on(clickHandler, selector, el => {
-      callback(el);
-    });
+    this.on(
+      clickHandler,
+      selector,
+      el => {
+        callback(el);
+      },
+      options
+    );
   }
 
   /**
@@ -694,7 +774,7 @@ class Winnetou_ {
           console.log(
             "The translation file ",
             `${Config.folderName}/translations/${defaultLang}.xml`,
-            " seens to be empty or incorrect.",
+            " seems to be empty or incorrect.",
             e.message
           );
         }
