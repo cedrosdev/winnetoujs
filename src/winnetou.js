@@ -180,7 +180,10 @@ class Winnetou_ {
   }
 
   /**
-   * Select the indicated element
+   * Select the indicated element.
+   * If selector is a class or tag and user request for
+   * a get function (e.g. getScrollTop()) the returned value
+   * will be of the first occurrence ([0]) of matches.
    * @param {string} selector html element. A tag, id ou class.
    */
   select(selector = "") {
@@ -430,6 +433,12 @@ class Winnetou_ {
       getFile() {
         return el[0].files[0];
       },
+      /**
+       * get scrollTop of a constructo
+       */
+      getScrollTop() {
+        return el[0].scrollTop;
+      },
     };
 
     el = obj.getEl(selector);
@@ -618,8 +627,32 @@ class Winnetou_ {
       callback: callback.toString(),
     });
 
-    // and finally add the event listener to document, associating 'eventHandler'.
-    document.addEventListener(eventName, eventHandler);
+    /**
+     * If the provided event is a scroll event, it must be
+     * associated with element and not to document.
+     * In this case the returned value is the event
+     * which can be accessed by e.target.scrollTop
+     * or Winnetou.select(e.target)
+     */
+    if (eventName === "scroll") {
+      try {
+        document
+          .querySelector("#" + elementSelector)
+          .addEventListener("scroll", e => {
+            callback(e);
+          });
+      } catch (e) {
+        document
+          .querySelector(elementSelector)
+          .addEventListener("scroll", e => {
+            callback(e);
+          });
+      }
+    } else {
+      // if it is not a scroll event
+      // finally add the event listener to document, associating 'eventHandler'.
+      document.addEventListener(eventName, eventHandler);
+    }
 
     /**
      * This function will be stored in EventListener with
@@ -702,6 +735,7 @@ class Winnetou_ {
       }
     }
   }
+
   /**
    * On touch devices sets event handler to touchstart
    * fallbacks to click
