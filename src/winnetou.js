@@ -443,6 +443,21 @@ class Winnetou_ {
 
     el = obj.getEl(selector);
 
+    if (el[0] === null) {
+      console.warn(
+        `WinnetouJs Warning: The provided element selector (${selector}) does not exists in DOM. Winnetou is skipping this fatal error, but verify.`
+      );
+
+      let void_ = this.vdom();
+      void_.appendChild(
+        document
+          .createRange()
+          .createContextualFragment("<p class='foo'>")
+      );
+
+      el = void_.querySelectorAll(".foo");
+    }
+
     return obj;
   }
 
