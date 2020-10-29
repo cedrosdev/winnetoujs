@@ -703,9 +703,10 @@ class Winnetou_ {
        * e.path contains all child elements of trigger
        * element, so it will be scanned.
        */
-      for (let c = 0; c < e.path.length; c++) {
+      let path = e.path || (e.composedPath && e.composedPath());
+      for (let c = 0; c < path.length; c++) {
         // item now is the deepest element
-        let item = e.path[c];
+        let item = path[c];
 
         /**
          * if options.remove was provided
