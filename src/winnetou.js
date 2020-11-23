@@ -606,6 +606,7 @@ class Winnetou_ {
   }
 
   /**
+   *
    * Method for handle events.
    * This method will add an event listener to entire document
    * associating elementSelector to the event.
@@ -620,6 +621,7 @@ class Winnetou_ {
    * @param  {Array.<string>} [options.remove] Array of child elements that will not be activated by the action trigger.
    */
   on(eventName, elementSelector, callback, options) {
+    let callbackBck;
     /**
      * This will test event to be not duplicated.
      * this.storedEvents contains all events created by winnetoujs.
@@ -642,31 +644,49 @@ class Winnetou_ {
       callback: callback.toString(),
     });
 
-    /**
-     * If the provided event is a scroll event, it must be
-     * associated with element and not to document.
-     * In this case the returned value is the event
-     * which can be accessed by e.target.scrollTop
-     * or Winnetou.select(e.target)
-     */
-    if (eventName === "scroll") {
-      try {
-        document
-          .querySelector("#" + elementSelector)
-          .addEventListener("scroll", e => {
-            callback(e);
-          });
-      } catch (e) {
-        document
-          .querySelector(elementSelector)
-          .addEventListener("scroll", e => {
-            callback(e);
-          });
-      }
-    } else {
-      // if it is not a scroll event
-      // finally add the event listener to document, associating 'eventHandler'.
-      document.addEventListener(eventName, eventHandler);
+    switch (eventName) {
+      /**
+       * If the provided event is a scroll event, it must be
+       * associated with element and not to document.
+       * In this case the returned value is the event
+       * which can be accessed by e.target.scrollTop
+       * or Winnetou.select(e.target)
+       */
+      case "scroll":
+        try {
+          document
+            .querySelector("#" + elementSelector)
+            .addEventListener("scroll", e => {
+              callback(e);
+            });
+        } catch (e) {
+          document
+            .querySelector(elementSelector)
+            .addEventListener("scroll", e => {
+              callback(e);
+            });
+        }
+        break;
+
+      /**
+       * On touch devices sets event handler to touchstart
+       * fallbacks to click
+       */
+      case "click":
+        eventName =
+          "ontouchstart" in document.documentElement
+            ? "touchstart"
+            : "click";
+        document.addEventListener(eventName, eventHandler);
+        break;
+
+      /**
+       * if it is not a special event
+       * finally add the event listener to document, associating 'eventHandler'.
+       */
+      default:
+        document.addEventListener(eventName, eventHandler);
+        break;
     }
 
     /**
@@ -753,6 +773,10 @@ class Winnetou_ {
   }
 
   /**
+   * @deprecated This method will be removed in the next major version
+   * due to its inefficiency when handling multiple callbacks.
+   * Use Winnetou on instead.
+   * @description
    * On touch devices sets event handler to touchstart
    * fallbacks to click
    * @param  {string} selector DOM selector, id, class or tag
