@@ -604,9 +604,45 @@ class Winnetou_ {
       history.pushState(url, null);
     }
   }
+  /**
+   * Method for handle events.
+   * @param  {string} event Event name, eg. 'click' or 'mouseover'
+   * @param  {string} elementSelector A valid element selector
+   * @param  {function} callback callback function
+   */
+  listen(event, elementSelector, callback) {
+    switch (event) {
+      case "click":
+        event =
+          "ontouchstart" in document.documentElement
+            ? "touchstart"
+            : "click";
+        break;
+    }
+
+    try {
+      document
+        .querySelector("#" + elementSelector)
+        .addEventListener(event, e => {
+          callback(e);
+        });
+    } catch (e) {
+      document.querySelectorAll(elementSelector).forEach(x => {
+        x.addEventListener(event, e => {
+          callback(e);
+        });
+      });
+    }
+  }
 
   /**
-   *
+   * @deprecated
+   * This method proved to be inefficient
+   * in object-oriented environments.
+   * It will be removed in the next
+   * major version of WinnetouJs.
+   * Use listen instead.
+   * @description
    * Method for handle events.
    * This method will add an event listener to entire document
    * associating elementSelector to the event.
@@ -775,7 +811,7 @@ class Winnetou_ {
   /**
    * @deprecated This method will be removed in the next major version
    * due to its inefficiency when handling multiple callbacks.
-   * Use Winnetou on instead.
+   * Use listen instead.
    * @description
    * On touch devices sets event handler to touchstart
    * fallbacks to click
