@@ -604,6 +604,21 @@ class Winnetou_ {
       history.pushState(url, null);
     }
   }
+
+  /**
+   * Winnetou function storage method
+   * @param  {function} function_ Function to be called when event fires
+   */
+  fx(function_) {
+    let name =
+      "winnetouFx" +
+      (new Date().getMilliseconds() * Math.random() * 10000).toFixed(
+        0
+      );
+    window[name] = function_;
+    return `${name}()`;
+  }
+
   /**
    * Method for handle events.
    * @param  {string} event Event name, eg. 'click' or 'mouseover'
