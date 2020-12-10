@@ -147,6 +147,26 @@ class Winnetou_ {
   }
 
   /**
+   * initMutable initiates a mutable with
+   * unique name saving it in
+   * notPersistent mode and returning it name.
+   * @param {string} value The string value of
+   * mutable
+   * @returns {string} unique name of mutable
+   */
+  initMutable(value) {
+    let name = (
+      new Date().getMilliseconds() *
+      Math.random() *
+      10000
+    ).toFixed(0);
+
+    this.setMutable(name, value, "notPersistent");
+
+    return name;
+  }
+
+  /**
    * Gets the value of passed winnetou mutable
    * @param {string} mutable string that represents a winnetou mutable
    * @returns {string} value or null if not exists
