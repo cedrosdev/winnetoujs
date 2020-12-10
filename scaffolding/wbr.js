@@ -744,15 +744,16 @@ function watchFiles() {
 
     try {
       // @ts-ignore
-      watch(`./translations`, { recursive: true }, async function (
-        evt,
-        name
-      ) {
-        refresh(name);
-        await translate();
-        time();
-        drawFinal();
-      });
+      watch(
+        `./translations`,
+        { recursive: true },
+        async function (evt, name) {
+          refresh(name);
+          await translate();
+          time();
+          drawFinal();
+        }
+      );
     } catch (e) {}
   }
 
@@ -937,7 +938,7 @@ async function transpileIcon(iconPath) {
 
       let xmlString = await readFileCache(iconPath);
 
-      let regPath = /[a-zA-Z]+/g;
+      let regPath = /[a-zA-Z0-9_]+/g;
 
       let id = iconPath.match(regPath);
 
@@ -981,7 +982,7 @@ async function transpileColoredIcon(iconPath) {
     try {
       let xmlString = await readFileCache(iconPath);
 
-      let regPath = /[a-zA-Z]+/g;
+      let regPath = /[a-zA-Z0-9_]+/g;
 
       let id = iconPath.match(regPath);
 
