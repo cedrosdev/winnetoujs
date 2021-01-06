@@ -12,7 +12,7 @@
     "uglifycss": "0.0.29",
     "win-animate": "^1.0.5",
     "win-slidescreen": "^1.0.7",
-    "winnetoujs": "^1.9.0",
+    "winnetoujs": "^1.10.0",
     "xml-parse": "^0.4.0"
   },
   "devDependencies": {
