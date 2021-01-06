@@ -646,15 +646,6 @@ class Winnetou_ {
    * @param  {function} callback callback function
    */
   listen(event, elementSelector, callback) {
-    switch (event) {
-      case "click":
-        event =
-          "ontouchstart" in document.documentElement
-            ? "touchstart"
-            : "click";
-        break;
-    }
-
     try {
       document
         .querySelector("#" + elementSelector)
@@ -873,7 +864,10 @@ class Winnetou_ {
 
   /**
    * Activate translations, Must be called when application starts.
-   * @param next_ callback to app start.
+   * @param {function} next_ callback to app start.
+   * @param {object} class_ the Strings class
+   * @example
+   * Winnetou.lang(Strings, render);
    */
 
   async lang(class_, next_) {
@@ -907,10 +901,10 @@ class Winnetou_ {
 
       if (this.readyState == 4 && this.status == 200) {
         try {
-          let trad = this.responseXML;
-          let el = trad.getElementsByTagName("winnetou");
-          let frases = el[0].childNodes;
-          frases.forEach(item => {
+          let xml = this.responseXML;
+          let el = xml.getElementsByTagName("winnetou");
+          let lines = el[0].childNodes;
+          lines.forEach(item => {
             if (item.nodeName != "#text") {
               This[item.nodeName] = item.textContent;
             }
@@ -933,6 +927,65 @@ class Winnetou_ {
       true
     );
     xhttp.send();
+  }
+
+  async updateTranslations(class_) {
+    /**
+     * Function to get json from API
+     * @param {string} url API Endpoint
+     */
+    const get = url => {
+      return new Promise((resolve, reject) => {
+        fetch(url, {
+          method: "GET",
+        })
+          .then(function (response) {
+            if (response.ok) {
+              return response.json();
+            } else {
+              return reject(response);
+            }
+          })
+          .then(function (data) {
+            return resolve(data);
+          })
+          .catch(function (error) {
+            return reject(error);
+          });
+      });
+    };
+    return new Promise(async (resolve, reject) => {
+      if (!window.localStorage.getItem("lang")) return resolve();
+
+      let This = class_;
+
+      if (!Config?.folderName) {
+        console.error(
+          "WinnetouJs updateTranslations Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
+        );
+
+        return resolve();
+      }
+
+      if (Config.folderName === "/") Config.folderName = "";
+
+      let defaultLang = Config?.defaultLang;
+      let localLang = window.localStorage.getItem("lang");
+      if (localLang) defaultLang = localLang;
+
+      let data = await get(
+        `${Config.folderName}/translations/${defaultLang}.json`
+      );
+
+      // let file = JSON.parse(data);
+
+      Object.keys(data).map(key => {
+        let value = data[key];
+        This[key] = value;
+      });
+
+      return resolve();
+    });
   }
 
   /**

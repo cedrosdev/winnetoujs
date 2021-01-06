@@ -1042,8 +1042,9 @@ async function translate() {
       "utf-8",
       function (err, data) {
         if (err) {
-          drawError(err.message);
-          return resolve();
+          // drawError(err.message);
+          // return resolve();
+          return json();
         }
         let trad = xml.parse(data)[0].childNodes;
 
@@ -1086,6 +1087,54 @@ async function translate() {
         );
       }
     );
+
+    function json() {
+      fs.readFile(
+        `${folderName}/${Config.defaultLang}.json`,
+        "utf-8",
+        function (err, data) {
+          if (err) {
+            drawError(err.message);
+            return resolve();
+          }
+
+          let file = JSON.parse(data);
+
+          Object.keys(file).map(key => {
+            let value = file[key];
+
+            strings += `/** @property ${value} */           
+            ${key}: "${value}",
+            `;
+          });
+
+          let res = `
+        
+          export default Winnetou.strings = {
+              ${strings}
+            }
+          
+          `;
+
+          let resFinal = `
+          import { Winnetou } from "../node_modules/winnetoujs/src/winnetou.js";       
+          ${res}
+          `;
+
+          fs.outputFile(
+            "./js/_strings.js",
+            beautify(resFinal, {
+              indent_size: 2,
+              space_in_empty_paren: true,
+            }),
+            function (err) {
+              drawAdd("Strings");
+              return resolve({ res });
+            }
+          );
+        }
+      );
+    }
   });
 }
 /**
