@@ -449,6 +449,15 @@ class Winnetou_ {
       },
       /**
        * Gets the file of a constructo
+       *
+       * @typedef {Object} File_
+       * @property {number} lastModified
+       * @property {date} lastModifiedDate
+       * @property {string} name
+       * @property {number} size
+       * @property {string} type
+       *
+       * @returns {File_}
        */
       getFile() {
         return el[0].files[0];
@@ -458,6 +467,16 @@ class Winnetou_ {
        */
       getScrollTop() {
         return el[0].scrollTop;
+      },
+
+      disable() {
+        el[0].disabled = true;
+        return this;
+      },
+
+      enable() {
+        el[0].disabled = false;
+        return this;
       },
     };
 
