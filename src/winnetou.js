@@ -448,7 +448,7 @@ class Winnetou_ {
         return el[0].checked;
       },
       /**
-       * Gets the file of a constructo
+       * Gets the file of a input type file
        *
        * @typedef {Object} File_
        * @property {number} lastModified
@@ -461,6 +461,14 @@ class Winnetou_ {
        */
       getFile() {
         return el[0].files[0];
+      },
+      /**
+       * Gets file array of a input type file
+       *
+       * @returns {Array.<File_>}
+       */
+      getFiles() {
+        return el[0].files;
       },
       /**
        * get scrollTop of a constructo
@@ -647,15 +655,16 @@ class Winnetou_ {
   /**
    * Winnetou function storage method
    * @param  {function} function_ Function to be called when event fires
+   * @param  {string} args A list of arguments comma separated
    */
-  fx(function_) {
+  fx(function_, args = "") {
     let name =
       "winnetouFx" +
       (new Date().getMilliseconds() * Math.random() * 10000).toFixed(
         0
       );
     window[name] = function_;
-    return `${name}()`;
+    return `${name}(${args})`;
   }
 
   /**
