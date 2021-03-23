@@ -442,6 +442,7 @@ const Err = {
       "Error code: e001\n" +
         `The constructo [[${id}]] of file "${filePath}" is duplicated. The original file is "${originalFile}".`
     );
+    process.stderr.write("\007");
   },
   /**
    * Cod e002
@@ -454,6 +455,7 @@ const Err = {
         "Transpile constructo error. Original Message: " +
         e
     );
+    process.stderr.write("\007");
   },
   /**
    * Cod 003
@@ -464,16 +466,26 @@ const Err = {
       "Error Code: 003\n" +
         `"./win.config.js" not found or misconfigured. Default config will be used.`
     );
+    process.stderr.write("\007");
   },
   e004() {
     drawError(
       "Error Code: 004\n" + `Fatal error when creating the css bundle`
     );
+    process.stderr.write("\007");
   },
   e005() {
     drawError(
       "Error Code: 005\n" + `The constructos folder does not exists`
     );
+    process.stderr.write("\007");
+  },
+  e006(file) {
+    drawError(
+      "Error Code: 006\n" +
+        `There are a constructo without [[id]] in a file "${file}"`
+    );
+    process.stderr.write("\007");
   },
 };
 
@@ -1161,7 +1173,15 @@ async function transpileConstructo(filePath) {
           let requiredElement = false;
           let jsdoc2 = "";
 
-          let id = constructo.match(/\[\[\s?(.*?)\s?\]\]/)[1];
+          let id;
+
+          try {
+            id = constructo.match(/\[\[\s?(.*?)\s?\]\]/)[1];
+          } catch (e) {
+            Err.e006(filePath);
+            return;
+          }
+
           let pureId = id + "-win-${identifier}";
 
           let verify = idList.filter(data => data.id === id);
