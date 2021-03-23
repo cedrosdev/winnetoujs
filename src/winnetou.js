@@ -63,17 +63,6 @@ class Winnetou_ {
       window.onpopstate = event => {
         event.preventDefault();
 
-        if (this.routesOptions?.onBack) {
-          try {
-            this.routesOptions.onBack();
-          } catch (e) {
-            console.error(
-              `Winnetou Error, id: CR001\nThe onBack option in createRoutes() is not valid. Please use a function. \n\nOriginal Error: `,
-              e
-            );
-          }
-        }
-
         if (event.state == null) {
           this.routes["/"]();
         } else {
@@ -82,6 +71,17 @@ class Winnetou_ {
           } catch (e) {
             console.error(
               `WinnetouJs Error, id: CR002\nGiven route is not available "${event.state}". Please verify given route. Original Error: ${e}`
+            );
+          }
+        }
+
+        if (this.routesOptions?.onBack) {
+          try {
+            this.routesOptions.onBack();
+          } catch (e) {
+            console.error(
+              `Winnetou Error, id: CR001\nThe onBack option in createRoutes() is not valid. Please use a function. \n\nOriginal Error: `,
+              e
             );
           }
         }
