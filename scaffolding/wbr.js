@@ -1167,8 +1167,8 @@ async function transpileConstructo(filePath) {
           let descri = component.getAttribute("description");
           let constructo = component.innerHTML;
           let jsdoc =
-            "\n\n// ========================================\n\n\n";
-          jsdoc += "\n\n/**\n";
+            "\n\n// ========================================";
+          jsdoc += "\n/**\n";
           jsdoc += `\t* ${descri || ""}\n`;
           let requiredElement = false;
           let jsdoc2 = "";
@@ -1280,7 +1280,8 @@ async function transpileConstructo(filePath) {
           class ${id}_ extends Constructos {` +
             jsdoc +
             " constructo = (elements, options) => {" +
-            "\n\nlet identifier = this._getIdentifier(options?options.identifier || 'notSet':'notSet');" +
+            "\n\nlet identifier = this._mutableToString(options);";
+          "\nidentifier = this._getIdentifier(options?identifier.identifier || 'notSet':'notSet');" +
             "\n\nlet elementsToString = this._mutableToString(elements);" +
             "let component;" +
             "let obj = {" +

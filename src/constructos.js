@@ -4,6 +4,7 @@ export class Constructos {
   _mutableToString(elements) {
     if (elements) {
       let retorno = JSON.parse(JSON.stringify(elements));
+
       Object.keys(elements).forEach(item => {
         if (
           typeof elements[item] === "object" &&
@@ -56,6 +57,35 @@ export class Constructos {
             // do nothing
           } else {
             Winnetou.usingMutable[elements[item].mutable].push(obj);
+          }
+        }
+      });
+    }
+
+    if (options) {
+      Object.keys(options).forEach(item => {
+        if (
+          typeof options[item] === "object" &&
+          options[item] !== null
+        ) {
+          if (!Winnetou.usingMutable[options[item].mutable])
+            Winnetou.usingMutable[options[item].mutable] = [];
+
+          let obj = {
+            pureId,
+            elements,
+            options,
+            method,
+          };
+
+          if (
+            Winnetou.usingMutable[options[item].mutable].filter(
+              x => x.pureId == pureId
+            ).length > 0
+          ) {
+            // do nothing
+          } else {
+            Winnetou.usingMutable[options[item].mutable].push(obj);
           }
         }
       });
