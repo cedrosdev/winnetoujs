@@ -1280,8 +1280,8 @@ async function transpileConstructo(filePath) {
           class ${id}_ extends Constructos {` +
             jsdoc +
             " constructo = (elements, options) => {" +
-            "\n\nlet identifier = this._mutableToString(options);";
-          "\nidentifier = this._getIdentifier(options?identifier.identifier || 'notSet':'notSet');" +
+            "\n\nlet identifier = this._mutableToString(options);" +
+            "\nidentifier = this._getIdentifier(options?identifier.identifier || 'notSet':'notSet');" +
             "\n\nlet elementsToString = this._mutableToString(elements);" +
             "let component;" +
             "let obj = {" +
