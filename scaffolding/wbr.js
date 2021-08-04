@@ -543,6 +543,13 @@ function configTest() {
     Config.entry = "./js/app.js";
   }
 
+  if (!Config.cssOut) {
+    drawWarning(
+      "win.config.js misconfigured. Not found 'cssOut' parameter. Using default './release'"
+    );
+    Config.cssOut = "./release";
+  }
+
   if (!fs.existsSync(Config.constructosPath)) {
     Err.e005();
   }
@@ -1407,7 +1414,7 @@ function execPromisesCss() {
         let result = UglifyCss.processString(data.join("\n"));
 
         fs.outputFile(
-          Config.out + "/winnetouBundle.min.css",
+          Config.cssOut + "/winnetouBundle.min.css",
           result,
           function (err) {
             if (err) {
