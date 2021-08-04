@@ -326,66 +326,84 @@ async function webpackBundleRelease() {
   await config();
   configTest();
 
-  const compiler = webpack({
-    entry: Config.entry,
-    output: {
-      chunkFilename: "[name].bundle.js",
-      filename: "winnetouBundle.min.js",
-      path: path.resolve(__dirname, Config.out),
-      publicPath: path.join(Config.folderName, Config.out, "/"),
-    },
-    mode: "production",
-    devtool: "source-map",
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              presets: [
-                [
-                  "@babel/preset-env",
-                  {
-                    targets:
-                      "last 2 Chrome versions, last 2 Firefox versions",
-                  },
+  let entry = Config.entry;
+  let out = Config.out;
+
+  if (typeof entry === "object") {
+    let keys = Object.keys(entry);
+    keys.map(key => {
+      Config.entry = entry[key];
+      Config.out = out[key];
+      run(entry[key], out[key]);
+    });
+  } else {
+    run(Config.entry, Config.out);
+  }
+
+  function run(entry, out) {
+    const compiler = webpack({
+      entry: entry,
+      output: {
+        chunkFilename: "[name].bundle.js",
+        filename: "winnetouBundle.min.js",
+        path: path.resolve(__dirname, out),
+        publicPath: path.join(Config.folderName, out, "/"),
+      },
+      mode: "production",
+      devtool: "source-map",
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            use: {
+              loader: "babel-loader",
+              options: {
+                presets: [
+                  [
+                    "@babel/preset-env",
+                    {
+                      targets:
+                        "last 2 Chrome versions, last 2 Firefox versions",
+                    },
+                  ],
                 ],
-              ],
-              plugins: [
-                "@babel/plugin-proposal-optional-chaining",
-                "@babel/plugin-proposal-nullish-coalescing-operator",
-                [
-                  "@babel/plugin-transform-runtime",
-                  {
-                    regenerator: true,
-                  },
+                plugins: [
+                  "@babel/plugin-proposal-optional-chaining",
+                  "@babel/plugin-proposal-nullish-coalescing-operator",
+                  [
+                    "@babel/plugin-transform-runtime",
+                    {
+                      regenerator: true,
+                    },
+                  ],
+                  "@babel/plugin-proposal-class-properties",
                 ],
-                "@babel/plugin-proposal-class-properties",
-              ],
+              },
             },
           },
-        },
-      ],
-    },
-  });
+        ],
+      },
+    });
 
-  drawText("Initializing webpack winnetou bundle, please wait.");
-  drawBlankLine();
+    drawTextBlock(
+      `Initializing webpack winnetou bundle, please wait. ${entry} => ${out}`
+    );
+    drawBlankLine();
 
-  compiler.run((e, s) => {
-    if (e) {
-      drawError(e.message);
-    }
-    if (s.compilation.errors.length > 0) {
-      drawError(s.compilation.errors.toString());
-    }
-    if (s.compilation.warnings.length > 0) {
-      drawWarning(s.compilation.warnings.toString());
-    }
-    drawAdd("Bundle Release Finished");
-    drawFinal();
-  });
+    compiler.run((e, s) => {
+      if (e) {
+        drawError(e.message);
+      }
+      if (s.compilation.errors.length > 0) {
+        drawError(s.compilation.errors.toString());
+      }
+      if (s.compilation.warnings.length > 0) {
+        drawWarning(s.compilation.warnings.toString());
+      }
+      drawAdd(`'${entry} => ${out}`);
+      drawFinal();
+    });
+  }
 }
 
 // WBR METHODS ================================================
@@ -553,6 +571,7 @@ async function config() {
         folderName: "/",
       };
       Err.e003();
+      console.log(e);
       return resolve();
     }
   });
@@ -832,36 +851,11 @@ function watchFiles() {
 }
 
 function fixedJson(badJSON) {
-  let a = badJSON
+  //
 
-    .replace("{", "")
-    .replace("}", "")
-    .replace("export default", "")
-    .replace(";", "")
+  let a = badJSON.replace("export default", "").replace(";", "");
 
-    .split(",")
-
-    .filter(x => typeof x === "string" && x.trim().length > 0)
-
-    .join(",")
-
-    // Replace ":" with "@colon@" if it's between double-quotes
-    .replace(/:\s*"([^"]*)"/g, function (match, p1) {
-      return ': "' + p1.replace(/:/g, "@colon@") + '"';
-    })
-
-    // Replace ":" with "@colon@" if it's between single-quotes
-    .replace(/:\s*'([^']*)'/g, function (match, p1) {
-      return ': "' + p1.replace(/:/g, "@colon@") + '"';
-    })
-
-    // Add double-quotes around any tokens before the remaining ":"
-    .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?\s*:/g, '"$2": ')
-
-    // Turn "@colon@" back into ":"
-    .replace(/@colon@/g, ":");
-
-  return JSON.parse(`{${a}}`);
+  return eval(`(${a})`);
 }
 
 async function icons() {
