@@ -452,7 +452,7 @@ class Winnetou_ {
        *
        * @typedef {Object} File_
        * @property {number} lastModified
-       * @property {date} lastModifiedDate
+       * @property {Date} lastModifiedDate
        * @property {string} name
        * @property {number} size
        * @property {string} type
@@ -532,11 +532,12 @@ class Winnetou_ {
   /**
    * Navigate between Winnetou routes
    * @param {string} url Path already defined in createRoutes method
+   * @param {boolean} pushState To use navigate without change URL
    */
-  navigate(url) {
+  navigate(url, pushState = true) {
     if (window.history && window.history.pushState) {
       this.callRoute(url);
-      this.pushState(url);
+      pushState && this.pushState(url);
       if (this.routesOptions?.onGo) {
         try {
           this.routesOptions.onGo();
