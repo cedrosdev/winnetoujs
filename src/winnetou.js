@@ -155,15 +155,19 @@ class Winnetou_ {
    * @returns {string} unique name of mutable
    */
   initMutable(value) {
-    let name = (
-      new Date().getMilliseconds() *
-      Math.random() *
-      10000
-    ).toFixed(0);
+    try {
+      let name = (
+        new Date().getMilliseconds() *
+        Math.random() *
+        10000
+      ).toFixed(0);
 
-    this.setMutable(name, value, "notPersistent");
+      this.setMutable(name, value, "notPersistent");
 
-    return name;
+      return name;
+    } catch (e) {
+      console.log("erro ao criar mutable", e);
+    }
   }
 
   /**
