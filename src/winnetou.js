@@ -155,19 +155,15 @@ class Winnetou_ {
    * @returns {string} unique name of mutable
    */
   initMutable(value) {
-    try {
-      let name = (
-        new Date().getMilliseconds() *
-        Math.random() *
-        10000
-      ).toFixed(0);
+    let name = (
+      new Date().getMilliseconds() *
+      Math.random() *
+      10000
+    ).toFixed(0);
 
-      this.setMutable(name, value, "notPersistent");
+    this.setMutable(name, value, "notPersistent");
 
-      return name;
-    } catch (e) {
-      console.log("erro ao criar mutable", e);
-    }
+    return name;
   }
 
   /**
@@ -930,6 +926,8 @@ class Winnetou_ {
           `${Config.folderName}/translations/${defaultLang}.xml`,
           "are not found"
         );
+        window.localStorage.removeItem("lang");
+        location.reload();
       }
 
       if (this.readyState == 4 && this.status == 200) {
