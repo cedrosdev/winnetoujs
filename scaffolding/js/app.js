@@ -1,9 +1,17 @@
 import { Winnetou } from "../node_modules/winnetoujs/src/winnetou.js";
-import Strings from "./_strings.js";
+import _strings from "./_strings.js";
 import { welcome } from "./constructos/welcome.js";
 
-Winnetou.lang(Strings, render);
+Winnetou.lang(_strings, render);
 
-function render() {
-  welcome({ title: Strings.welcome }).create("#app");
+async function render() {
+  let json = await (
+    await fetch("../node_modules/winnetoujs/package.json")
+  ).json();
+
+  welcome({
+    title: _strings.welcome,
+    version_string: _strings.version_string,
+    version: json.version,
+  }).create("#app");
 }

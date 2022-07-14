@@ -1,3 +1,6 @@
+/**
+ * @type {import('./interfaces').IWinConfig}
+ */
 export default {
   constructosPath: "./constructos",
   constructosOut: "./js/constructos",
@@ -6,4 +9,5 @@ export default {
   folderName: "/",
   sass: "./sass",
   defaultLang: "en-us",
+  cssOut: "./release",
 };

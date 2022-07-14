@@ -1,34 +1,42 @@
 import {
   Winnetou
 } from "../../node_modules/winnetoujs/src/winnetou.js";
+import {
+  Constructos
+} from "../../node_modules/winnetoujs/src/constructos.js";
+
+
 
 /**@private */
-class welcome_ extends Winnetou {
+class welcome_ extends Constructos {
 
   // ========================================
-
-
-
-
   /**
    * 
    * @param {object} elements
    * @param {any} elements.title 
+   * @param {any} elements.version_string 
+   * @param {any} elements.version 
    * @param {object} [options]
    * @param {any=} options.identifier
    */
   constructo = (elements, options) => {
 
-    let identifier = this._getIdentifier(options ? options.identifier || 'notSet' : 'notSet');
+    let identifier = this._mutableToString(options);
+    identifier = this._getIdentifier(options ? identifier.identifier || 'notSet' : 'notSet');
 
-    elements = this._test(identifier, 'welcome', `welcome-win-${identifier}`, elements);
+    let elementsToString = this._mutableToString(elements);
     let component;
     let obj = {
-      code(elements) {
+      code(elements_) {
         return `
-  <div id="welcome-win-${identifier}">
+  <div id="welcome-win-${identifier}" class="welcome">
+    <img src="https://raw.githubusercontent.com/cedrosdev/winnetoujs_assets/master/logo_v1_2020/logo_transparent.png"
+      class="logo"
+    >
     <h1>WinnetouJs</h1>
-    <h2>${(elements?.title)}</h2>
+    <h2>${(elements_?.title)}</h2>
+    <span class="version">${(elements_?.version_string)} ${(elements_?.version)}</span>
     <p>
       <a href="https://winnetoujs.org">https://winnetoujs.org</a>
     </p>
@@ -38,10 +46,12 @@ class welcome_ extends Winnetou {
 
       /**
        * Create Winnetou Constructo        
-       * @param  {string} output The node or list of nodes where the component will be created
+       * @param  {object|string} output The node or list of nodes where the component will be created
        * @param  {object} [options] Options to control how the construct is inserted. Optional.
        * @param  {boolean} [options.clear] Clean the node before inserting the construct
        * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+       * @param {object} [options.vdom] Winnetou.vdom() fragment
+       * @param {boolean} [options.replace] Replace a constructo
        */
 
       "create": (output, options) => {
@@ -50,10 +60,13 @@ class welcome_ extends Winnetou {
           ids: {
             welcome: `welcome-win-${identifier}`,
           },
+          code: obj.code(elementsToString),
         }
-      }
+      },
+      constructoString: () => obj.code(elementsToString)
     }
-    component = obj.code(elements);
+    component = obj.code(elementsToString);
+    this._saveUsingMutable(`welcome-win-${identifier}`, elements, options, welcome_);
     return obj;
   }
 }
