@@ -347,7 +347,7 @@ async function webpackBundleRelease() {
         chunkFilename: "[name].bundle.js",
         filename: "winnetouBundle.min.js",
         path: path.resolve(__dirname, out),
-        publicPath: path.join(Config.folderName, out, "/"),
+        publicPath: path.join(/*Config.folderName,*/ out, "/"),
       },
       mode: "production",
       devtool: "source-map",
@@ -530,9 +530,9 @@ function configTest() {
   }
 
   if (!Config.folderName) {
-    drawWarning(
-      "win.config.js misconfigured. Not found 'folderName' parameter. Using default '/'"
-    );
+    // drawWarning(
+    //   "win.config.js misconfigured. Not found 'folderName' parameter. Using default '/'"
+    // );
     Config.folderName = "/";
   }
 
@@ -1036,27 +1036,27 @@ async function transpileColoredIcon(iconPath) {
 
 async function translate() {
   return new Promise((resolve, reject) => {
-    if (!Config?.folderName) {
-      console.error(
-        "WinnetouJs Translation Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
-      );
+    // if (!Config?.folderName) {
+    //   console.error(
+    //     "WinnetouJs Translation Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
+    //   );
 
-      return reject({ err: "erro" });
-    }
+    //   return reject({ err: "erro" });
+    // }
 
     // if (Config.folderName === "/") Config.folderName = "";
-    let folderName = path.join(__dirname, "/translations");
+    let translationsPath = path.join(__dirname, "/translations");
 
     let strings = "";
     let jsdoc = "";
 
     fs.readFile(
-      `${folderName}/${Config.defaultLang}.xml`,
+      `${translationsPath}/${Config.defaultLang}.xml`,
       "utf-8",
       function (err, data) {
         if (err) {
-          // drawError(err.message);
-          // return resolve();
+          // first search for legacy xml translation
+          // if not located, run new json format
           return json();
         }
         let trad = xml.parse(data)[0].childNodes;
@@ -1103,7 +1103,7 @@ async function translate() {
 
     function json() {
       fs.readFile(
-        `${folderName}/${Config.defaultLang}.json`,
+        `${translationsPath}/${Config.defaultLang}.json`,
         "utf-8",
         function (err, data) {
           if (err) {

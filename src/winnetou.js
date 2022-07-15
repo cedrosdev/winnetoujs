@@ -897,6 +897,8 @@ class Winnetou_ {
    * @param {object} class_ the Strings class
    * @example
    * Winnetou.lang(Strings, render);
+   *
+   * @deprecated
    */
 
   async lang(class_, next_) {
@@ -960,6 +962,20 @@ class Winnetou_ {
     xhttp.send();
   }
 
+  /**
+   * The updateTranslation method is only called when user
+   * already changed language with `changeLang()` method.
+   * when this happens, an local storage variable `lang`
+   * is created, changing all app language.
+   * If `lang` is not defined yet, this method
+   * does nothing.
+   *
+   * @param {object} class_ the import from _strings.js
+   * @example
+   * import _strings from "./_strings.js";
+   * Winnetou.updateTranslations(_strings).then(() => render());
+   * @returns
+   */
   async updateTranslations(class_) {
     /**
      * Function to get json from API
@@ -1012,6 +1028,8 @@ class Winnetou_ {
 
       Object.keys(data).map(key => {
         let value = data[key];
+
+        // replace all values of _strings.js object
         This[key] = value;
       });
 

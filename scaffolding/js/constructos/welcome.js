@@ -37,8 +37,9 @@ class welcome_ extends Constructos {
     <h1>WinnetouJs</h1>
     <h2>${(elements_?.title)}</h2>
     <span class="version">${(elements_?.version_string)} ${(elements_?.version)}</span>
-    <p>
-      <a href="https://winnetoujs.org">https://winnetoujs.org</a>
+    <p class="main_link">
+      <a href="https://winnetoujs.org" target="_blank"
+        >winnetoujs.org</a>
     </p>
   </div>
 `

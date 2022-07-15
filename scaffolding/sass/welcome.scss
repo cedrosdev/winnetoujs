@@ -5,6 +5,12 @@ html,
 body {
   padding: 0px;
   margin: 0px;
+  height: 100%;
+  width: 100%;
+}
+#app {
+  height: 100%;
+  width: 100%;
 }
 .welcome {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -18,16 +24,26 @@ body {
   color: #222;
   padding: 30px;
   width: 100vw;
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  h2 {
+    text-align: center;
+  }
 }
-a {
-  color: #333;
+.main_link {
   margin-top: 150px;
   display: block;
+}
+a {
+  color: rgb(128, 7, 165);
+  text-decoration: none;
+  &:hover {
+    color: rgb(56, 26, 56);
+    font-weight: bold;
+  }
 }
 .logo {
   width: calc(424px / 4);

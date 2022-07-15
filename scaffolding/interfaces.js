@@ -32,7 +32,6 @@
  * }
  * ```
  *
- * @property {string} folderName The root of project, default "/"
  * @property {string} sass The path of sass files to be compiled and watched
  * @property {string} cssOut The path of sass files release css bundle
  * @property {string} defaultLang Initial language, "en-us"
@@ -42,5 +41,6 @@
 
 /**
  * @type IWinConfig
+ * Property folderName is deprecated since version 1.17.5, set it doesn't affect the code.
  */
 exports.IWinConfig = class WinConfig {};
