@@ -291,7 +291,7 @@ const drawAddError = text => {
 };
 
 const drawHtmlMin = text => {
-  console.log("> [html minifield] " + text);
+  console.log("> [html minified] " + text);
 };
 
 const drawEnd = text => {

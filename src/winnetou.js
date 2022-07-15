@@ -906,15 +906,15 @@ class Winnetou_ {
 
     let This = class_;
 
-    if (!Config?.folderName) {
-      console.error(
-        "WinnetouJs Translation Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
-      );
+    // if (!Config?.folderName) {
+    //   console.error(
+    //     "WinnetouJs Translation Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
+    //   );
 
-      return next_();
-    }
+    //   return next_();
+    // }
 
-    if (Config.folderName === "/") Config.folderName = "";
+    // if (Config.folderName === "/") Config.folderName = "";
 
     let defaultLang = Config?.defaultLang;
     let localLang = window.localStorage.getItem("lang");
@@ -925,7 +925,7 @@ class Winnetou_ {
       if (this.readyState == 4 && this.status == 404) {
         console.log(
           "\nThe file ",
-          `${Config.folderName}/translations/${defaultLang}.xml`,
+          `./translations/${defaultLang}.xml`,
           "are not found"
         );
         window.localStorage.removeItem("lang");
@@ -945,7 +945,7 @@ class Winnetou_ {
         } catch (e) {
           console.log(
             "The translation file ",
-            `${Config.folderName}/translations/${defaultLang}.xml`,
+            `./translations/${defaultLang}.xml`,
             " seems to be empty or incorrect.",
             e.message
           );
@@ -954,11 +954,7 @@ class Winnetou_ {
         return next_();
       }
     };
-    xhttp.open(
-      "GET",
-      `${Config.folderName}/translations/${defaultLang}.xml`,
-      true
-    );
+    xhttp.open("GET", `./translations/${defaultLang}.xml`, true);
     xhttp.send();
   }
 
@@ -1006,23 +1002,21 @@ class Winnetou_ {
 
       let This = class_;
 
-      if (!Config?.folderName) {
-        console.error(
-          "WinnetouJs updateTranslations Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
-        );
+      // if (!Config?.folderName) {
+      //   console.error(
+      //     "WinnetouJs updateTranslations Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
+      //   );
 
-        return resolve();
-      }
+      //   return resolve();
+      // }
 
-      if (Config.folderName === "/") Config.folderName = "";
+      // if (Config.folderName === "/") Config.folderName = "";
 
       let defaultLang = Config?.defaultLang;
       let localLang = window.localStorage.getItem("lang");
       if (localLang) defaultLang = localLang;
 
-      let data = await get(
-        `${Config.folderName}/translations/${defaultLang}.json`
-      );
+      let data = await get(`/translations/${defaultLang}.json`);
 
       // let file = JSON.parse(data);
 
