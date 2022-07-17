@@ -986,14 +986,18 @@ class Winnetou_ {
             if (response.ok) {
               return response.json();
             } else {
-              return reject(response);
+              return reject(
+                "Translation file not found. Code error kj438dj."
+              );
             }
           })
           .then(function (data) {
             return resolve(data);
           })
           .catch(function (error) {
-            return reject(error);
+            return reject(
+              "Translation file not found. Code error kj438dssj."
+            );
           });
       });
     };
@@ -1016,7 +1020,18 @@ class Winnetou_ {
       let localLang = window.localStorage.getItem("lang");
       if (localLang) defaultLang = localLang;
 
-      let data = await get(`/translations/${defaultLang}.json`);
+      let data;
+
+      try {
+        data = await get(`/translations/${defaultLang}.json`);
+      } catch (e) {
+        console.log("Lang error. Reloading...");
+        window.localStorage.removeItem("lang");
+        setTimeout(() => {
+          // to use new cycle
+          location.reload();
+        }, 200);
+      }
 
       // let file = JSON.parse(data);
 
