@@ -8,5 +8,6 @@ export default {
   out: "./release",
   sass: "./sass",
   defaultLang: "en-us",
+  publicPath: "/",
   cssOut: "./release",
 };

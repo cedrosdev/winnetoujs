@@ -1006,15 +1006,15 @@ class Winnetou_ {
 
       let This = class_;
 
-      // if (!Config?.folderName) {
-      //   console.error(
-      //     "WinnetouJs updateTranslations Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
-      //   );
+      if (!Config?.publicPath) {
+        console.error(
+          "WinnetouJs updateTranslations Miss Configuration Error:You have to specify the public path in order to use the translations;"
+        );
 
-      //   return resolve();
-      // }
+        Config.publicPath = "";
+      }
 
-      // if (Config.folderName === "/") Config.folderName = "";
+      if (Config.publicPath === "/") Config.publicPath = "";
 
       let defaultLang = Config?.defaultLang;
       let localLang = window.localStorage.getItem("lang");
@@ -1023,9 +1023,16 @@ class Winnetou_ {
       let data;
 
       try {
-        data = await get(`/translations/${defaultLang}.json`);
+        data = await get(
+          `${Config.publicPath}/translations/${defaultLang}.json`
+        );
       } catch (e) {
-        console.log("Lang error. Reloading...");
+        console.warn(
+          `Lang error. Reloading...
+
+
+The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. Did you set publicPath in win.config.js and created json translation file?`
+        );
         window.localStorage.removeItem("lang");
         setTimeout(() => {
           // to use new cycle

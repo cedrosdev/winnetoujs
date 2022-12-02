@@ -35,6 +35,7 @@
  * @property {string} sass The path of sass files to be compiled and watched
  * @property {string} cssOut The path of sass files release css bundle
  * @property {string} defaultLang Initial language, "en-us"
+ * @property {string} publicPath Relative path address to translations folder
  * @property {string} [icons] The path of icons
  *
  */
