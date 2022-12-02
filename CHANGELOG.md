@@ -1,3 +1,9 @@
+#### 1.17.9 (2022-12-02)
+
+##### Bug Fixes
+
+*  scaffolding winnetou dependency ([f93b9868](https://github.com/cedrosdev/winnetoujs/commit/f93b98685021538aab378d2962fcbe753500cffb))
+
 #### 1.17.8 (2022-12-02)
 
 ##### Bug Fixes
