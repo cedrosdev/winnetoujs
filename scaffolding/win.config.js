@@ -10,4 +10,5 @@ export default {
   defaultLang: "en-us",
   publicPath: "/",
   cssOut: "./release",
+  icons: "./icons",
 };
