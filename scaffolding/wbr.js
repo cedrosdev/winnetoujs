@@ -988,7 +988,6 @@ class Sass {
 
   async transpileSass(file) {
     return new Promise(async (resolve, reject) => {
-      console.log("file :>> ", file);
       sass
         .compileAsync(file)
         .then((res) => {
