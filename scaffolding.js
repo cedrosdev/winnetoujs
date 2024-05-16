@@ -67,29 +67,17 @@ const drawText = (text = "", params) => {
   let line = "= " + color + text + "\x1b[0m";
 
   if (params && params.type === "add") {
-    line =
-      "= \x1b[42m\x1b[37m success \x1b[0m " +
-      color +
-      text +
-      "\x1b[0m";
+    line = "= \x1b[42m\x1b[37m success \x1b[0m " + color + text + "\x1b[0m";
     text = " success  " + text;
   }
 
   if (params && params.type === "change") {
-    line =
-      "= \x1b[45m\x1b[37m changed \x1b[0m " +
-      color +
-      text +
-      "\x1b[0m";
+    line = "= \x1b[45m\x1b[37m changed \x1b[0m " + color + text + "\x1b[0m";
     text = " changed  " + text;
   }
 
   if (params && params.type === "addError") {
-    line =
-      "= \x1b[5m\x1b[43m\x1b[37m fail \x1b[0m " +
-      color +
-      text +
-      "\x1b[0m";
+    line = "= \x1b[5m\x1b[43m\x1b[37m fail \x1b[0m " + color + text + "\x1b[0m";
     text = " fail  " + text;
   }
 
@@ -107,7 +95,7 @@ const drawText = (text = "", params) => {
 
 const drawTextBlock = (text, params) => {
   let arr = text.match(/.{1,74}/g);
-  arr.forEach(item => {
+  arr.forEach((item) => {
     drawText(item, params);
   });
 };
@@ -124,7 +112,7 @@ const drawSpace = () => {
  * Draw error
  * @param {string} text error string
  */
-const drawError = text => {
+const drawError = (text) => {
   errorsCount++;
   drawLine();
   drawBlankLine();
@@ -136,7 +124,7 @@ const drawError = text => {
   drawBlankLine();
 };
 
-const drawWarning = text => {
+const drawWarning = (text) => {
   warningCount++;
   drawLine();
   drawBlankLine();
@@ -154,10 +142,9 @@ const drawWelcome = () => {
   drawBlankLine();
   drawText("W I N N E T O U J S ", { color: "bright" });
   drawBlankLine();
-  drawText(
-    "T h e  i n d i e  j a v a s c r i p t  c o n s t r u c t o r",
-    { color: "dim" }
-  );
+  drawText("T h e  i n d i e  j a v a s c r i p t  c o n s t r u c t o r", {
+    color: "dim",
+  });
   drawBlankLine();
   drawText("WinnetouJs.org", { color: "yellow" });
 
@@ -184,28 +171,28 @@ const drawWelcome = () => {
  * Draw add
  * @param {string} text add string
  */
-const drawAdd = text => {
+const drawAdd = (text) => {
   drawText(text, { type: "add", color: "green" });
   drawBlankLine();
 };
 
-const drawChange = text => {
+const drawChange = (text) => {
   drawText(text, { type: "change", color: "green" });
   drawBlankLine();
 };
 
-const drawAddError = text => {
+const drawAddError = (text) => {
   errorsCount++;
 
   drawText(text, { type: "addError", color: "cyan" });
   drawBlankLine();
 };
 
-const drawHtmlMin = text => {
+const drawHtmlMin = (text) => {
   console.log("> [html minifield] " + text);
 };
 
-const drawEnd = text => {
+const drawEnd = (text) => {
   console.log("> [Bundle Release Finished] " + text);
 };
 
@@ -240,12 +227,15 @@ drawBlankLine();
 
 //@ts-ignore
 ncp.limit = 16;
- 
-ncp( path.join(__dirname, "./scaffolding"), path.join(__dirname, "../../"), function (err) {
- if (err) {
-   return drawError(err);
- }
- drawAdd('Scaffolding complete');
- drawFinal();
-});
 
+ncp(
+  path.join(__dirname, "./node_modules/winnetoujs/scaffolding"),
+  path.join(__dirname, "./"),
+  function (err) {
+    if (err) {
+      return drawError(err.join("\n"));
+    }
+    drawAdd("Scaffolding complete");
+    drawFinal();
+  }
+);

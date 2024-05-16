@@ -6,7 +6,13 @@ const ncp = require("ncp").ncp;
 // @ts-ignore
 ncp.limit = 16;
 ncp(
-  path.join(__dirname, "./scaffolding/wbr.js"),
+  path.join(__dirname, "./wbr.js"),
   path.join(__dirname, "../../", "wbr.js"),
-  function (err) { }
+  function (err) {}
+);
+
+ncp(
+  path.join(__dirname, "./scaffolding.js"),
+  path.join(__dirname, "../../", "scaffolding.js"),
+  function (err) {}
 );
