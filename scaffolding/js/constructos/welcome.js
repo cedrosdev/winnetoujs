@@ -15,8 +15,7 @@ class welcome_ extends Constructos {
    * 
    * @param {object} elements
    * @param {any} elements.title 
-   * @param {any} elements.version_string 
-   * @param {any} elements.version 
+   * @param {any} elements.text 
    * @param {object} [options]
    * @param {any=} options.identifier
    */
@@ -36,10 +35,9 @@ class welcome_ extends Constructos {
     >
     <h1>WinnetouJs</h1>
     <h2>${(elements_?.title)}</h2>
-    <span class="version">${(elements_?.version_string)} ${(elements_?.version)}</span>
+    <span class="text">${(elements_?.text)}</span>
     <p class="main_link">
-      <a href="https://winnetoujs.org" target="_blank"
-        >winnetoujs.org</a>
+      <a href="https://winnetoujs.org" target="_blank">winnetoujs.org</a>
     </p>
   </div>
 `

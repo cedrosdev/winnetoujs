@@ -8,9 +8,9 @@
     "node-html-parser": "^1.2.20",
     "node-watch": "^0.6.4",
     "recursive-readdir": "^2.2.2",
-    "sass": "^1.26.10",
+    "sass": "^1.77.1",
     "uglifycss": "0.0.29",
-    "winnetoujs": "^1.17.9",
+    "winnetoujs": "^1.18.2",
     "xml-parse": "^0.4.0"
   },
   "devDependencies": {

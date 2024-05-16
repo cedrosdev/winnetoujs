@@ -115,6 +115,16 @@ class WBR {
         case "":
           this.transpileAll();
           break;
+
+        default:
+          new Drawer().drawError(
+            `Unknown command ${arg1}. ${
+              arg1 === "--buildRelease" || arg1 === "-buildRelease"
+                ? "Did you mean --bundleRelease?"
+                : ""
+            }`
+          );
+          break;
       }
     }
   }
@@ -198,7 +208,7 @@ class WBR {
   }
 
   watchFiles() {
-    const refresh = (name) => {
+    const refresh = name => {
       new Drawer().drawChange(name);
       global.idList = [];
       global.promisesConstructos = [];
@@ -294,7 +304,7 @@ class WBR {
     let out = global.config.out;
     if (typeof entry === "object") {
       let keys = Object.keys(entry);
-      keys.map((key) => {
+      keys.map(key => {
         global.config.entry = entry[key];
         global.config.out = out[key];
         return this.__bundle(entry[key], out[key]);
@@ -391,11 +401,11 @@ class Icons {
         }
       }
 
-      Promise.all(global.promisesIcons).then(async (res) => {
+      Promise.all(global.promisesIcons).then(async res => {
         let splitter = new Array();
         splitter["icons"] = [];
 
-        res.forEach((item) => {
+        res.forEach(item => {
           if (typeof item == "object") {
             let s = item.iconPath.split("/");
             if (s.length > 2) {
@@ -409,7 +419,7 @@ class Icons {
 
         let finalPromise = [];
 
-        Object.keys(splitter).forEach((key) => {
+        Object.keys(splitter).forEach(key => {
           finalPromise.push(
             fs.outputFile(
               path.join(
@@ -421,7 +431,7 @@ class Icons {
           );
         });
 
-        Promise.all(finalPromise).then((res) => {
+        Promise.all(finalPromise).then(res => {
           global.transpileIconsComplete = true;
           return resolve(true);
         });
@@ -438,7 +448,7 @@ class Icons {
 
         let id = iconPath.match(regPath);
 
-        id = id.filter((x) => x != "svg");
+        id = id.filter(x => x != "svg");
 
         id = id.join("_");
 
@@ -508,8 +518,8 @@ class Constructos {
             return resolve(true);
           }
           files2 = files2
-            .filter((x) => x.includes("win-"))
-            .filter((x) => x.includes(".htm") || x.includes(".html"));
+            .filter(x => x.includes("win-"))
+            .filter(x => x.includes(".htm") || x.includes(".html"));
 
           if (files2.length > 0) {
             try {
@@ -548,14 +558,14 @@ class Constructos {
   async transpileConstructo(filePath) {
     return new Promise((resolve, reject) => {
       try {
-        new Files().getFileFromCacheAsync(filePath).then((data) => {
+        new Files().getFileFromCacheAsync(filePath).then(data => {
           // transforma o html em método
           let dom = htmlParser.parse(data);
           let components = dom.querySelectorAll("winnetou");
           let finalReturn = "";
           let constructos = [];
 
-          Array.from(components).forEach((component) => {
+          Array.from(components).forEach(component => {
             let descri = component.getAttribute("description");
             let constructo = component.innerHTML;
             let jsdoc = "\n\n// ========================================";
@@ -580,7 +590,7 @@ class Constructos {
 
             let pureId = id + "-win-${identifier}";
 
-            let verify = global.idList.filter((data) => data.id === id);
+            let verify = global.idList.filter(data => data.id === id);
 
             //duplicated constructo
             if (verify.length > 0) {
@@ -603,12 +613,12 @@ class Constructos {
 
             let ids = "ids:{";
 
-            matchIds = matchIds.map((item) =>
+            matchIds = matchIds.map(item =>
               item.replace("[[", "").replace("]]", "")
             );
-            matchIds = matchIds.map((item) => item + "-win-${identifier}");
+            matchIds = matchIds.map(item => item + "-win-${identifier}");
 
-            matchIds.forEach((item) => {
+            matchIds.forEach(item => {
               let nome = item.split("-win-")[0];
               ids += nome + ":`" + item + "`,";
             });
@@ -629,7 +639,7 @@ class Constructos {
             let matches = constructo.match(regex);
 
             if (matches) {
-              matches.forEach((match) => {
+              matches.forEach(match => {
                 let el = match.replace("{{", "");
                 el = el.replace("}}", "");
 
@@ -744,7 +754,7 @@ class Constructos {
 
   async execPromisesConstructos() {
     return new Promise((resolve, reject) => {
-      Promise.all(global.promisesConstructos).then(async (data) => {
+      Promise.all(global.promisesConstructos).then(async data => {
         /**
          * data[0].method
          * data[0].constructosList
@@ -801,8 +811,8 @@ class Constructos {
       recursive("./node_modules", async (err2, files2) => {
         if (err2) files2 = [];
         files2 = files2
-          .filter((x) => x.includes("win-"))
-          .filter((x) => x.includes(".htm") || x.includes(".html"));
+          .filter(x => x.includes("win-"))
+          .filter(x => x.includes(".htm") || x.includes(".html"));
 
         if (files2.length > 0) {
           try {
@@ -812,17 +822,17 @@ class Constructos {
           }
         }
 
-        files = files.map((x) => path.parse(x).name);
+        files = files.map(x => path.parse(x).name);
 
         recursive(constructosOut, async (err3, jsFiles) => {
-          jsFiles = jsFiles.map((x) => path.parse(x).name);
+          jsFiles = jsFiles.map(x => path.parse(x).name);
 
           let diff = this.diffArray(files, jsFiles);
 
-          diff = diff.map((x) => path.join("./", constructosOut, x + ".js"));
+          diff = diff.map(x => path.join("./", constructosOut, x + ".js"));
 
-          diff.forEach((item) => {
-            fs.unlink(item, (e) => {});
+          diff.forEach(item => {
+            fs.unlink(item, e => {});
           });
         });
       });
@@ -832,7 +842,7 @@ class Constructos {
   diffArray(arr1, arr2) {
     return arr1
       .concat(arr2)
-      .filter((val) => !(arr1.includes(val) && arr2.includes(val)));
+      .filter(val => !(arr1.includes(val) && arr2.includes(val)));
   }
 }
 
@@ -860,7 +870,7 @@ class Translator {
           }
           let trad = xml.parse(data)[0].childNodes;
 
-          trad.forEach((item) => {
+          trad.forEach(item => {
             if (item.tagName && item.childNodes[0]?.text) {
               strings += `
                   /** @property ${item.childNodes[0].text.trim()} */           
@@ -888,7 +898,7 @@ class Translator {
               indent_size: 2,
               space_in_empty_paren: true,
             }),
-            (err) => {
+            err => {
               new Drawer().drawAdd("Strings");
               return resolve(true);
             }
@@ -920,7 +930,7 @@ class Translator {
             return resolve(true);
           }
 
-          Object.keys(file).map((key) => {
+          Object.keys(file).map(key => {
             let value = file[key];
             strings += `
                 /** @property ${value} */           
@@ -944,7 +954,7 @@ class Translator {
               indent_size: 2,
               space_in_empty_paren: true,
             }),
-            (err) => {
+            err => {
               new Drawer().drawAdd("Strings");
               return resolve(true);
             }
@@ -990,10 +1000,10 @@ class Sass {
     return new Promise(async (resolve, reject) => {
       sass
         .compileAsync(file)
-        .then((res) => {
+        .then(res => {
           return resolve(res.css.toString());
         })
-        .catch((e) => {
+        .catch(e => {
           return reject(e);
         });
     });
@@ -1002,7 +1012,7 @@ class Sass {
   async execSassPromises() {
     return new Promise((resolve, reject) => {
       Promise.all(global.promisesCss)
-        .then((data) => {
+        .then(data => {
           // data has all css files
           data.push(
             `    
@@ -1028,7 +1038,7 @@ class Sass {
             }
           );
         })
-        .catch((e) => {
+        .catch(e => {
           new Err().e004();
           return resolve(true);
         });
@@ -1125,7 +1135,7 @@ class Drawer {
 
   drawTextBlock = (text, params) => {
     let arr = text.match(/.{1,74}/g);
-    arr.forEach((item) => {
+    arr.forEach(item => {
       this.drawText(item, params);
     });
   };
@@ -1142,7 +1152,7 @@ class Drawer {
    * Draw error
    * @param {string} text error string
    */
-  drawError = (text) => {
+  drawError = text => {
     global.errorsCount++;
     this.drawLine();
     this.drawBlankLine();
@@ -1154,7 +1164,7 @@ class Drawer {
     this.drawBlankLine();
   };
 
-  drawWarning = (text) => {
+  drawWarning = text => {
     global.warningCount++;
     this.drawLine();
     this.drawBlankLine();
@@ -1207,28 +1217,28 @@ class Drawer {
    * Draw add
    * @param {string} text add string
    */
-  drawAdd = (text) => {
+  drawAdd = text => {
     this.drawText(text, { type: "add", color: "green" });
     this.drawBlankLine();
   };
 
-  drawChange = (text) => {
+  drawChange = text => {
     this.drawText(text, { type: "change", color: "green" });
     this.drawBlankLine();
   };
 
-  drawAddError = (text) => {
+  drawAddError = text => {
     global.errorsCount++;
 
     this.drawText(text, { type: "addError", color: "cyan" });
     this.drawBlankLine();
   };
 
-  drawHtmlMin = (text) => {
+  drawHtmlMin = text => {
     console.log("> [html minified] " + text);
   };
 
-  drawEnd = (text) => {
+  drawEnd = text => {
     console.log("> [Bundle Release Finished] " + text);
   };
 
