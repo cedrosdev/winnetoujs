@@ -30,6 +30,7 @@ const { exit } = require("process");
 const winnetouPackage = require("winnetoujs/package.json");
 const watch = require("node-watch");
 const webpack = require("webpack");
+const ncp = require("ncp").ncp;
 
 let global = {
   errorsCount: 0,
@@ -112,6 +113,14 @@ class WBR {
             : this.bundleRelease();
           break;
 
+        case "--scaffolding":
+          this.scaffolding();
+          break;
+
+        case "-scaffolding":
+          this.scaffolding();
+          break;
+
         case "":
           this.transpileAll();
           break;
@@ -127,6 +136,28 @@ class WBR {
           break;
       }
     }
+  }
+
+  scaffolding() {
+    new Drawer().drawText("Init scaffolding ...");
+    new Drawer().drawBlankLine();
+
+    // COPY METHODS ===============================================
+
+    //@ts-ignore
+    ncp.limit = 16;
+
+    ncp(
+      path.join(__dirname, "./node_modules/winnetoujs/scaffolding"),
+      path.join(__dirname, "./"),
+      function (err) {
+        if (err) {
+          return new Drawer().drawError(err.join("\n"));
+        }
+        new Drawer().drawAdd("Scaffolding complete");
+        new Drawer().drawFinal();
+      }
+    );
   }
 
   fixedJson(badJSON) {
