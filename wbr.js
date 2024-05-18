@@ -999,6 +999,7 @@ class Sass {
           return resolve(res.css.toString());
         })
         .catch(e => {
+          new Drawer().drawWarning(e.message);
           return reject(e);
         });
     });
