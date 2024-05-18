@@ -56,8 +56,6 @@ let global = {
   init: new Date().getTime(),
   finish: null,
   res: null,
-  transpileComplete: false,
-  transpileIconsComplete: false,
 };
 
 class WBR {
@@ -209,6 +207,9 @@ class WBR {
   }
 
   watchFiles() {
+    new Drawer().drawText("Live reload enabled. Watching for changes...", {
+      color: "dim",
+    });
     const refresh = name => {
       new Drawer().drawChange(name);
       global.idList = [];
@@ -241,13 +242,10 @@ class WBR {
           global.config.constructosPath,
           { recursive: true },
           async (evt, name) => {
-            if (global.transpileComplete && global.transpileIconsComplete) {
-              global.transpileComplete = false;
-              refresh(name);
-              await new Constructos().transpile(name);
-              this.getTimeElapsed();
-              new Drawer().drawFinal();
-            }
+            refresh(name);
+            await new Constructos().transpile(name);
+            this.getTimeElapsed();
+            new Drawer().drawFinal();
           }
         );
       } catch (e) {}
@@ -259,8 +257,7 @@ class WBR {
       try {
         watch.default(folders, { recursive: true }, async (evt, name) => {
           refresh(name);
-          global.transpileComplete = false;
-          global.transpileIconsComplete = false;
+
           await new Icons().transpile();
           await new Constructos().transpile();
           this.getTimeElapsed();
@@ -433,7 +430,6 @@ class Icons {
         });
 
         Promise.all(finalPromise).then(res => {
-          global.transpileIconsComplete = true;
           return resolve(true);
         });
       });
@@ -788,8 +784,6 @@ class Constructos {
 
           await fs.outputFile(pathOut, resultadoFinal);
         }
-
-        global.transpileComplete = true;
 
         return resolve(true);
       });
