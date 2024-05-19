@@ -33,6 +33,11 @@ const webpack = require("webpack");
 const ncp = require("ncp").ncp;
 
 let global = {
+  totalFiles: 0,
+  compiledFiles: 0,
+  webpackPromises: new Array(),
+  watch: true,
+  firstWebpackRebuild: true,
   errorsCount: 0,
   warningCount: 0,
   /**@type {import("./interfaces.js").IWinConfig} */
@@ -71,6 +76,10 @@ class WBR {
       const arg2 = process.argv[3];
 
       switch (arg1) {
+        case "":
+          this.transpileAll();
+          break;
+
         case "--version":
           console.log(winnetouPackage.version);
           exit();
@@ -102,17 +111,17 @@ class WBR {
         case "--bundleRelease":
           arg2 === "--standalone" || arg2 === "-standalone"
             ? this.bundleRelease(false)
+            : arg2 === "--no-watch" || arg2 === "-no-watch"
+            ? (this.bundleRelease(), (global.watch = false))
             : this.bundleRelease();
           break;
 
         case "-bundleRelease":
           arg2 === "--standalone" || arg2 === "-standalone"
             ? this.bundleRelease(false)
+            : arg2 === "--no-watch" || arg2 === "-no-watch"
+            ? (this.bundleRelease(), (global.watch = false))
             : this.bundleRelease();
-          break;
-
-        case "":
-          this.transpileAll();
           break;
 
         default:
@@ -207,9 +216,9 @@ class WBR {
   }
 
   watchFiles() {
-    new Drawer().drawText("Live reload enabled. Watching for changes...", {
-      color: "dim",
-    });
+    if (global.watch === false) return;
+
+    new Drawer().drawBlankLine();
     const refresh = name => {
       new Drawer().drawChange(name);
       global.idList = [];
@@ -257,7 +266,6 @@ class WBR {
       try {
         watch.default(folders, { recursive: true }, async (evt, name) => {
           refresh(name);
-
           await new Icons().transpile();
           await new Constructos().transpile();
           this.getTimeElapsed();
@@ -293,87 +301,127 @@ class WBR {
     if (watch) this.watchFiles();
   }
 
-  // node wbr --webpack
+  // node wbr --bundleRelease
   async bundleRelease(transpileAll = true) {
     transpileAll
       ? await this.transpileAll(false)
       : (await this.config(), await this.testConfig());
+
+    // within watchFiles are making an watch verification
+    this.watchFiles();
+
+    new Drawer().drawTextBlock(`Building release bundles...`);
+    new Drawer().drawBlankLine();
+
     let entry = global.config.entry;
     let out = global.config.out;
     if (typeof entry === "object") {
       let keys = Object.keys(entry);
-      keys.map(key => {
+      let watch = global.watch;
+      global.totalFiles = keys.length;
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
         global.config.entry = entry[key];
         global.config.out = out[key];
-        return this.__bundle(entry[key], out[key]);
-      });
+        global.webpackPromises.push(this.__bundle(entry[key], out[key], watch));
+      }
+      await Promise.all(global.webpackPromises);
     } else {
-      return this.__bundle(global.config.entry, global.config.out);
+      await this.__bundle(global.config.entry, global.config.out, global.watch);
     }
+    this.getTimeElapsed();
+    new Drawer().drawFinal();
   }
 
-  __bundle(entry, out) {
-    const compiler = webpack({
-      entry: entry,
-      output: {
-        chunkFilename: "[name].bundle.js",
-        filename: "winnetouBundle.min.js",
-        path: path.resolve(__dirname, out),
-        publicPath: path.join(/*Config.folderName,*/ out, "/"),
-      },
-      mode: "production",
-      devtool: "source-map",
-      module: {
-        rules: [
-          {
-            test: /\.js$/,
-            use: {
-              loader: "babel-loader",
-              options: {
-                presets: [
-                  [
-                    "@babel/preset-env",
-                    {
-                      targets:
-                        "last 2 Chrome versions, last 2 Firefox versions",
-                    },
-                  ],
-                ],
-                plugins: [
-                  "@babel/plugin-transform-optional-chaining",
-                  "@babel/plugin-transform-nullish-coalescing-operator",
-                  [
-                    "@babel/plugin-transform-runtime",
-                    {
-                      regenerator: true,
-                    },
-                  ],
-                  /* "@babel/plugin-proposal-class-properties",*/
-                ],
-              },
-            },
+  async __bundle(entry, out, watch = false) {
+    return new Promise((resolve, reject) => {
+      const compiler = webpack(
+        {
+          watch: watch,
+          watchOptions: {
+            aggregateTimeout: 500,
+            ignored: [
+              "**/node_modules",
+              out,
+              global.config.cssOut,
+              path.resolve(__dirname, out),
+              path.resolve(__dirname, global.config.cssOut),
+            ],
           },
-        ],
-      },
-    });
-    new Drawer().drawTextBlock(
-      `Initializing webpack winnetou bundle, please wait. \n\n${entry} => ${out}`
-    );
-    new Drawer().drawBlankLine();
-    return compiler.run((e, s) => {
-      if (e) {
-        new Drawer().drawError(e.message);
-      }
-      if (s && s.compilation.errors.length > 0) {
-        new Drawer().drawError(s.compilation.errors.toString());
-      }
-      if (s && s.compilation.warnings.length > 0) {
-        new Drawer().drawWarning(s.compilation.warnings.toString());
-      }
-      new Drawer().drawAdd(`'${entry} => ${out}`);
-      this.getTimeElapsed();
-      new Drawer().drawFinal();
-      return true;
+          entry: entry,
+          output: {
+            chunkFilename: "[name].bundle.js",
+            filename: "winnetouBundle.min.js",
+            path: path.resolve(__dirname, out),
+            publicPath: path.join(/*Config.folderName,*/ out, "/"),
+          },
+          mode: "production",
+
+          devtool: "source-map",
+          module: {
+            rules: [
+              {
+                test: /\.js$/,
+                use: {
+                  loader: "babel-loader",
+                  options: {
+                    presets: [
+                      [
+                        "@babel/preset-env",
+                        {
+                          targets:
+                            "last 2 Chrome versions, last 2 Firefox versions",
+                        },
+                      ],
+                    ],
+                    plugins: [
+                      "@babel/plugin-transform-optional-chaining",
+                      "@babel/plugin-transform-nullish-coalescing-operator",
+                      [
+                        "@babel/plugin-transform-runtime",
+                        {
+                          regenerator: true,
+                        },
+                      ],
+                      /* "@babel/plugin-proposal-class-properties",*/
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+        (err, stats) => {
+          if (global.compiledFiles >= global.totalFiles) {
+            let d = new Drawer();
+
+            d.drawBlankLine();
+            d.drawAdd(
+              `Bundle rebuild successful in ` +
+                (stats.endTime - stats.startTime) +
+                "ms"
+            );
+            d.drawLine();
+          }
+          global.compiledFiles++;
+        }
+      );
+
+      return compiler.run((e, s) => {
+        if (e.name !== "ConcurrentCompilationError") {
+          console.log(e);
+          new Drawer().drawError(e.message);
+        }
+        if (s && s.compilation.errors.length > 0) {
+          new Drawer().drawError(s.compilation.errors.toString());
+        }
+        if (s && s.compilation.warnings.length > 0) {
+          new Drawer().drawWarning(s.compilation.warnings.toString());
+        }
+        new Drawer().drawAdd(`'${entry} => ${out}`);
+
+        return resolve(true);
+      });
     });
   }
 }
@@ -1219,6 +1267,7 @@ class Drawer {
   };
 
   drawChange = text => {
+    this.drawBlankLine();
     this.drawText(text, { type: "change", color: "green" });
     this.drawBlankLine();
   };
@@ -1242,7 +1291,12 @@ class Drawer {
     this.drawLine();
     this.drawBlankLine();
     this.drawText("All tasks completed.");
+    if (global.watch)
+      new Drawer().drawText("Live reload enabled. Watching for changes...", {
+        color: "dim",
+      });
     this.drawBlankLine();
+
     if (global.errorsCount > 0) {
       this.drawText("... with " + global.errorsCount + " errors");
       this.drawBlankLine();
@@ -1253,7 +1307,6 @@ class Drawer {
     }
 
     this.drawLine();
-    this.drawSpace();
   };
 }
 

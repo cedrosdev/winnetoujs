@@ -27,8 +27,8 @@
  * out:"./js/app.js"
  * // or
  * out:{
- *   pc:"./js/pc.js",
- *   mobile:"./js/mobile.js"
+ *   pc:"./release/pc",
+ *   mobile:"./release/mobile"
  * }
  * ```
  *
