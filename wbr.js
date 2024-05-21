@@ -30,9 +30,13 @@ const { exit } = require("process");
 const winnetouPackage = require("winnetoujs/package.json");
 const watch = require("node-watch");
 const webpack = require("webpack");
-const ncp = require("ncp").ncp;
 
 let global = {
+  args: {
+    standalone: false,
+    watch: true,
+    production: false,
+  },
   totalFiles: 0,
   compiledFiles: 0,
   webpackPromises: new Array(),
@@ -70,6 +74,86 @@ class WBR {
   }
 
   readArgs() {
+    const args = process.argv.slice(2); // remove 'node' and 'script' from argv
+
+    if (args.length === 0) {
+      this.transpileAll();
+      return;
+    }
+
+    const commands = {
+      "--version": () => {
+        console.log(winnetouPackage.version);
+        process.exit();
+      },
+      "--v": () => {
+        console.log(winnetouPackage.version);
+        process.exit();
+      },
+      "-version": () => {
+        console.log(winnetouPackage.version);
+        process.exit();
+      },
+      "-v": () => {
+        console.log(winnetouPackage.version);
+        process.exit();
+      },
+      "--webpack": this.bundleRelease,
+      "-webpack": this.bundleRelease,
+      "--bundleRelease": () => {},
+      "-bundleRelease": () => {},
+      "--standalone": () => {
+        global.args.standalone = true;
+      },
+      "-standalone": () => {
+        global.args.standalone = true;
+      },
+      "--no-watch": () => {
+        global.args.watch = false;
+      },
+      "-no-watch": () => {
+        global.args.watch = false;
+      },
+      "--production": () => {
+        global.args.production = true;
+      },
+      "-production": () => {
+        global.args.production = true;
+      },
+      "-buildRelease": () => {
+        new Drawer().drawError(
+          `Unknown command -buildRelease. Did you mean --bundleRelease?`
+        );
+      },
+      "--buildRelease": () => {
+        new Drawer().drawError(
+          `Unknown command --buildRelease. Did you mean --bundleRelease?`
+        );
+      },
+      "-help": () => {
+        new Drawer().drawHelp();
+        process.exit();
+      },
+      "--help": () => {
+        new Drawer().drawHelp();
+        process.exit();
+      },
+    };
+
+    for (const arg of args) {
+      if (commands[arg]) {
+        commands[arg]();
+      } else {
+        new Drawer().drawError(`Unknown command ${arg}.`);
+      }
+    }
+
+    if (args.includes("--bundleRelease") || args.includes("-bundleRelease")) {
+      this.bundleRelease();
+    }
+  }
+
+  readArgs_backup() {
     if (process.argv.length === 2) this.transpileAll();
     else {
       const arg1 = process.argv[2];
@@ -110,7 +194,7 @@ class WBR {
 
         case "--bundleRelease":
           arg2 === "--standalone" || arg2 === "-standalone"
-            ? this.bundleRelease(false)
+            ? this.bundleRelease()
             : arg2 === "--no-watch" || arg2 === "-no-watch"
             ? (this.bundleRelease(), (global.watch = false))
             : this.bundleRelease();
@@ -118,7 +202,7 @@ class WBR {
 
         case "-bundleRelease":
           arg2 === "--standalone" || arg2 === "-standalone"
-            ? this.bundleRelease(false)
+            ? this.bundleRelease()
             : arg2 === "--no-watch" || arg2 === "-no-watch"
             ? (this.bundleRelease(), (global.watch = false))
             : this.bundleRelease();
@@ -216,7 +300,7 @@ class WBR {
   }
 
   watchFiles() {
-    if (global.watch === false) return;
+    if (global.args.watch === false) return;
 
     new Drawer().drawBlankLine();
     const refresh = name => {
@@ -289,21 +373,21 @@ class WBR {
   }
 
   // node wbr
-  async transpileAll(watch = true) {
+  async transpileAll(__runWatchFiles = true) {
     await this.config();
     await this.testConfig();
     if (global.config?.sass) await new Sass().transpile();
     if (global.config?.icons) await new Icons().transpile();
     if (global.config?.defaultLang) await new Translator().translate();
     await new Constructos().transpile();
-    if (watch) this.getTimeElapsed();
-    if (watch) new Drawer().drawFinal();
-    if (watch) this.watchFiles();
+    if (__runWatchFiles) this.getTimeElapsed();
+    if (__runWatchFiles) new Drawer().drawFinal();
+    if (__runWatchFiles) this.watchFiles();
   }
 
   // node wbr --bundleRelease
-  async bundleRelease(transpileAll = true) {
-    transpileAll
+  async bundleRelease() {
+    !global.args.standalone
       ? await this.transpileAll(false)
       : (await this.config(), await this.testConfig());
 
@@ -317,27 +401,28 @@ class WBR {
     let out = global.config.out;
     if (typeof entry === "object") {
       let keys = Object.keys(entry);
-      let watch = global.watch;
+
       global.totalFiles = keys.length;
       for (let i = 0; i < keys.length; i++) {
         let key = keys[i];
         global.config.entry = entry[key];
         global.config.out = out[key];
-        global.webpackPromises.push(this.__bundle(entry[key], out[key], watch));
+        global.webpackPromises.push(this.__bundle(entry[key], out[key]));
       }
       await Promise.all(global.webpackPromises);
     } else {
-      await this.__bundle(global.config.entry, global.config.out, global.watch);
+      global.totalFiles = 1;
+      await this.__bundle(global.config.entry, global.config.out);
     }
     this.getTimeElapsed();
     new Drawer().drawFinal();
   }
 
-  async __bundle(entry, out, watch = false) {
+  async __bundle(entry, out) {
     return new Promise((resolve, reject) => {
       const compiler = webpack(
         {
-          watch: watch,
+          watch: global.args.watch,
           watchOptions: {
             aggregateTimeout: 500,
             ignored: [
@@ -353,17 +438,21 @@ class WBR {
             chunkFilename: "[name].bundle.js",
             filename: "winnetouBundle.min.js",
             path: path.resolve(__dirname, out),
-            publicPath: path.join(/*Config.folderName,*/ out, "/"),
+            publicPath: path.join(out, "/"),
           },
-          mode: "production",
+          mode: global.args.production ? "production" : "development",
+          devtool: global.args.production ? false : "source-map",
+          stats: "normal",
+          bail: true,
 
-          devtool: "source-map",
           module: {
             rules: [
               {
                 test: /\.js$/,
+
                 use: {
                   loader: "babel-loader",
+
                   options: {
                     presets: [
                       [
@@ -374,6 +463,7 @@ class WBR {
                         },
                       ],
                     ],
+
                     plugins: [
                       "@babel/plugin-transform-optional-chaining",
                       "@babel/plugin-transform-nullish-coalescing-operator",
@@ -392,6 +482,19 @@ class WBR {
           },
         },
         (err, stats) => {
+          // console.log({ err, stats });
+          const info = stats.toJson();
+          stats.compilation.errors.forEach(err => {
+            console.log(err.message);
+          });
+          if (stats.hasErrors()) {
+            console.error(info.errors);
+          }
+
+          if (stats.hasWarnings()) {
+            console.warn(info.warnings);
+          }
+
           if (global.compiledFiles >= global.totalFiles) {
             let d = new Drawer();
 
@@ -407,21 +510,40 @@ class WBR {
         }
       );
 
-      return compiler.run((e, s) => {
-        if (e.name !== "ConcurrentCompilationError") {
-          console.log(e);
-          new Drawer().drawError(e.message);
-        }
-        if (s && s.compilation.errors.length > 0) {
-          new Drawer().drawError(s.compilation.errors.toString());
-        }
-        if (s && s.compilation.warnings.length > 0) {
-          new Drawer().drawWarning(s.compilation.warnings.toString());
-        }
-        new Drawer().drawAdd(`'${entry} => ${out}`);
+      if (global.args.watch) {
+        compiler.watch({}, (e, s) => {
+          if (e.name !== "ConcurrentCompilationError") {
+            console.log(e);
+            new Drawer().drawError(e.message);
+          }
+          if (s && s.compilation.errors.length > 0) {
+            new Drawer().drawError(s.compilation.errors.toString());
+          }
+          if (s && s.compilation.warnings.length > 0) {
+            new Drawer().drawWarning(s.compilation.warnings.toString());
+          }
+          new Drawer().drawAdd(`'${entry} => ${out}`);
 
-        return resolve(true);
-      });
+          return resolve(true);
+        });
+      } else {
+        compiler.run((e, s) => {
+          if (e.name !== "ConcurrentCompilationError") {
+            console.log(e);
+            new Drawer().drawError(e.message);
+          }
+          if (s && s.compilation.errors.length > 0) {
+            new Drawer().drawError(s.compilation.errors.toString());
+          }
+          if (s && s.compilation.warnings.length > 0) {
+            new Drawer().drawWarning(s.compilation.warnings.toString());
+          }
+          new Drawer().drawAdd(`'${entry} => ${out}`);
+
+          compiler.close(() => {});
+          return resolve(true);
+        });
+      }
     });
   }
 }
@@ -1208,6 +1330,26 @@ class Drawer {
     this.drawBlankLine();
   };
 
+  drawHelp = () => {
+    this.drawLine();
+    this.drawBlankLine();
+
+    this.drawText("Help", { color: "cyan" });
+    this.drawBlankLine();
+    this.drawText("node wbr --bundleRelease", { color: "dim" });
+    this.drawText("node wbr --bundleRelease --watch", { color: "dim" });
+    this.drawText("node wbr --bundleRelease --watch --standalone", {
+      color: "dim",
+    });
+    this.drawText("node wbr --bundleRelease --production", { color: "dim" });
+    this.drawText("For further help, visit https://winnetoujs.org/docs", {
+      color: "dim",
+    });
+
+    this.drawBlankLine();
+    this.drawLine();
+  };
+
   drawWarning = text => {
     global.warningCount++;
     this.drawLine();
@@ -1291,7 +1433,7 @@ class Drawer {
     this.drawLine();
     this.drawBlankLine();
     this.drawText("All tasks completed.");
-    if (global.watch)
+    if (global.args.watch)
       new Drawer().drawText("Live reload enabled. Watching for changes...", {
         color: "dim",
       });

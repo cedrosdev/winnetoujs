@@ -10,17 +10,17 @@
     "recursive-readdir": "^2.2.2",
     "sass": "^1.77.1",
     "uglifycss": "0.0.29",
-    "winnetoujs": "^1.18.8",
+    "winnetoujs": "^1.18.9",
     "xml-parse": "^0.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
-    "@babel/plugin-transform-nullish-coalescing-operator": "^7.10.4",
-    "@babel/plugin-transform-optional-chaining": "^7.11.0",
-    "@babel/plugin-transform-runtime": "^7.11.0",
-    "@babel/preset-env": "^7.10.4",
-    "@babel/runtime": "^7.11.2",
-    "babel-loader": "^8.1.0",   
-    "webpack": "^5.73.0"
+    "@babel/eslint-parser": "^7.24.5",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.1",
+    "@babel/plugin-transform-optional-chaining": "^7.24.5",
+    "@babel/plugin-transform-runtime": "^7.24.3",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/runtime": "^7.24.5",
+    "babel-loader": "^9.1.3"
   }
 }
