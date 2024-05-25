@@ -1134,6 +1134,15 @@ class Sass {
   async transpile() {
     return new Promise((resolve, reject) => {
       if (global.config.sass) {
+        if (global.config.sassInitFile) {
+          global.promisesCss.push(
+            this.transpileSass(
+              path.join(global.config.sass, global.config.sassInitFile)
+            )
+          );
+          new Drawer().drawAdd(global.config.sassInitFile);
+        }
+
         // recursive read dir
         recursive(global.config.sass, async (err, files) => {
           if (err) {
@@ -1142,6 +1151,9 @@ class Sass {
             return;
           }
           for (let c = 0; c < files.length; c++) {
+            if (files[c].includes(global.config.sassInitFile)) {
+              continue;
+            }
             try {
               // add to promisesCss array
               global.promisesCss.push(this.transpileSass(files[c]));
