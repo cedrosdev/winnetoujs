@@ -50,8 +50,7 @@ let global = {
     constructosOut: "",
     entry: undefined,
     out: undefined,
-    sass: "",
-    cssOut: "",
+    sass: [],
     defaultLang: "",
     publicPath: "",
     icons: "",
@@ -238,8 +237,13 @@ class WBR {
           constructosOut: "./js/constructos",
           entry: "./js/app.js",
           out: "./release",
-          sass: "./sass",
-          cssOut: "./release",
+          sass: [
+            {
+              firstFile: null,
+              entryFolder: "./sass",
+              outFolder: "./release",
+            },
+          ],
           defaultLang: "en-us",
           publicPath: "/",
         };
@@ -277,13 +281,6 @@ class WBR {
         "win.config.js misconfigured. Not found 'entry' parameter. Using default './js/app.js'"
       );
       global.config.entry = "./js/app.js";
-    }
-
-    if (!global.config.cssOut) {
-      new Drawer().drawWarning(
-        "win.config.js misconfigured. Not found 'cssOut' parameter. Using default './release'"
-      );
-      global.config.cssOut = "./release";
     }
 
     if (!fs.existsSync(global.config.constructosPath)) {
@@ -360,7 +357,9 @@ class WBR {
 
     if (global.config.sass) {
       let folders = [];
-      if (global.config.sass) folders.push(global.config.sass);
+      global.config.sass.forEach(item => {
+        folders.push(item.entryFolder);
+      });
       try {
         watch.default(folders, { recursive: true }, async (evt, name) => {
           refresh(name);
@@ -425,13 +424,7 @@ class WBR {
           watch: global.args.watch,
           watchOptions: {
             aggregateTimeout: 500,
-            ignored: [
-              "**/node_modules",
-              out,
-              global.config.cssOut,
-              path.resolve(__dirname, out),
-              path.resolve(__dirname, global.config.cssOut),
-            ],
+            ignored: ["**/node_modules", out, path.resolve(__dirname, out)],
           },
           entry: entry,
           output: {
@@ -1132,44 +1125,62 @@ class Translator {
 
 class Sass {
   async transpile() {
-    return new Promise((resolve, reject) => {
-      if (global.config.sass) {
-        if (global.config.sassInitFile) {
-          global.promisesCss.push(
-            this.transpileSass(
-              path.join(global.config.sass, global.config.sassInitFile)
-            )
-          );
-          new Drawer().drawAdd(global.config.sassInitFile);
-        }
+    return new Promise((resolve, rejects) => {
+      let promises = [];
+      let arr = global.config.sass;
+      arr.forEach(item => {
+        promises.push(
+          this.transpileFolder(item.entryFolder, item.outFolder, item.firstFile)
+        );
+      });
 
-        // recursive read dir
-        recursive(global.config.sass, async (err, files) => {
-          if (err) {
-            new Drawer().drawError(err.message);
-            this.execSassPromises();
-            return;
-          }
-          for (let c = 0; c < files.length; c++) {
-            if (files[c].includes(global.config.sassInitFile)) {
-              continue;
-            }
-            try {
-              // add to promisesCss array
-              global.promisesCss.push(this.transpileSass(files[c]));
-              new Drawer().drawAdd(files[c]);
-            } catch (e) {
-              new Drawer().drawAddError(files[c]);
-              new Drawer().drawText("Sass transpile error.");
-              new Drawer().drawTextBlock(e.message);
-              new Drawer().drawBlankLine();
-            }
-          }
-
-          await this.execSassPromises();
+      Promise.all(promises)
+        .then(res => {
+          return resolve(true);
+        })
+        .catch(e => {
+          new Drawer().drawError(e);
           return resolve(true);
         });
+    });
+  }
+
+  async transpileFolder(entry, out, first) {
+    let promises = [];
+    return new Promise((resolve, reject) => {
+      // add init file
+      if (first) {
+        promises.push(this.transpileSass(path.join(entry, first)));
+        new Drawer().drawAdd(first);
       }
+
+      // recursive read dir
+      recursive(entry, async (err, files) => {
+        if (err) {
+          new Drawer().drawError(err.message);
+          await this.execSassPromises(out);
+          return resolve(true);
+        }
+        for (let c = 0; c < files.length; c++) {
+          if (files[c].includes(first)) {
+            // to avoid duplicate first file
+            continue;
+          }
+          try {
+            // add to promisesCss array
+            promises.push(this.transpileSass(files[c]));
+            new Drawer().drawAdd(files[c]);
+          } catch (e) {
+            new Drawer().drawAddError(files[c]);
+            new Drawer().drawText("Sass transpile error.");
+            new Drawer().drawTextBlock(e.message);
+            new Drawer().drawBlankLine();
+          }
+        }
+
+        await this.execSassPromises(out, promises);
+        return resolve(true);
+      });
     });
   }
 
@@ -1187,9 +1198,9 @@ class Sass {
     });
   }
 
-  async execSassPromises() {
+  async execSassPromises(out, promisesArray) {
     return new Promise((resolve, reject) => {
-      Promise.all(global.promisesCss)
+      Promise.all(promisesArray)
         .then(data => {
           // data has all css files
           data.push(
@@ -1206,7 +1217,7 @@ class Sass {
           let result = UglifyCss.processString(data.join("\n"));
 
           fs.outputFile(
-            global.config.cssOut + "/winnetouBundle.min.css",
+            out + "/winnetouBundle.min.css",
             result,
             function (err) {
               if (err) {
