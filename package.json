@@ -1,5 +1,5 @@
 {
-  "version": "1.18.13",
+  "version": "1.18.14",
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
@@ -15,9 +15,7 @@
     "recursive-readdir": "^2.2.2",
     "sass": "^1.77.1",
     "uglifycss": "0.0.29",
-    "xml-parse": "^0.4.0"
-  },
-  "devDependencies": {
+    "xml-parse": "^0.4.0",
     "@babel/core": "^7.24.5",
     "@babel/eslint-parser": "^7.24.5",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.1",
