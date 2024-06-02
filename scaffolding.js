@@ -204,9 +204,9 @@ const drawEnd = (text) => {
 const drawFinal = () => {
   drawLine();
   drawBlankLine();
-  drawText("All tasks completed");
+  drawText("All tasks completed.");
   drawBlankLine();
-  drawText("Run npm install to finish setup");
+  drawText("Good coding!");
   drawBlankLine();
   if (errorsCount > 0) {
     drawText("... with " + errorsCount + " errors");
