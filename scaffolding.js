@@ -97,7 +97,7 @@ const drawText = (text = "", params) => {
 
 const drawTextBlock = (text, params) => {
   let arr = text.match(/.{1,74}/g);
-  arr.forEach(item => {
+  arr.forEach((item) => {
     drawText(item, params);
   });
 };
@@ -114,7 +114,7 @@ const drawSpace = () => {
  * Draw error
  * @param {string} text error string
  */
-const drawError = text => {
+const drawError = (text) => {
   errorsCount++;
   drawLine();
   drawBlankLine();
@@ -126,7 +126,7 @@ const drawError = text => {
   drawBlankLine();
 };
 
-const drawWarning = text => {
+const drawWarning = (text) => {
   warningCount++;
   drawLine();
   drawBlankLine();
@@ -142,37 +142,9 @@ const drawWelcome = () => {
   drawLine();
   drawBlankLine();
   drawBlankLine();
-  drawText("W I N N E T O U J S ", { color: "bright" });
-  drawBlankLine();
-  drawText("T h e  i n d i e  j a v a s c r i p t  c o n s t r u c t o r", {
-    color: "dim",
-  });
-  drawBlankLine();
-  drawText("WinnetouJs.org", { color: "yellow" });
-
-  drawBlankLine();
-  drawBlankLine();
-  drawLine();
-  drawBlankLine();
-  drawText("Find online help and docs", { color: "dim" });
-  drawText("https://winnetoujs.org/docs");
-  drawBlankLine();
-  drawText("Fork on GitHub", { color: "dim" });
-  drawText("https://github.com/cedrosdev/WinnetouJs.git");
-  drawBlankLine();
-  drawText("(c) 2020 Cedros Development (https://cedrosdev.com)", {
-    color: "dim",
-  });
-
-  drawBlankLine();
-  drawLine();
-  drawBlankLine(); // console.clear();
-  drawLine();
-  drawBlankLine();
-  drawBlankLine();
   // drawText("WINNETOUJS ", { color: "dim" });
   // drawBlankLine();
-  drawText("WinnetouJs Bundle Releaser (WBR)", {
+  drawText("WinnetouJs", {
     color: "yellow",
   });
   // drawBlankLine();
@@ -191,7 +163,7 @@ const drawWelcome = () => {
   // don't use new Date here, it needs to be manually updated
   // to the last year of the project in order to
   // ensure updates are being made
-  drawText(`(c) 2020 - 2024 Cedros Development (https://cedrosdev.com)`, {
+  drawText(`(c) 2020 - 2024 Cedros Development (https://cedros.dev)`, {
     color: "dim",
   });
 
@@ -204,28 +176,28 @@ const drawWelcome = () => {
  * Draw add
  * @param {string} text add string
  */
-const drawAdd = text => {
+const drawAdd = (text) => {
   drawText(text, { type: "add", color: "green" });
   drawBlankLine();
 };
 
-const drawChange = text => {
+const drawChange = (text) => {
   drawText(text, { type: "change", color: "green" });
   drawBlankLine();
 };
 
-const drawAddError = text => {
+const drawAddError = (text) => {
   errorsCount++;
 
   drawText(text, { type: "addError", color: "cyan" });
   drawBlankLine();
 };
 
-const drawHtmlMin = text => {
+const drawHtmlMin = (text) => {
   console.log("> [html minifield] " + text);
 };
 
-const drawEnd = text => {
+const drawEnd = (text) => {
   console.log("> [Bundle Release Finished] " + text);
 };
 

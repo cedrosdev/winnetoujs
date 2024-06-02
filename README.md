@@ -1,6 +1,6 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/cedrosdev/winnetoujs_assets/master/logo_v1_2020/logo_logomarca_slogan_transparent.png" alt="Unform" />
-  
+  <img src="https://raw.githubusercontent.com/cedrosdev/winnetoujs_assets/master/logo_v1_2020/winnetoujs-official-logo-2024-framework-javascript-web-development.png" alt="Winnetou Logo 2024" />
+
 </p>
 
 # WinnetouJs
@@ -11,18 +11,16 @@
   <img src="https://img.shields.io/npm/dm/winnetoujs?color=cd94d5&style=plastic" />  
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=plastic" />
   </p>
-  
 
-
-WinnetouJs is a javascript framework that encompasses multi solutions for creating web apps and frontend of dynamic websites.
+WinnetouJs is a javascript framework that encompasses multi solutions for creating web apps frontend.
 
 ## Why?
 
-WinnetouJs comes for developers who love pure, root, vanilla javascript, for those who like clean code, without mixing html and javascript in a alphabet soup that at a certain level are ineligible. It comes from developers to developers. It comes from those who loves javascript for those who also loves javascript. And, after all, it comes to those who don't feel obliged to use typescript and still looking for a robust solution, which is self-complete and helps.
+WinnetouJs comes for developers who love pure, root, vanilla javascript, for those who like clean code, without mixing html and javascript that at a certain level are ineligible. It comes from developers to developers. It comes from those who loves javascript for those who also loves javascript. And, after all, it comes to those who don't feel obliged to use typescript and still looking for a robust solution.
 
 ## How it works?
 
-The basis of a Winnetou application are the constructos, which are html files where we write our html components - called "constructos" - and the wbr will transform them into javascript classes ready for reuse, optimized for a modern and lightweight web, without loads unnecessary.
+The basis of a Winnetou application are the constructos, which are html files where we write our html components - called "constructos" - and then wbr will transform them into javascript code ready for reuse, optimized for a modern and lightweight web.
 
 ## How to use
 
@@ -30,8 +28,6 @@ The basis of a Winnetou application are the constructos, which are html files wh
 import { h1 } from "./constructos/componentsTest.js";
 h1({ text: "Welcome to your first WinnetouJs App" }).create("#app");
 ```
-
-[To learn WinnetouJs go to the project's Wiki. Click here.](https://github.com/cedrosdev/winnetoujs/wiki)
 
 ## Getting Started
 
@@ -46,24 +42,20 @@ You will need **nodejs** and **npm** on your machine to develop a Winnetou appli
 After you have the latest version of the node and npm properly installed, install winnetou from npm.
 
 ```
-npm i winnetoujs
+npm install --save-dev winnetoujs
 ```
 
 If you are creating a new project and node_modules folder and wbr.js don't show up, run `npm init -y` and try again.
 
-You can add WinnetouJs to an existing project. To start a new project use winnetou scaffolding with the command below:
+You can add WinnetouJs to an existing project.
+
+To start a new project use winnetou's scaffolding with the command below:
 
 ```
-node ./node_modules/winnetoujs/build
+node scaffolding
 ```
 
 The node will create the basic skeleton of a WinnetouJs web application automatically. We warn you to start a winnetoujs project in an empty folder as this process can overwrite pre-existing files.
-
-Now install the Winnetou dependencies.
-
-```
-npm i
-```
 
 Now you will be ready to run the Winnetou engine, which will transpile your constructos, your sass and also create the bundles for production.
 
@@ -80,17 +72,17 @@ WBR will also automatically initialize watchers in your code, so that any change
 
 ## Deployment
 
-The deployment of a winnetou application is done through the webpack, but don't worry, the WBR is already equipped with everything you need, just run:
+The deployment of a Winnetou application is done through the webpack, but don't worry, the WBR is already equipped with everything you need, just run:
 
 ```
-node wbr --webpack
+node wbr --bundleRelease
 ```
 
 and your winnetouBundle.min.js will now be available for use.
 
 ## I wanna dive in deep
 
-[Start with the wiki here.](https://github.com/cedrosdev/winnetoujs/wiki)
+[Start with the documentation here.](https://winnetoujs.org/docs)
 
 ## Contributing
 
@@ -98,7 +90,7 @@ Pull requests are welcome
 
 ## Authors
 
-- **Kaue Sedrez** - _Initial work_ - [GitHub](https://github.com/kauesedrez)
+- **Pamela Sedrez** - _Initial work_ - [GitHub](https://github.com/kauesedrez)
 
 See also the list of [contributors](https://github.com/cedrosdev/winnetoujs/contributors) who participated in this project.
 
