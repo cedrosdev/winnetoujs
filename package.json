@@ -1,9 +1,10 @@
 {
-  "version": "1.18.16 - alpha 1",
+  "version": "1.18.16 - alpha 2",
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
   "dependencies": {
+    "source-map": "^0.7.4",
     "ncp": "^2.0.0",
     "escape-string-regexp": "^4.0.0",
     "esm": "^3.2.25",
@@ -14,7 +15,6 @@
     "node-watch": "^0.6.4",
     "recursive-readdir": "^2.2.2",
     "sass": "^1.77.1",
-    "uglifycss": "0.0.29",
     "xml-parse": "^0.4.0",
     "@babel/core": "^7.24.5",
     "@babel/eslint-parser": "^7.24.5",

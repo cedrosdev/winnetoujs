@@ -25,7 +25,11 @@ const prettify = require("html-prettify");
 const escapeStringRegexp = require("escape-string-regexp");
 const xml = require("xml-parse");
 const sass = require("sass");
-const UglifyCss = require("uglifycss");
+const {
+  SourceMapConsumer,
+  SourceMapGenerator,
+  SourceNode,
+} = require("source-map");
 const { exit } = require("process");
 const winnetouPackage = require("winnetoujs/package.json");
 const watch = require("node-watch");
@@ -1134,49 +1138,46 @@ class Translator {
 
 class Sass {
   async transpile() {
-    return new Promise((resolve, rejects) => {
+    return new Promise((resolve, reject) => {
       let promises = [];
       let arr = global.config.sass;
       arr?.forEach(item => {
         promises.push(
-          this.transpileFolder(item.entryFolder, item.outFolder, item.firstFile)
+          this.readScssFolder(item.entryFolder, item.outFolder, item.firstFile)
         );
       });
 
       Promise.all(promises)
         .then(res => {
-          return resolve(true);
+          resolve(true);
         })
         .catch(e => {
           new Drawer().drawError(e);
-          return resolve(true);
+          resolve(true);
         });
     });
   }
 
-  async transpileFolder(entry, out, first) {
+  async readScssFolder(entry, out, first) {
     let promises = [];
     return new Promise((resolve, reject) => {
-      // add init file
       if (first) {
         promises.push(this.transpileSass(path.join(entry, first)));
         new Drawer().drawAdd(first);
       }
 
-      // recursive read dir
       recursive(entry, async (err, files) => {
         if (err) {
           new Drawer().drawError(err.message);
           await this.execSassPromises(out);
-          return resolve(true);
+          resolve(true);
         }
+
         for (let c = 0; c < files.length; c++) {
           if (files[c].includes(first)) {
-            // to avoid duplicate first file
             continue;
           }
           try {
-            // add to promisesCss array
             promises.push(this.transpileSass(files[c]));
             new Drawer().drawAdd(files[c]);
           } catch (e) {
@@ -1188,21 +1189,25 @@ class Sass {
         }
 
         await this.execSassPromises(out, promises);
-        return resolve(true);
+        resolve(true);
       });
     });
   }
 
   async transpileSass(file) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       sass
-        .compileAsync(file)
+        .compileAsync(file, {
+          sourceMap: !global.args.production,
+          sourceMapIncludeSources: !global.args.production,
+          ...(global.args.production && { style: "compressed" }),
+        })
         .then(res => {
-          return resolve(res.css.toString());
+          resolve({ css: res.css.toString(), map: res.sourceMap });
         })
         .catch(e => {
           new Drawer().drawWarning(e.message);
-          return reject(e);
+          reject(e);
         });
     });
   }
@@ -1210,37 +1215,75 @@ class Sass {
   async execSassPromises(out, promisesArray) {
     return new Promise((resolve, reject) => {
       Promise.all(promisesArray)
-        .then(data => {
-          // data has all css files
-          data.push(
-            `    
-                * {
-                    -webkit-overflow-scrolling: touch;
-                  }   
-                .winnetou_display_none {
-                    display: none !important;
-                  }                
-            `
+        .then(async data => {
+          let cssContent = data.map(item => item.css);
+          let mapContent = data.map(item => item.map);
+
+          cssContent.push(
+            `*{-webkit-overflow-scrolling:touch;}.winnetou_display_none{display:none !important;}`
           );
 
-          let result = UglifyCss.processString(data.join("\n"));
+          if (!global.args.production) {
+            cssContent.push(
+              `/*# sourceMappingURL=winnetouBundle.min.css.map */`
+            );
+          }
 
-          fs.outputFile(
-            out + "/winnetouBundle.min.css",
-            result,
-            function (err) {
-              if (err) {
-                new Err().e004();
-              }
-              return resolve(true);
+          let result = cssContent.join("\n");
+
+          let finalMap;
+          !global.args.production &&
+            (finalMap = await this.mergeSourceMaps(mapContent, cssContent));
+
+          fs.outputFile(out + "/winnetouBundle.min.css", result, err => {
+            if (err) {
+              new Drawer().drawError("Code pt4y - " + err.message);
+              new Err().e004();
             }
-          );
+
+            !global.args.production
+              ? fs.outputFile(
+                  out + "/winnetouBundle.min.css.map",
+                  finalMap,
+                  err => {
+                    if (err) {
+                      new Drawer().drawError("Code 90ls - " + err.message);
+                      new Err().e004();
+                    }
+                    resolve(true);
+                  }
+                )
+              : resolve(true);
+          });
         })
         .catch(e => {
+          new Drawer().drawError("Code io9s - " + e.message);
           new Err().e004();
-          return resolve(true);
+          resolve(true);
         });
     });
+  }
+
+  async mergeSourceMaps(maps, finalCSS) {
+    let node = SourceNode.fromStringWithSourceMap(
+      finalCSS[0],
+      await new SourceMapConsumer(maps[0])
+    );
+
+    for (let i = 1; i < maps.length; i++) {
+      node.add(
+        SourceNode.fromStringWithSourceMap(
+          finalCSS[i],
+          await new SourceMapConsumer(maps[i])
+        )
+      );
+    }
+
+    let map = node.toStringWithSourceMap({
+      file: "winnetouBundle.min.css",
+    }).map;
+
+    return map.toString();
   }
 }
 
