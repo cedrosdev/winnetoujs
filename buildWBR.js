@@ -10,9 +10,3 @@ ncp(
   path.join(__dirname, "../../", "wbr.js"),
   function (err) {}
 );
-
-ncp(
-  path.join(__dirname, "./scaffolding.js"),
-  path.join(__dirname, "../../", "scaffolding.js"),
-  function (err) {}
-);
