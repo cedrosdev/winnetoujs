@@ -3,30 +3,26 @@ import { Winnetou } from "./winnetou.js";
 export class Constructos {
   _mutableToString(elements) {
     if (elements) {
-      let retorno = JSON.parse(JSON.stringify(elements));
+      let jsonElements = JSON.parse(JSON.stringify(elements));
 
       Object.keys(elements).forEach(item => {
-        if (
-          typeof elements[item] === "object" &&
-          elements[item] !== null
-        ) {
+        if (typeof elements[item] === "object" && elements[item] !== null) {
           let mutable = elements[item].mutable;
 
           let val;
 
-          Winnetou.getMutable(mutable) ||
-          Winnetou.getMutable(mutable) === ""
+          Winnetou.getMutable(mutable) || Winnetou.getMutable(mutable) === ""
             ? (val = Winnetou.getMutable(mutable))
             : (val = `Mutable "${mutable}" not initialized yet.`);
 
           /**
            * change mutable to string
            */
-          retorno[item] = val;
+          jsonElements[item] = val;
         }
       });
 
-      return retorno;
+      return jsonElements;
     } else {
       return elements;
     }
@@ -35,10 +31,7 @@ export class Constructos {
   _saveUsingMutable(pureId, elements, options, method) {
     if (elements) {
       Object.keys(elements).forEach(item => {
-        if (
-          typeof elements[item] === "object" &&
-          elements[item] !== null
-        ) {
+        if (typeof elements[item] === "object" && elements[item] !== null) {
           if (!Winnetou.usingMutable[elements[item].mutable])
             Winnetou.usingMutable[elements[item].mutable] = [];
 
@@ -64,10 +57,7 @@ export class Constructos {
 
     if (options) {
       Object.keys(options).forEach(item => {
-        if (
-          typeof options[item] === "object" &&
-          options[item] !== null
-        ) {
+        if (typeof options[item] === "object" && options[item] !== null) {
           if (!Winnetou.usingMutable[options[item].mutable])
             Winnetou.usingMutable[options[item].mutable] = [];
 
@@ -136,9 +126,7 @@ export class Constructos {
         }
       });
     } else {
-      frag = document
-        .createRange()
-        .createContextualFragment(component);
+      frag = document.createRange().createContextualFragment(component);
 
       if (typeof output !== "object") {
         let el;

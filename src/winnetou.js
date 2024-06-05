@@ -1,5 +1,6 @@
 //@ts-ignore
 import Config from "../../../win.config.js";
+// import Config from "../win.config.js";
 
 class Winnetou_ {
   constructor() {
@@ -53,14 +54,14 @@ class Winnetou_ {
     /**@type {object} */
     this.strings = {};
 
-    document.addEventListener("keydown", event => {
+    document.addEventListener("keydown", (event) => {
       if (event.which === 27) {
         history.go(-1);
       }
     });
 
-    if (window.history && window.history.pushState) {
-      window.onpopstate = event => {
+    if (window.history) {
+      window.onpopstate = (event) => {
         event.preventDefault();
 
         if (event.state == null) {
@@ -92,9 +93,9 @@ class Winnetou_ {
       //   : null;
     }
 
-    let theme = window.localStorage.getItem("theme");
-    if (theme) {
-      theme = JSON.parse(theme);
+    let theme_ = window.localStorage.getItem("theme");
+    if (theme_) {
+      let theme = JSON.parse(theme_);
       let root = document.documentElement;
       Object.keys(theme).forEach(function (item) {
         root.style.setProperty(item, theme[item]);
@@ -125,7 +126,7 @@ class Winnetou_ {
 
       this.usingMutable[mutable] = [];
 
-      tmpArr.forEach(item => {
+      tmpArr.forEach((item) => {
         /**
          * go through the tmpArr to handle constructos
          */
@@ -155,11 +156,9 @@ class Winnetou_ {
    * @returns {string} unique name of mutable
    */
   initMutable(value) {
-    let name = (
-      new Date().getMilliseconds() *
-      Math.random() *
-      10000
-    ).toFixed(0);
+    let name = (new Date().getMilliseconds() * Math.random() * 10000).toFixed(
+      0
+    );
 
     this.setMutable(name, value, "notPersistent");
 
@@ -169,7 +168,7 @@ class Winnetou_ {
   /**
    * Gets the value of passed winnetou mutable
    * @param {string} mutable string that represents a winnetou mutable
-   * @returns {string} value or null if not exists
+   * @returns {string|null} value or null if not exists
    */
   getMutable(mutable) {
     if (
@@ -177,10 +176,7 @@ class Winnetou_ {
       window.localStorage.getItem(`mutable_${mutable}`) === ""
     ) {
       return window.localStorage.getItem(`mutable_${mutable}`);
-    } else if (
-      this.mutable[mutable] ||
-      this.mutable[mutable] === ""
-    ) {
+    } else if (this.mutable[mutable] || this.mutable[mutable] === "") {
       return this.mutable[mutable];
     } else {
       return null;
@@ -230,9 +226,7 @@ class Winnetou_ {
           //
           else if (selector.match(/^\./)) {
             selector = selector.replace(".", "");
-            return Array.from(
-              document.getElementsByClassName(selector)
-            );
+            return Array.from(document.getElementsByClassName(selector));
           }
           //
           else {
@@ -241,9 +235,7 @@ class Winnetou_ {
               return [document.getElementById(selector)];
             }
 
-            let arr = Array.from(
-              document.getElementsByTagName(selector)
-            );
+            let arr = Array.from(document.getElementsByTagName(selector));
 
             if (arr.length === 0) {
               return [document.getElementById(selector)];
@@ -257,7 +249,7 @@ class Winnetou_ {
        * remove constructo from the DOM
        */
       remove() {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.remove();
         });
 
@@ -268,7 +260,7 @@ class Winnetou_ {
        * @param {string} htmlContentString the html string to be inserted
        */
       html(htmlContentString) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.innerHTML = htmlContentString;
         });
         return this;
@@ -290,7 +282,7 @@ class Winnetou_ {
        * @param {string} htmlContentString the html string to be inserted
        */
       append(htmlContentString) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.innerHTML += htmlContentString;
         });
         return this;
@@ -301,7 +293,7 @@ class Winnetou_ {
        */
       prepend(htmlContentString) {
         // el.innerHTML = texto + el.innerHTML;
-        el.forEach(item => {
+        el.forEach((item) => {
           item.innerHTML = htmlContentString + item.innerHTML;
         });
         return this;
@@ -314,7 +306,7 @@ class Winnetou_ {
        */
       css(property, value) {
         let valueString = value;
-        el.forEach(item => {
+        el.forEach((item) => {
           if (typeof value == "number") valueString = value + "px";
           item.style[property] = valueString;
         });
@@ -325,7 +317,7 @@ class Winnetou_ {
        * @param {string} className name of class
        */
       toggleClass(className) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.classList.toggle(className);
         });
         return this;
@@ -335,7 +327,7 @@ class Winnetou_ {
        * @param {string} className name of class
        */
       addClass(className) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.classList.add(className);
         });
         return this;
@@ -345,7 +337,7 @@ class Winnetou_ {
        * @param {string} className name of class
        */
       removeClass(className) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.classList.remove(className);
         });
         return this;
@@ -354,7 +346,7 @@ class Winnetou_ {
        * Hide a constructo
        */
       hide() {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.classList.add("winnetou_display_none");
         });
         return this;
@@ -363,7 +355,7 @@ class Winnetou_ {
        * Show a constructo
        */
       show() {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.classList.remove("winnetou_display_none");
 
           if (getComputedStyle(item).display == "none") {
@@ -413,7 +405,7 @@ class Winnetou_ {
        * @param {string} value The value.
        */
       setVal(value) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.value = value;
           if ("createEvent" in document) {
             var evt = document.createEvent("HTMLEvents");
@@ -429,7 +421,7 @@ class Winnetou_ {
        * @param  {string} value the values
        */
       setAttr(attr, value) {
-        el.forEach(item => {
+        el.forEach((item) => {
           item.setAttribute(attr, value);
         });
         return this;
@@ -497,9 +489,7 @@ class Winnetou_ {
 
       let void_ = this.vdom();
       void_.appendChild(
-        document
-          .createRange()
-          .createContextualFragment("<p class='foo'>")
+        document.createRange().createContextualFragment("<p class='foo'>")
       );
 
       el = void_.querySelectorAll(".foo");
@@ -519,7 +509,7 @@ class Winnetou_ {
     this.routes = obj;
     this.routesOptions = options;
 
-    Object.keys(this.routes).forEach(route => {
+    Object.keys(this.routes).forEach((route) => {
       let segment = route.split("/");
       let size = segment.length;
       this.paramRoutes.push({
@@ -535,7 +525,7 @@ class Winnetou_ {
    * @param {boolean} pushState To use navigate without change URL
    */
   navigate(url, pushState = true) {
-    if (window.history && window.history.pushState) {
+    if (window.history) {
       this.callRoute(url);
       pushState && this.pushState(url);
       if (this.routesOptions?.onGo) {
@@ -558,7 +548,7 @@ class Winnetou_ {
    * @param {string} route function already set in createRoutes
    */
   pass(route) {
-    if (window.history && window.history.pushState) {
+    if (window.history) {
       this.callRoute(route);
       this.pushStateInteraction(route);
       if (this.routesOptions?.onGo) {
@@ -581,7 +571,7 @@ class Winnetou_ {
   /** @private */
   pushStateInteraction(func) {
     // history.replaceState(func, null);
-    history.pushState(func, null);
+    history.pushState(func, "");
   }
   /** @private
    * W.navigate('/profile/azul')
@@ -591,9 +581,7 @@ class Winnetou_ {
       let splittedUrl = url.split("/");
       let size = splittedUrl.length;
 
-      let filter = this.paramRoutes.filter(
-        data => data.size === size
-      );
+      let filter = this.paramRoutes.filter((data) => data.size === size);
 
       if (filter.length === 0) {
         this.notFound();
@@ -649,7 +637,7 @@ class Winnetou_ {
     try {
       history.pushState(url, "", url);
     } catch (e) {
-      history.pushState(url, null);
+      history.pushState(url, "");
     }
   }
 
@@ -661,9 +649,7 @@ class Winnetou_ {
   fx(function_, args = "") {
     let name =
       "winnetouFx" +
-      (new Date().getMilliseconds() * Math.random() * 10000).toFixed(
-        0
-      );
+      (new Date().getMilliseconds() * Math.random() * 10000).toFixed(0);
     window[name] = function_;
     return `${name}(${args})`;
   }
@@ -676,286 +662,17 @@ class Winnetou_ {
    */
   listen(event, elementSelector, callback) {
     try {
-      document
-        .querySelector("#" + elementSelector)
-        .addEventListener(event, e => {
-          callback(e);
-        });
+      let el = document.querySelector("#" + elementSelector);
+      el?.addEventListener(event, (e) => {
+        callback(e);
+      });
     } catch (e) {
-      document.querySelectorAll(elementSelector).forEach(x => {
-        x.addEventListener(event, e => {
+      document.querySelectorAll(elementSelector).forEach((x) => {
+        x.addEventListener(event, (e) => {
           callback(e);
         });
       });
     }
-  }
-
-  /**
-   * @deprecated
-   * This method proved to be inefficient
-   * in object-oriented environments.
-   * It will be removed in the next
-   * major version of WinnetouJs.
-   * Use listen instead.
-   * @description
-   * Method for handle events.
-   * This method will add an event listener to entire document
-   * associating elementSelector to the event.
-   * In this way the construct can be created after the creation
-   * of the event listener which will still fire correctly.
-   *
-   *
-   * @param  {string} eventName Name of event, eg. "keyup"
-   * @param  {string} elementSelector DOM selector, id, class or tag
-   * @param  {function} callback function to be called when trigger event, eg. e=>{}
-   * @param  {object} [options]
-   * @param  {Array.<string>} [options.remove] Array of child elements that will not be activated by the action trigger.
-   */
-  on(eventName, elementSelector, callback, options) {
-    let callbackBck;
-    /**
-     * This will test event to be not duplicated.
-     * this.storedEvents contains all events created by winnetoujs.
-     * If it already exists then return, exiting algorithm.
-     */
-    let test = this.storedEvents.filter(
-      data =>
-        data.eventName === eventName &&
-        data.elementSelector === elementSelector &&
-        data.callback === callback.toString()
-    );
-    // if test filter returned a result, then exit.
-    if (test.length > 0) {
-      return;
-    }
-    // else continue and store the event
-    this.storedEvents.push({
-      eventName,
-      elementSelector,
-      callback: callback.toString(),
-    });
-
-    switch (eventName) {
-      /**
-       * If the provided event is a scroll event, it must be
-       * associated with element and not to document.
-       * In this case the returned value is the event
-       * which can be accessed by e.target.scrollTop
-       * or Winnetou.select(e.target)
-       */
-      case "scroll":
-        try {
-          document
-            .querySelector("#" + elementSelector)
-            .addEventListener("scroll", e => {
-              callback(e);
-            });
-        } catch (e) {
-          document
-            .querySelector(elementSelector)
-            .addEventListener("scroll", e => {
-              callback(e);
-            });
-        }
-        break;
-
-      /**
-       * On touch devices sets event handler to touchstart
-       * fallbacks to click
-       */
-      case "click":
-        eventName =
-          "ontouchstart" in document.documentElement
-            ? "touchstart"
-            : "click";
-        document.addEventListener(eventName, eventHandler);
-        break;
-
-      /**
-       * if it is not a special event
-       * finally add the event listener to document, associating 'eventHandler'.
-       */
-      default:
-        document.addEventListener(eventName, eventHandler);
-        break;
-    }
-
-    /**
-     * This function will be stored in EventListener with
-     * provided elementSelector
-     * @param {any} e EventListener
-     */
-    function eventHandler(e) {
-      // if elementSelector is an id but without #
-      let elementSelectorId = "#" + elementSelector;
-
-      /**
-       * https://developer.mozilla.org/pt-BR/docs/Web/API/Element/closest
-       *
-       * First the algorithm will search if the clicked element (e.target)
-       * owns an element that matches elementSelector
-       * if not, exits.
-       */
-      if (!e.target.closest(elementSelector)) {
-        try {
-          if (!e.target.closest(elementSelectorId)) {
-            return;
-          }
-        } catch (e) {
-          return;
-        }
-      }
-
-      // boolean that controls if callback function
-      // can be fired
-      let shouldContinue = true;
-
-      /**
-       * e.path contains all child elements of trigger
-       * element, so it will be scanned.
-       */
-      let path = e.path || (e.composedPath && e.composedPath());
-      for (let c = 0; c < path.length; c++) {
-        // item now is the deepest element
-        let item = path[c];
-
-        /**
-         * if options.remove was provided
-         * needs to check if a child element
-         * must be excluded
-         */
-        if (options && options.remove) {
-          // remove scan
-          for (let w = 0; w < options.remove.length; w++) {
-            try {
-              // if match, switch control to false
-              if (item.matches(options.remove[w])) {
-                shouldContinue = false;
-              }
-
-              // if not match, try an selector id (#id)
-              if (item.matches("#" + options.remove[w])) {
-                shouldContinue = false;
-              }
-            } catch (e) {}
-          }
-        }
-
-        /**
-         * check if item matches elementSelector
-         */
-        try {
-          if (item.matches(elementSelector)) {
-            /**
-             * if match, trigger the stored callback
-             * providing the element as parameter (item)
-             * if shouldContinue is true
-             */
-            shouldContinue && callback(item);
-          } else if (item.matches(elementSelectorId)) {
-            /**
-             * if not match, try forcing id selector (#id)
-             */
-            shouldContinue && callback(item);
-          }
-        } catch (e) {}
-      }
-    }
-  }
-
-  /**
-   * @deprecated This method will be removed in the next major version
-   * due to its inefficiency when handling multiple callbacks.
-   * Use listen instead.
-   * @description
-   * On touch devices sets event handler to touchstart
-   * fallbacks to click
-   * @param  {string} selector DOM selector, id, class or tag
-   * @param  {function} callback function to be called when trigger event, eg. e=>{}
-   * @param  {object} [options]
-   * @param  {Array.<string>} [options.remove]
-   */
-  click(selector, callback, options) {
-    var clickHandler =
-      "ontouchstart" in document.documentElement
-        ? "touchstart"
-        : "click";
-
-    this.on(
-      clickHandler,
-      selector,
-      el => {
-        callback(el);
-      },
-      options
-    );
-  }
-
-  /**
-   * Activate translations, Must be called when application starts.
-   * @param {function} next_ callback to app start.
-   * @param {object} class_ the Strings class
-   * @example
-   * Winnetou.lang(Strings, render);
-   *
-   * @deprecated
-   */
-
-  async lang(class_, next_) {
-    if (!window.localStorage.getItem("lang")) return next_();
-
-    let This = class_;
-
-    // if (!Config?.folderName) {
-    //   console.error(
-    //     "WinnetouJs Translation Miss Configuration Error:You have to specify the name of winnetou folder in order to use the translations;"
-    //   );
-
-    //   return next_();
-    // }
-
-    // if (Config.folderName === "/") Config.folderName = "";
-
-    let defaultLang = Config?.defaultLang;
-    let localLang = window.localStorage.getItem("lang");
-    if (localLang) defaultLang = localLang;
-
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 404) {
-        console.log(
-          "\nThe file ",
-          `./translations/${defaultLang}.xml`,
-          "are not found"
-        );
-        window.localStorage.removeItem("lang");
-        location.reload();
-      }
-
-      if (this.readyState == 4 && this.status == 200) {
-        try {
-          let xml = this.responseXML;
-          let el = xml.getElementsByTagName("winnetou");
-          let lines = el[0].childNodes;
-          lines.forEach(item => {
-            if (item.nodeName != "#text") {
-              This[item.nodeName] = item.textContent;
-            }
-          });
-        } catch (e) {
-          console.log(
-            "The translation file ",
-            `./translations/${defaultLang}.xml`,
-            " seems to be empty or incorrect.",
-            e.message
-          );
-        }
-
-        return next_();
-      }
-    };
-    xhttp.open("GET", `./translations/${defaultLang}.xml`, true);
-    xhttp.send();
   }
 
   /**
@@ -977,7 +694,7 @@ class Winnetou_ {
      * Function to get json from API
      * @param {string} url API Endpoint
      */
-    const get = url => {
+    const get = (url) => {
       return new Promise((resolve, reject) => {
         fetch(url, {
           method: "GET",
@@ -986,23 +703,19 @@ class Winnetou_ {
             if (response.ok) {
               return response.json();
             } else {
-              return reject(
-                "Translation file not found. Code error kj438dj."
-              );
+              return reject("Translation file not found. Code error kj438dj.");
             }
           })
           .then(function (data) {
             return resolve(data);
           })
           .catch(function (error) {
-            return reject(
-              "Translation file not found. Code error kj438dssj."
-            );
+            return reject("Translation file not found. Code error kj438dssj.");
           });
       });
     };
     return new Promise(async (resolve, reject) => {
-      if (!window.localStorage.getItem("lang")) return resolve();
+      if (!window.localStorage.getItem("lang")) return resolve(true);
 
       let This = class_;
 
@@ -1042,14 +755,14 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
 
       // let file = JSON.parse(data);
 
-      Object.keys(data).map(key => {
+      Object.keys(data).map((key) => {
         let value = data[key];
 
         // replace all values of _strings.js object
         This[key] = value;
       });
 
-      return resolve();
+      return resolve(true);
     });
   }
 
@@ -1086,7 +799,7 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
       el = document.querySelectorAll("#" + output);
     }
 
-    el.forEach(item => {
+    el.forEach((item) => {
       // options
       if (options && options.clear) item.innerHTML = "";
       // @ts-ignore
