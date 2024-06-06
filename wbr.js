@@ -730,6 +730,7 @@ class Constructos {
             jsdoc += "\n/**\n";
             jsdoc += `\t* ${descri || ""}\n`;
             let requiredElement = false;
+            let hasPropElements = false;
             let jsdoc2 = "";
 
             let id;
@@ -797,6 +798,7 @@ class Constructos {
             let matches = constructo.match(regex);
 
             if (matches) {
+              hasPropElements = true;
               matches.forEach(match => {
                 let el = match.replace("{{", "");
                 el = el.replace("}}", "");
@@ -827,7 +829,7 @@ class Constructos {
               });
             }
 
-            if (requiredElement) jsdoc += "\t* @param {object} elements\n";
+            if (hasPropElements) jsdoc += "\t* @param {object} elements\n";
 
             jsdoc += jsdoc2;
 
@@ -841,9 +843,9 @@ class Constructos {
             class ${id}_ extends Constructos {` +
               jsdoc +
               ` constructo = (${
-                requiredElement ? "elements," : ""
+                hasPropElements ? "elements," : ""
               } options) => {` +
-              `${requiredElement ? "" : "\n\nlet elements = {};"}` +
+              `${hasPropElements ? "" : "\n\nlet elements = {};"}` +
               "\n\nlet identifier = this._mutableToString(options);" +
               "\nidentifier = this._getIdentifier(options?identifier.identifier || 'notSet':'notSet');" +
               "let elementsToString = this._mutableToString(elements);" +
