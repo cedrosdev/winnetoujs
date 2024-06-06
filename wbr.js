@@ -416,10 +416,15 @@ class WBR {
           },
           entry: entry,
           output: {
-            chunkFilename: "[name].bundle.js",
+            chunkFilename: "[contenthash].bundle.js",
             filename: "winnetouBundle.min.js",
             path: path.resolve(__dirname, out),
             publicPath: path.join(out, "/"),
+            clean: {
+              keep(asset) {
+                return asset.includes("css");
+              },
+            },
           },
           mode: global.args.production ? "production" : "development",
           devtool: global.args.production ? false : "source-map",
