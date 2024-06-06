@@ -848,7 +848,12 @@ class Constructos {
             jsdoc += jsdoc2;
 
             jsdoc += "\t* @param {object} [options]\n";
-            jsdoc += "\t* @param {any} [options.identifier]\n";
+            jsdoc += "\t* @param {string} [options.identifier]\n";
+
+            if (!hasPropElements) {
+              jsdoc += "\t* @param {object} [oldOptions]\n";
+              jsdoc += "\t* @param {string} [oldOptions.identifier]\n";
+            }
 
             jsdoc += "\t*/\n";
 
@@ -856,10 +861,18 @@ class Constructos {
               `/**@private */
             class ${id}_ extends Constructos {` +
               jsdoc +
-              ` constructo = (${
-                hasPropElements ? "elements," : ""
-              } options) => {` +
-              `${hasPropElements ? "" : "\n\nlet elements = {};"}` +
+              ` constructo = (${hasPropElements ? "elements," : ""} options${
+                hasPropElements ? "" : ", oldOptions"
+              }) => {` +
+              `${
+                hasPropElements
+                  ? ""
+                  : `
+              if (!options?.identifier && oldOptions?.identifier) {
+                options = oldOptions;
+              }
+              ` + "\n\nlet elements = {};"
+              }` +
               "\n\nlet identifier = this._mutableToString(options);" +
               "\nidentifier = this._getIdentifier(options?identifier.identifier || 'notSet':'notSet');" +
               "let elementsToString = this._mutableToString(elements);" +
