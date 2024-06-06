@@ -816,9 +816,9 @@ class Constructos {
                 el = elArr[0].replace("?", "").trim();
                 let commentary = elArr[1] || "";
 
-                jsdoc2 += `\t* @param {any${
-                  required ? "" : "="
-                }} elements.${el} ${commentary.trim()}\n`;
+                jsdoc2 += `\t* @param {any} ${
+                  required ? `elements.${el}` : `[elements.${el}]`
+                }  ${commentary.trim()}\n`;
 
                 let escapedString = escapeStringRegexp(match);
 
@@ -829,12 +829,16 @@ class Constructos {
               });
             }
 
-            if (hasPropElements) jsdoc += "\t* @param {object} elements\n";
+            if (hasPropElements && requiredElement)
+              jsdoc += "\t* @param {object} elements\n";
+
+            if (hasPropElements && !requiredElement)
+              jsdoc += "\t* @param {object} [elements]\n";
 
             jsdoc += jsdoc2;
 
             jsdoc += "\t* @param {object} [options]\n";
-            jsdoc += "\t* @param {any=} options.identifier\n";
+            jsdoc += "\t* @param {any} [options.identifier]\n";
 
             jsdoc += "\t*/\n";
 
