@@ -416,10 +416,12 @@ class WBR {
           },
           entry: entry,
           output: {
-            chunkFilename: "[contenthash].bundle.js",
+            chunkFilename: `[${
+              global.args.production ? "contenthash" : "name"
+            }].bundle.js`,
             filename: "winnetouBundle.min.js",
             path: path.resolve(__dirname, out),
-            publicPath: path.join(out, "/"),
+            publicPath: path.join(global.config.publicPath, out),
             clean: {
               keep(asset) {
                 return asset.includes("css");
@@ -428,8 +430,9 @@ class WBR {
           },
           mode: global.args.production ? "production" : "development",
           devtool: global.args.production ? false : "source-map",
-          stats: "normal",
+          stats: "errors-only",
           bail: true,
+          cache: true,
 
           module: {
             rules: [
@@ -440,6 +443,7 @@ class WBR {
                   loader: "babel-loader",
 
                   options: {
+                    compact: false,
                     presets: [
                       [
                         "@babel/preset-env",
@@ -478,14 +482,17 @@ class WBR {
           // console.log({ err, stats });
           const info = stats?.toJson();
           stats?.compilation.errors.forEach(err => {
-            console.log(err.message);
+            new Drawer().drawError(err.message.toString());
           });
           if (stats?.hasErrors()) {
-            console.error(info?.errors);
+            new Drawer().drawError(info?.errors.toString());
           }
 
           if (stats?.hasWarnings()) {
-            console.warn(info?.warnings);
+            info?.warnings?.forEach(warning => {
+              new Drawer().drawWarning(warning.message);
+            });
+            // new Drawer().drawWarning(JSON.stringify(info?.warnings, null, 2));
           }
 
           if (global.compiledFiles >= global.totalFiles) {
@@ -501,6 +508,7 @@ class WBR {
             d.drawLine();
           }
           global.compiledFiles++;
+          return resolve(true);
         }
       );
 
@@ -518,8 +526,6 @@ class WBR {
             new Drawer().drawWarning(s.compilation.warnings.toString());
           }
           new Drawer().drawAdd(`'${entry} => ${out}`);
-
-          return resolve(true);
         });
       } else {
         compiler.run((e, s) => {
@@ -537,7 +543,6 @@ class WBR {
           new Drawer().drawAdd(`'${entry} => ${out}`);
 
           compiler.close(() => {});
-          return resolve(true);
         });
       }
     });
