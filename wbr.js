@@ -1217,6 +1217,11 @@ class Sass {
           sourceMap: !global.args.production,
           sourceMapIncludeSources: !global.args.production,
           ...(global.args.production && { style: "compressed" }),
+          logger: {
+            warn: global.args.production
+              ? text => {}
+              : new Drawer().drawWarning,
+          },
         })
         .then(res => {
           resolve({ css: res.css.toString(), map: res.sourceMap });
@@ -1441,13 +1446,16 @@ class Drawer {
     this.drawLine();
   };
 
-  drawWarning = text => {
+  drawWarning = (text, options) => {
     global.warningCount++;
     this.drawLine();
     this.drawBlankLine();
     this.drawText("Warning", { color: "warning" });
     this.drawBlankLine();
     this.drawTextBlock(text);
+    if (options && options.stack) {
+      this.drawText(options.stack.trim(), { color: "red" });
+    }
     this.drawBlankLine();
     this.drawLine();
   };
