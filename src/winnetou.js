@@ -54,6 +54,12 @@ class Winnetou_ {
     /**@type {object} */
     this.strings = {};
 
+    /**
+     * @type {any} 
+     * @private
+     * */
+    this.observer;
+
     document.addEventListener("keydown", (event) => {
       if (event.which === 27) {
         history.go(-1);
@@ -182,6 +188,77 @@ class Winnetou_ {
       return null;
     }
   }
+
+  constructosWatch = {
+    /**
+     * Starts the entire app constructos removal watch events. This method is only called once, even if you instantiate it several times. Only works if your main app element is 'app'.
+     * @returns {boolean}
+     */
+    start: () => {
+      if (this.observer) return;
+      this.observer = new MutationObserver(mutationsArray => {
+        try {
+          mutationsArray.forEach(MutationRecord => {
+            MutationRecord.removedNodes.forEach(removedNode => {
+              let removedId = removedNode instanceof Element ? removedNode.id : null;
+              document.getElementById('app').dispatchEvent(
+                new CustomEvent('constructoRemoved', { detail: { removedId } })
+              )
+            })
+
+          })
+        } catch (e) { }
+      });
+      this.observer.disconnect();
+      this.observer.observe(document.getElementById("app"), {
+        childList: true,
+        subtree: true,
+      });
+      return true;
+    },
+    /**
+     * Add a remove event binding to constructo
+     * @param {string} id constructo id that will be watched
+     * @param {function} callback the function that will be called when constructo is removed 
+     * @returns {boolean}
+     */
+    onRemove: (id, callback) => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+      document.getElementById("app").addEventListener(
+        "constructoRemoved",
+        /**
+         *
+         * @param {CustomEvent} data
+         */
+        data => {
+          if (id === data.detail.removedId) {
+            callback();
+            controller.abort();
+          }
+        },
+        {
+          signal,
+        }
+      );
+      return true;
+    },
+    /**
+     * Remove the main listener from app. 
+     * Using this method is discouraged as 
+     * it may break your app elsewhere in the code.
+     * Use it at your own risk.
+     */
+    destroy: () => {
+      setTimeout(() => {
+        this.observer.disconnect();
+        this.observer = null;
+      }, 100)
+
+    }
+  }
+
+
 
   /**
    * Method to replace a constructo
@@ -812,3 +889,5 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
 }
 
 export const Winnetou = new Winnetou_();
+export const W = Winnetou;
+export const Win = Winnetou;
