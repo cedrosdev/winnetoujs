@@ -292,7 +292,7 @@ class Winnetou_ {
           return [selector];
         } else {
           //
-          if (selector.includes(" ")) {
+          if (selector.includes(",")) {
             return document.querySelectorAll(selector);
           }
           //
@@ -719,16 +719,31 @@ class Winnetou_ {
   }
 
   /**
-   * Winnetou function storage method
+   * Winnetou function storage method. If you provide this, use quotes.
    * @param  {function} function_ Function to be called when event fires
-   * @param  {string} args A list of arguments comma separated
+   * @param  {...string} args A list of arguments comma separated
+   * @example
+   * ```
+   let div3 = myFirstDiv(
+    {
+      sub_title_txt: "subtitle 3",
+      title_txt: "title 3",
+      onclick: Winnetou.fx(el => (el.style.color = "white"), "this"),
+    },
+    { identifier: "2" }
+   ).create("#app").ids.myFirstDiv;
+  ```
    */
-  fx(function_, args = "") {
+  fx(function_, ...args) {
     let name =
       "winnetouFx" +
       (new Date().getMilliseconds() * Math.random() * 10000).toFixed(0);
     window[name] = function_;
-    return `${name}(${args})`;
+    if (args[0] === 'this')
+      return `${name}(this)`;
+    if (args.length === 1)
+      return `${name}('${args[0]}')`;
+    return `${name}(${args.map(x => x==='this'?`this`:`'${x}'`).join(',')})`;
   }
 
   /**
