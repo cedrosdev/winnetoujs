@@ -2,12 +2,16 @@
  * @type {import('./interfaces').IWinConfig}
  */
 export default {
-  constructosPath: "./constructos",
-  constructosOut: "./js/constructos",
-  entry: "./js/app.js",
-  out: "./release",
   defaultLang: "en-us",
   publicPath: "/",
+  constructosPath: "./constructos",
+  constructosOut: "./js/constructos",
+  apps: [
+    {
+      entry: "./js/app.js",
+      out: "./release",
+    },
+  ],
   sass: [
     {
       entryFolder: "./sass",

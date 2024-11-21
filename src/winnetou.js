@@ -189,7 +189,7 @@ class Winnetou_ {
     }
   }
 
-  constructosWatch = {
+  mutations = {
     /**
      * Starts the entire app constructos removal watch events. This method is only called once, even if you instantiate it several times. Only works if your main app element is 'app'.
      * @returns {boolean}
