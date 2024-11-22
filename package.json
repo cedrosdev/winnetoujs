@@ -1,9 +1,11 @@
 {
-  "version": "1.19.0-alpha.1",
+  "version": "1.19.0-alpha.2",
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
   "dependencies": {
+    "postcss": "^8.4.49",
+    "postcss-media-minmax": "^5.0.0",
     "piscina": "^4.7.0",
     "source-map": "^0.7.4",
     "ncp": "^2.0.0",

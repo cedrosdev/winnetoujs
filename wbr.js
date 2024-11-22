@@ -37,6 +37,8 @@ const watch = require("node-watch");
 const webpack = require("webpack");
 const readline = require("node:readline");
 const Piscina = require("piscina");
+const postcss = require("postcss");
+const minmax = require("postcss-media-minmax");
 
 let global = {
   args: {
@@ -1286,7 +1288,8 @@ class Sass {
           },
         })
         .then(res => {
-          resolve({ css: res.css.toString(), map: res.sourceMap });
+          let output = postcss().use(minmax()).process(res.css.toString()).css;
+          resolve({ css: output, map: res.sourceMap });
         })
         .catch(e => {
           new Drawer().drawWarning(e.message);
