@@ -1,5 +1,5 @@
 {
-  "version": "1.19.0-alpha.2",
+  "version": "1.19.0-alpha.3",
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
