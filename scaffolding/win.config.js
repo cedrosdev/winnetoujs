@@ -1,7 +1,7 @@
 /**
  * @type {import('./interfaces').IWinConfig}
  */
-export default {
+const config = {
   defaultLang: "en-us",
   publicPath: "/",
   constructosPath: "./constructos",
@@ -19,3 +19,5 @@ export default {
     },
   ],
 };
+
+module.exports = config;

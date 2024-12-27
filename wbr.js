@@ -208,16 +208,11 @@ class WBR {
     });
   }
 
-  fixedJson(badJSON) {
-    let a = badJSON.replace("export default", "").replace(";", "");
-    return eval(`(${a})`);
-  }
-
   async config() {
     return new Promise(async (resolve, reject) => {
       try {
-        let data = await fs.readFile("./win.config.js", "utf-8");
-        global.config = this.fixedJson(data);
+        let data = await import("./win.config.js");
+        global.config = data.default;
         return resolve(true);
       } catch (e) {
         global.config = {
