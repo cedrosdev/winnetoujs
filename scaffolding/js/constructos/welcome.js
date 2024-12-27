@@ -14,26 +14,23 @@ class welcome_ extends Constructos {
   /**
    * 
    * @param {object} elements
-   * @param {any} elements.title 
-   * @param {any} elements.text 
+   * @param {any} elements.title  
+   * @param {any} elements.text  
    * @param {object} [options]
-   * @param {any=} options.identifier
+   * @param {string} [options.identifier]
    */
   constructo = (elements, options) => {
 
     let identifier = this._mutableToString(options);
     identifier = this._getIdentifier(options ? identifier.identifier || 'notSet' : 'notSet');
-
     let elementsToString = this._mutableToString(elements);
     let component;
     let obj = {
       code(elements_) {
         return `
   <div id="welcome-win-${identifier}" class="welcome">
-    <img src="https://raw.githubusercontent.com/cedrosdev/winnetoujs_assets/master/logo_v1_2020/logo_transparent.png"
-      class="logo"
-    >
-    <h1>WinnetouJs</h1>
+    <img src="./logo.svg" class="logo" >
+    <h1>WinnetouJs 2</h1>
     <h2>${(elements_?.title)}</h2>
     <span class="text">${(elements_?.text)}</span>
     <p class="main_link">
@@ -59,7 +56,6 @@ class welcome_ extends Constructos {
           ids: {
             welcome: `welcome-win-${identifier}`,
           },
-          code: obj.code(elementsToString),
         }
       },
       constructoString: () => obj.code(elementsToString)

@@ -39,6 +39,24 @@ const readline = require("node:readline");
 const Piscina = require("piscina");
 const postcss = require("postcss");
 const minmax = require("postcss-media-minmax");
+const express = require("express");
+const { createServer } = require("http");
+const { Server, Socket } = require("socket.io");
+const { send } = require("node:process");
+
+/**@type {Socket<import("socket.io").DefaultEventsMap, import("socket.io").DefaultEventsMap, import("socket.io").DefaultEventsMap, any>} */
+let globalSocket;
+const sendToExtension = (/** @type {{ type: string; payload: any; }} */ data) =>
+  globalSocket?.emit(data.type, data.payload);
+
+let watchers = {
+  constructos: null,
+  translations: null,
+  icons: null,
+  sass: null,
+  webpack: new Array(),
+  isWatchingT: false,
+};
 
 let global = {
   args: {
@@ -76,21 +94,63 @@ let global = {
   res: null,
 };
 
+let memory = {
+  store: structuredClone(global),
+  stopWatchers: () => {
+    watchers.constructos?.close();
+    watchers.icons?.close();
+    watchers.sass?.close();
+    watchers.translations?.close();
+    watchers.webpack.forEach(watcher => watcher.watching.close(() => {}));
+    watchers.webpack = [];
+    sendToExtension({
+      type: `cancelWatchingT`,
+      payload: ``,
+    });
+    watchers.isWatchingT = false;
+  },
+  reset: () => {
+    global = structuredClone(memory.store);
+  },
+};
+
 class WBR {
   constructor() {
+    global.init = new Date().getTime();
+  }
+
+  initiator() {
     new Drawer().drawWelcome();
     this.readArgs();
   }
 
-  readArgs() {
-    const args = process.argv.slice(2); // remove 'node' and 'script' from argv
+  async readArgs() {
+    const args = process.argv.slice(2); // remove 'node' and 'wbr' from argv
+
+    if (
+      args.includes("--run-server") ||
+      args.includes("-run-server") ||
+      args.includes("-rs")
+    ) {
+      await this.config();
+      return new WinnetouJsServer();
+    }
 
     if (args.length === 0) {
+      // --no-watch does not work here because length will be 1
       this.transpileAll();
       return;
     }
 
     let commands = {};
+
+    // don`t forget to use semicolon
+
+    ["--transpile", "-transpile", "-t"].forEach(key => {
+      commands[key] = () => {
+        this.transpileAll();
+      };
+    });
 
     ["--version", "-version", `-v`].forEach(
       key =>
@@ -211,8 +271,11 @@ class WBR {
   async config() {
     return new Promise(async (resolve, reject) => {
       try {
-        let data = await import("./win.config.js");
-        global.config = data.default;
+        let fileContent = await fs.promises.readFile("./win.config.json", {
+          encoding: "utf-8",
+        });
+        let data = JSON.parse(fileContent);
+        global.config = data;
         return resolve(true);
       } catch (e) {
         global.config = {
@@ -243,40 +306,40 @@ class WBR {
   async testConfig() {
     if (global.config.out) {
       new Drawer().drawWarning(
-        "win.config.js misconfigured, 'out' parameter is deprecated. Use 'apps' instead."
+        "win.config.json misconfigured, 'out' parameter is deprecated. Use 'apps' instead."
       );
     }
 
     if (global.config.entry) {
       new Drawer().drawWarning(
-        "win.config.js misconfigured, 'entry' parameter is deprecated. Use 'apps' instead."
+        "win.config.json misconfigured, 'entry' parameter is deprecated. Use 'apps' instead."
       );
     }
 
     if (!global.config.apps[0].entry) {
       new Drawer().drawWarning(
-        "win.config.js misconfigured. Not found any entry point in 'apps' parameter. Using default './js/app.js'"
+        "win.config.json misconfigured. Not found any entry point in 'apps' parameter. Using default './js/app.js'"
       );
       global.config.apps[0].entry = "./js/app.js";
     }
 
     if (!global.config.apps[0].out) {
       new Drawer().drawWarning(
-        "win.config.js misconfigured. Not found any release 'out' point in 'apps' parameter. Using default './release'"
+        "win.config.json misconfigured. Not found any release 'out' point in 'apps' parameter. Using default './release'"
       );
       global.config.apps[0].out = "./release";
     }
 
     if (!global.config.constructosPath) {
       new Drawer().drawWarning(
-        "win.config.js misconfigured. Not found 'constructosPath' parameter. Using default './constructos'"
+        "win.config.json misconfigured. Not found 'constructosPath' parameter. Using default './constructos'"
       );
       global.config.constructosPath = "./constructos";
     }
 
     if (!global.config.constructosOut) {
       new Drawer().drawWarning(
-        "win.config.js misconfigured. Not found 'constructosOut' parameter. Using default './js/constructos'"
+        "win.config.json misconfigured. Not found 'constructosOut' parameter. Using default './js/constructos'"
       );
       global.config.constructosOut = "./js/constructos";
     }
@@ -292,45 +355,51 @@ class WBR {
     const finish = new Date().getTime();
     const res = finish - global.init;
     new Drawer().drawText("in " + res + "ms", { color: "dim" });
+    return res;
   }
 
   watchFiles() {
     if (global.args.watch === false) return;
 
+    sendToExtension({
+      type: "watchingT",
+      payload: "",
+    });
+
+    watchers.isWatchingT = true;
+
     new Drawer().drawBlankLine();
-    const refresh = name => {
+    const refresh = async name => {
       new Drawer().drawChange(name);
-      global.idList = [];
-      global.promisesConstructos = [];
-      global.promisesCss = [];
-      global.promisesIcons = [];
-      global.errorsCount = 0;
-      global.warningCount = 0;
+      memory.reset();
+      await this.config();
       global.init = new Date().getTime();
+      return true;
     };
 
     if (global.config.defaultLang) {
       try {
-        watch.default(
+        watchers.translations = watch.default(
           `./translations`,
           { recursive: true },
           async (evt, name) => {
-            refresh(name);
+            await refresh(name);
             await new Translator().translate();
             this.getTimeElapsed();
             new Drawer().drawFinal();
           }
         );
+        // w.close();
       } catch (e) {}
     }
 
     if (global.config.constructosPath) {
       try {
-        watch.default(
+        watchers.constructos = watch.default(
           global.config.constructosPath,
           { recursive: true },
           async (evt, name) => {
-            refresh(name);
+            await refresh(name);
             await new Constructos().transpile(name);
             this.getTimeElapsed();
             new Drawer().drawFinal();
@@ -343,13 +412,17 @@ class WBR {
       let folders = [];
       if (global.config.icons) folders.push(global.config.icons);
       try {
-        watch.default(folders, { recursive: true }, async (evt, name) => {
-          refresh(name);
-          await new Icons().transpile();
-          await new Constructos().transpile();
-          this.getTimeElapsed();
-          new Drawer().drawFinal();
-        });
+        watchers.icons = watch.default(
+          folders,
+          { recursive: true },
+          async (evt, name) => {
+            await refresh(name);
+            await new Icons().transpile();
+            await new Constructos().transpile();
+            this.getTimeElapsed();
+            new Drawer().drawFinal();
+          }
+        );
       } catch (e) {}
     }
 
@@ -359,12 +432,16 @@ class WBR {
         folders.push(item.entryFolder);
       });
       try {
-        watch.default(folders, { recursive: true }, async (evt, name) => {
-          refresh(name);
-          await new Sass().transpile();
-          this.getTimeElapsed();
-          new Drawer().drawFinal();
-        });
+        watchers.sass = watch.default(
+          folders,
+          { recursive: true },
+          async (evt, name) => {
+            await refresh(name);
+            await new Sass().transpile();
+            this.getTimeElapsed();
+            new Drawer().drawFinal();
+          }
+        );
       } catch (e) {}
     }
   }
@@ -377,7 +454,13 @@ class WBR {
     if (global.config?.icons) await new Icons().transpile();
     if (global.config?.defaultLang) await new Translator().translate();
     await new Constructos().transpile();
-    if (__runWatchFiles) this.getTimeElapsed();
+    if (__runWatchFiles) {
+      let time = this.getTimeElapsed();
+      sendToExtension({
+        type: "timeElapsed",
+        payload: time,
+      });
+    }
     if (__runWatchFiles) new Drawer().drawFinal();
     if (__runWatchFiles) this.watchFiles();
   }
@@ -394,9 +477,13 @@ class WBR {
     // verify new version 1.19.0
     if (global.config.apps) {
       if (global.args.production) {
-        // apps + production = piscina, no-watch
+        // apps + production = piscina, no-watch, xwin
         new Drawer().drawTextBlock(` Using XWin `, {
           color: "production",
+        });
+        sendToExtension({
+          type: "xwin",
+          payload: "",
         });
         new Drawer().drawBlankLine();
         global.args.watch = false;
@@ -409,7 +496,14 @@ class WBR {
           ),
         });
         global.config.apps.forEach(async app => {
-          new Drawer().drawAdd(`'${app.entry} => ${app.out}`);
+          sendToExtension({
+            type: "fileName",
+            payload: path.basename(app.entry),
+          });
+          // new Drawer().drawAdd(`'${app.entry} => ${app.out}`);
+          new Drawer().drawTextBlock(`'${app.entry} => ${app.out}`, {
+            color: "cyan",
+          });
           apps.push(
             piscina.run({
               entry: app.entry,
@@ -421,29 +515,50 @@ class WBR {
           );
         });
         let res = await Promise.all(apps);
+        new Files().history();
         res.forEach(item => {
+          sendToExtension({
+            type: "file",
+            payload: ``,
+          });
           item.errors.forEach(error =>
             new Drawer().drawError(JSON.stringify(error, null, 1))
           );
           item.warnings.forEach(warn => {
             new Drawer().drawWarning(JSON.stringify(warn, null, 1));
           });
+          sendToExtension({
+            type: "compilationErrors",
+            payload: { errors: item.errors, warnings: item.warnings },
+          });
         });
       } else {
         // apps without production = __bundle, watch can be used
         // within watchFiles are making an watch verification
         // this is for scss and constructos transpilations
-        this.watchFiles();
+
         global.totalFiles = global.config.apps.length;
         global.config.apps.forEach(async app => {
+          sendToExtension({
+            type: "fileName",
+            payload: path.basename(app.entry),
+          });
           global.webpackPromises.push(this.__bundle(app.entry, app.out));
         });
-        await Promise.all(global.webpackPromises);
+        let res = await Promise.all(global.webpackPromises);
+        // it's send inside __bundle
+        // res.forEach(item => {
+        //   sendToExtension({
+        //     type: "file",
+        //     payload: ``,
+        //   });
+        // });
+        this.watchFiles();
       }
     } else {
       // retro-compatibility
       // within watchFiles are making an watch verification
-      this.watchFiles();
+
       let entry = global.config.entry;
       let out = global.config.out;
       if (typeof entry === "object") {
@@ -460,13 +575,22 @@ class WBR {
         global.totalFiles = 1;
         await this.__bundle(global.config.entry, global.config.out);
       }
+      this.watchFiles();
     }
-    this.getTimeElapsed();
+    let time = this.getTimeElapsed();
+    sendToExtension({
+      type: "timeElapsed",
+      payload: time,
+    });
     new Drawer().drawFinal();
   }
 
   async __bundle(entry, out) {
     return new Promise((resolve, reject) => {
+      sendToExtension({
+        type: "fileName",
+        payload: path.basename(entry),
+      });
       const compiler = webpack(
         {
           watch: global.args.watch,
@@ -568,11 +692,16 @@ class WBR {
             d.drawLine();
           }
           global.compiledFiles++;
+          sendToExtension({
+            type: "file",
+            payload: path.basename(entry),
+          });
           return resolve(true);
         }
       );
 
       if (global.args.watch) {
+        // it creates a watcher for each file given by webpack promises
         compiler.watch({}, (e, s) => {
           if (e)
             if (e?.name !== "ConcurrentCompilationError") {
@@ -585,8 +714,10 @@ class WBR {
           if (s && s.compilation.warnings.length > 0) {
             new Drawer().drawWarning(s.compilation.warnings.toString());
           }
-          new Drawer().drawAdd(`'${entry} => ${out}`);
+          new Drawer().drawTextBlock(`'${entry} => ${out}`, { color: "cyan" });
         });
+        watchers.webpack.push(compiler);
+        // compiler.watching.close(e => {});
       } else {
         compiler.run((e, s) => {
           if (e)
@@ -600,12 +731,128 @@ class WBR {
           if (s && s.compilation.warnings.length > 0) {
             new Drawer().drawWarning(s.compilation.warnings.toString());
           }
-          new Drawer().drawAdd(`'${entry} => ${out}`);
+          new Drawer().drawTextBlock(`'${entry} => ${out}`, { color: "cyan" });
 
           compiler.close(() => {});
         });
       }
     });
+  }
+}
+
+class WinnetouJsServer {
+  constructor() {
+    this.createServer();
+    this.routes();
+  }
+
+  createServer() {
+    const app = express();
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    this.app = app;
+    const port = global.config.serverPort || 5501;
+
+    try {
+      const httpServer = createServer(app);
+      this.io = new Server(httpServer, {
+        transports: ["websocket", "polling"],
+        cors: {
+          origin: `http://localhost:${port}`,
+        },
+      });
+      httpServer
+        .listen(port)
+        .on("listening", ev => {
+          new Drawer().drawTextBlock(`Server Running at ${port}`, {
+            color: `green`,
+          });
+          new Drawer().drawBlankLine();
+          new Drawer().drawLine();
+          this.init_socket();
+          this.watchConfig();
+        })
+        .on("error", ev => {
+          new Drawer().drawError(
+            `Port ${port} is already in use. Change it in win.config.json and try again.`
+          );
+          new Drawer().drawBlankLine();
+          new Drawer().drawLine();
+          return;
+        });
+    } catch (e) {
+      new Drawer().drawError(e.message);
+      new Drawer().drawBlankLine();
+      new Drawer().drawLine();
+      return;
+    }
+  }
+
+  routes() {
+    this.app.get("/", (request, response) => {
+      response.json(`its works!`);
+    });
+  }
+
+  init_socket() {
+    this.io.on("connection", socket => {
+      globalSocket = socket;
+
+      socket.on("runBundler", async data => {
+        memory.stopWatchers();
+        memory.reset();
+        await new WBR().config();
+        global.args.production = data.production;
+        global.args.standalone = !data.transpile;
+        global.args.watch = data.watch;
+
+        if (data.compile) {
+          let totalFiles = await new Files().initialFileCount({
+            compile: true,
+            transpile: data.transpile,
+          });
+          sendToExtension({
+            type: "totalFiles",
+            payload: totalFiles,
+          });
+          new WBR().bundleRelease();
+        } else {
+          let totalFiles = await new Files().initialFileCount();
+          sendToExtension({
+            type: "totalFiles",
+            payload: totalFiles,
+          });
+          new WBR().transpileAll();
+        }
+      });
+
+      socket.on("isWatchingT", () => {
+        if (watchers.isWatchingT) {
+          sendToExtension({
+            type: "watchingT",
+            payload: "",
+          });
+        }
+      });
+
+      socket.on("closeWBR", () => {
+        process.exit();
+      });
+    });
+  }
+
+  watchConfig() {
+    watch.default(
+      `./win.config.json`,
+      { recursive: true },
+      async (evt, name) => {
+        memory.stopWatchers();
+        memory.reset();
+        await new WBR().config();
+        await new WBR().testConfig();
+        console.log("config changed");
+      }
+    );
   }
 }
 
@@ -703,6 +950,10 @@ class Icons {
           symbol += `</svg></winnetou>`;
 
           new Drawer().drawAdd(iconPath);
+          sendToExtension({
+            type: "file",
+            payload: path.basename(iconPath),
+          });
           return resolve({ symbol, iconPath });
         } else {
           return reject();
@@ -763,7 +1014,6 @@ class Constructos {
 
               if (typeof file === "string") {
                 let ext = path.parse(path.join(__dirname, file)).ext;
-                // apenas se for html ou htm
                 if (ext == ".html" || ext == ".htm") {
                   global.promisesConstructos.push(
                     this.transpileConstructo(file)
@@ -985,6 +1235,10 @@ class Constructos {
             constructos.push(`export const ${id} = new ${id}_().constructo;`);
           });
 
+          sendToExtension({
+            type: "file",
+            payload: path.basename(filePath),
+          });
           return resolve({
             class: beautify(finalReturn, {
               indent_size: 2,
@@ -1098,6 +1352,10 @@ class Translator {
   }
 
   async translate() {
+    /**
+     * First call deprecated xml format
+     * if no one file exists, runs json
+     */
     return await this.xml();
   }
 
@@ -1157,6 +1415,7 @@ class Translator {
   async json() {
     return new Promise((resolve, reject) => {
       let strings = "";
+
       fs.readFile(
         `${this.translationsPath}/${global.config.defaultLang}.json`,
         "utf-8",
@@ -1205,6 +1464,10 @@ class Translator {
               return resolve(true);
             }
           );
+          sendToExtension({
+            type: "file",
+            payload: path.basename("_strings.js"),
+          });
         }
       );
     });
@@ -1284,6 +1547,10 @@ class Sass {
         })
         .then(res => {
           let output = postcss().use(minmax()).process(res.css.toString()).css;
+          sendToExtension({
+            type: "file",
+            payload: path.basename(file),
+          });
           resolve({ css: output, map: res.sourceMap });
         })
         .catch(e => {
@@ -1491,7 +1758,7 @@ class Drawer {
     this.drawLine();
     this.drawBlankLine();
 
-    this.drawText(" Bundle Error ", { color: "error" });
+    this.drawText(" Error ", { color: "error" });
     this.drawBlankLine();
     text = text.replace(`"`, ``);
     text.split(`:`).forEach(t => {
@@ -1708,12 +1975,12 @@ class Err {
 
   /**
    * Cod 003
-   * win.config.js
+   * win.config.json
    */
   e003() {
     new Drawer().drawError(
       "Error Code: 003\n" +
-        `"./win.config.js" not found or misconfigured. Default config will be used.`
+        `"./win.config.json" not found or misconfigured. Default config will be used.`
     );
     process.stderr.write("\x07");
   }
@@ -1781,6 +2048,180 @@ class Files {
       });
     });
   }
+
+  async initialFileCount(data) {
+    let totalFiles = 0;
+    let entries = 0;
+
+    if (data) {
+      if (data.compile) {
+        entries = global.config.apps.length;
+      }
+      if (!data.transpile) {
+        return entries;
+      } else {
+        totalFiles += entries;
+      }
+    }
+
+    const sass = async () => {
+      let arr = global.config.sass;
+      arr?.forEach(async item => {
+        let files = await recursive(item.entryFolder);
+        totalFiles += files.length;
+      });
+      return true;
+    };
+    const icons = async () => {
+      const iconsPath = global.config.icons;
+      if (iconsPath) {
+        try {
+          let files = await recursive(iconsPath);
+          totalFiles += files.length;
+        } catch (e) {}
+      }
+      return true;
+    };
+    const translate = async () => {
+      if (global.config.defaultLang) totalFiles++;
+      return true;
+    };
+    const constructos = async () => {
+      const constructosPath = global.config.constructosPath;
+      let files = await recursive(constructosPath);
+      totalFiles += files.length;
+      return true;
+    };
+    await Promise.all([sass(), icons(), translate(), constructos()]);
+    return totalFiles;
+  }
+
+  async history_() {
+    let content = await fs.promises
+      .readFile("./.winnetouJsData", { encoding: "utf8" })
+      .catch(err => {
+        console.error(err);
+      });
+    let json = {};
+    if (content) {
+      json = JSON.parse(content);
+    }
+
+    const FILES = async () => {
+      let arr = global.config.apps;
+      arr?.forEach(async item => {
+        let output = item.out;
+        let files = await fs.promises.readdir(output);
+        files.forEach(async file => {
+          let data = await fs.promises.stat(path.join(output, file));
+          console.log(`history`, { data });
+        });
+      });
+      return true;
+    };
+
+    FILES();
+  }
+
+  async history() {
+    try {
+      const filePath = path.resolve(__dirname, "./.winnetouJsData");
+      let json = {};
+
+      // Read existing data if the file exists, or start with an empty JSON object
+      const content = await fs.promises
+        .readFile(filePath, { encoding: "utf8" })
+        .catch(err => {
+          if (err.code === "ENOENT") {
+            console.warn("File not found, starting with empty JSON.");
+            return null;
+          }
+          throw err;
+        });
+      if (content) {
+        json = JSON.parse(content);
+      }
+
+      const parseFiles = async () => {
+        const apps = global.config.apps;
+        for (const app of apps) {
+          const output = app.out;
+          if (!json[output]) json[output] = {};
+          const filesInAppOutput = await fs.promises.readdir(output);
+          for (const file of filesInAppOutput) {
+            const fileName = file;
+            const filePath = path.join(output, file);
+            const stats = await fs.promises.stat(filePath);
+            const size = (stats.size / 1024).toFixed(2);
+            if (!json[output][fileName]) json[output][fileName] = [];
+            if (
+              json[output][fileName].length === 0 ||
+              json[output][fileName][json[output][fileName].length - 1]
+                .sizeKB !== size
+            ) {
+              json[output][fileName].push({
+                date: new Date(),
+                sizeKB: size,
+              });
+              if (json[output][fileName].length > 4) {
+                json[output][fileName].shift();
+              }
+            }
+          }
+        }
+      };
+
+      const parseFilesBackup = async () => {
+        const arr = global.config.apps;
+        if (!arr) {
+          throw new Error("global.config.apps is not defined or empty.");
+        }
+        for (const item of arr) {
+          const output = item.out;
+          try {
+            const files = await fs.promises.readdir(output);
+            for (const file of files) {
+              const filePath = path.join(output, file);
+              const stats = await fs.promises.stat(filePath);
+              const key = item.out + "___" + file;
+              if (!json[key]) json[key] = {};
+
+              let size = (stats.size / 1024).toFixed(2);
+
+              if (!json[key].releases) json[key].releases = [];
+              if (
+                json[key].releases.length === 0 ||
+                json[key].releases[json[key].releases.length - 1].sizeKB != size
+              ) {
+                json[key].file = file;
+                json[key].path = output;
+
+                json[key].releases.push({
+                  date: new Date(),
+                  sizeKB: size,
+                });
+              }
+            }
+          } catch (err) {
+            console.error(`Error processing directory: ${output}`, err);
+          }
+        }
+
+        return true;
+      };
+
+      await parseFiles();
+
+      // console.log(JSON.stringify(json, null, 1));
+
+      await fs.promises.writeFile(filePath, JSON.stringify(json, null, 2), {
+        encoding: "utf8",
+      });
+      console.log("File metadata successfully stored in .winnetouJsData");
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }
 }
 
-new WBR();
+new WBR().initiator();
