@@ -1,6 +1,5 @@
-//@ts-ignore
-import Config from "../../../win.config.js";
-// import Config from "../win.config.js";
+
+import Config from "../../../win.config.json";
 
 class Winnetou_ {
   constructor() {
@@ -836,7 +835,7 @@ class Winnetou_ {
           `Lang error. Reloading...
 
 
-The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. Did you set publicPath in win.config.js and created json translation file?`
+The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. Did you set publicPath in win.config.json and created json translation file?`
         );
         window.localStorage.removeItem("lang");
         setTimeout(() => {
@@ -860,11 +859,12 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
 
   /**
    * Change language
-   * @param lang string language
+   * @param {string} lang string language
+   * @param {boolean} [reload] boolean reload page, default is true
    */
-  changeLang(lang) {
+  changeLang(lang, reload=true) {
     window.localStorage.setItem("lang", lang);
-    location.reload();
+    reload && location.reload();
   }
   /**
    * Change application css
