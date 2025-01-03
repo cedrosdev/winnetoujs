@@ -21,6 +21,7 @@
  * @property {string} [publicPath]
  * Relative path address to translations folder
  * @property {string} [icons] The path of icons
+ * @property {number} [serverPort] Port number for WinnetouJs Visual Studio Code Extension Server
  */
 
 /**
