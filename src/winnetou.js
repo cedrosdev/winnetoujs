@@ -1,6 +1,4 @@
 
-import Config from "../../../win.config.json";
-
 class Winnetou_ {
   constructor() {
     /**
@@ -805,8 +803,11 @@ class Winnetou_ {
           });
       });
     };
+
     return new Promise(async (resolve, reject) => {
       if (!window.localStorage.getItem("lang")) return resolve(true);
+
+      const Config = await get("../../../win.config.json")
 
       let This = class_;
 
