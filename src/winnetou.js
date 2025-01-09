@@ -1,4 +1,3 @@
-
 class Winnetou_ {
   constructor() {
     /**
@@ -52,19 +51,19 @@ class Winnetou_ {
     this.strings = {};
 
     /**
-     * @type {any} 
+     * @type {any}
      * @private
      * */
     this.observer;
 
-    document.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", event => {
       if (event.which === 27) {
         history.go(-1);
       }
     });
 
     if (window.history) {
-      window.onpopstate = (event) => {
+      window.onpopstate = event => {
         event.preventDefault();
 
         if (event.state == null) {
@@ -81,7 +80,7 @@ class Winnetou_ {
 
         if (this.routesOptions?.onBack) {
           try {
-            this.routesOptions.onBack();
+            this.routesOptions.onBack(event.state || "/");
           } catch (e) {
             console.error(
               `Winnetou Error, id: CR001\nThe onBack option in createRoutes() is not valid. Please use a function. \n\nOriginal Error: `,
@@ -129,7 +128,7 @@ class Winnetou_ {
 
       this.usingMutable[mutable] = [];
 
-      tmpArr.forEach((item) => {
+      tmpArr.forEach(item => {
         /**
          * go through the tmpArr to handle constructos
          */
@@ -197,14 +196,16 @@ class Winnetou_ {
         try {
           mutationsArray.forEach(MutationRecord => {
             MutationRecord.removedNodes.forEach(removedNode => {
-              let removedId = removedNode instanceof Element ? removedNode.id : null;
-              document.getElementById('app').dispatchEvent(
-                new CustomEvent('constructoRemoved', { detail: { removedId } })
-              )
-            })
-
-          })
-        } catch (e) { }
+              let removedId =
+                removedNode instanceof Element ? removedNode.id : null;
+              document.getElementById("app").dispatchEvent(
+                new CustomEvent("constructoRemoved", {
+                  detail: { removedId },
+                })
+              );
+            });
+          });
+        } catch (e) {}
       });
       this.observer.disconnect();
       this.observer.observe(document.getElementById("app"), {
@@ -216,7 +217,7 @@ class Winnetou_ {
     /**
      * Add a remove event binding to constructo
      * @param {string} id constructo id that will be watched
-     * @param {function} callback the function that will be called when constructo is removed 
+     * @param {function} callback the function that will be called when constructo is removed
      * @returns {boolean}
      */
     onRemove: (id, callback) => {
@@ -241,8 +242,8 @@ class Winnetou_ {
       return true;
     },
     /**
-     * Remove the main listener from app. 
-     * Using this method is discouraged as 
+     * Remove the main listener from app.
+     * Using this method is discouraged as
      * it may break your app elsewhere in the code.
      * Use it at your own risk.
      */
@@ -250,12 +251,9 @@ class Winnetou_ {
       setTimeout(() => {
         this.observer.disconnect();
         this.observer = null;
-      }, 100)
-
-    }
-  }
-
-
+      }, 100);
+    },
+  };
 
   /**
    * Method to replace a constructo
@@ -293,6 +291,10 @@ class Winnetou_ {
             return document.querySelectorAll(selector);
           }
           //
+          else if (selector.includes(" ")) {
+            return document.querySelectorAll(selector);
+          }
+          //
           else if (selector.match(/^\#/)) {
             selector = selector.replace("#", "");
             return [document.getElementById(selector)];
@@ -323,7 +325,7 @@ class Winnetou_ {
        * remove constructo from the DOM
        */
       remove() {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.remove();
         });
 
@@ -334,7 +336,7 @@ class Winnetou_ {
        * @param {string} htmlContentString the html string to be inserted
        */
       html(htmlContentString) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.innerHTML = htmlContentString;
         });
         return this;
@@ -356,7 +358,7 @@ class Winnetou_ {
        * @param {string} htmlContentString the html string to be inserted
        */
       append(htmlContentString) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.innerHTML += htmlContentString;
         });
         return this;
@@ -367,7 +369,7 @@ class Winnetou_ {
        */
       prepend(htmlContentString) {
         // el.innerHTML = texto + el.innerHTML;
-        el.forEach((item) => {
+        el.forEach(item => {
           item.innerHTML = htmlContentString + item.innerHTML;
         });
         return this;
@@ -380,7 +382,7 @@ class Winnetou_ {
        */
       css(property, value) {
         let valueString = value;
-        el.forEach((item) => {
+        el.forEach(item => {
           if (typeof value == "number") valueString = value + "px";
           item.style[property] = valueString;
         });
@@ -391,7 +393,7 @@ class Winnetou_ {
        * @param {string} className name of class
        */
       toggleClass(className) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.classList.toggle(className);
         });
         return this;
@@ -401,7 +403,7 @@ class Winnetou_ {
        * @param {string} className name of class
        */
       addClass(className) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.classList.add(className);
         });
         return this;
@@ -411,7 +413,7 @@ class Winnetou_ {
        * @param {string} className name of class
        */
       removeClass(className) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.classList.remove(className);
         });
         return this;
@@ -420,7 +422,7 @@ class Winnetou_ {
        * Hide a constructo
        */
       hide() {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.classList.add("winnetou_display_none");
         });
         return this;
@@ -429,7 +431,7 @@ class Winnetou_ {
        * Show a constructo
        */
       show() {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.classList.remove("winnetou_display_none");
 
           if (getComputedStyle(item).display == "none") {
@@ -479,7 +481,7 @@ class Winnetou_ {
        * @param {string} value The value.
        */
       setVal(value) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.value = value;
           if ("createEvent" in document) {
             var evt = document.createEvent("HTMLEvents");
@@ -495,7 +497,7 @@ class Winnetou_ {
        * @param  {string} value the values
        */
       setAttr(attr, value) {
-        el.forEach((item) => {
+        el.forEach(item => {
           item.setAttribute(attr, value);
         });
         return this;
@@ -583,7 +585,7 @@ class Winnetou_ {
     this.routes = obj;
     this.routesOptions = options;
 
-    Object.keys(this.routes).forEach((route) => {
+    Object.keys(this.routes).forEach(route => {
       let segment = route.split("/");
       let size = segment.length;
       this.paramRoutes.push({
@@ -604,7 +606,7 @@ class Winnetou_ {
       pushState && this.pushState(url);
       if (this.routesOptions?.onGo) {
         try {
-          this.routesOptions.onGo();
+          this.routesOptions.onGo(url || "/"); // if url is undefined, it will be '/'
         } catch (e) {
           console.error(
             `Winnetou Error, id: CR001\nThe onGo option in createRoutes() is not valid. Please use a function. \n\nOriginal Error: `,
@@ -627,7 +629,7 @@ class Winnetou_ {
       this.pushStateInteraction(route);
       if (this.routesOptions?.onGo) {
         try {
-          this.routesOptions.onGo();
+          this.routesOptions.onGo(route || "/"); // if url is undefined, it will be '/'
         } catch (e) {
           console.error(
             `Winnetou Error, id: CR001\nThe onGo option in createRoutes() is not valid. Please use a function. \n\nOriginal Error: `,
@@ -655,7 +657,7 @@ class Winnetou_ {
       let splittedUrl = url.split("/");
       let size = splittedUrl.length;
 
-      let filter = this.paramRoutes.filter((data) => data.size === size);
+      let filter = this.paramRoutes.filter(data => data.size === size);
 
       if (filter.length === 0) {
         this.notFound();
@@ -736,11 +738,11 @@ class Winnetou_ {
       "winnetouFx" +
       (new Date().getMilliseconds() * Math.random() * 10000).toFixed(0);
     window[name] = function_;
-    if (args[0] === 'this')
-      return `${name}(this)`;
-    if (args.length === 1)
-      return `${name}('${args[0]}')`;
-    return `${name}(${args.map(x => x==='this'?`this`:`'${x}'`).join(',')})`;
+    if (args[0] === "this") return `${name}(this)`;
+    if (args.length === 1) return `${name}('${args[0]}')`;
+    return `${name}(${args
+      .map(x => (x === "this" ? `this` : `'${x}'`))
+      .join(",")})`;
   }
 
   /**
@@ -752,12 +754,12 @@ class Winnetou_ {
   listen(event, elementSelector, callback) {
     try {
       let el = document.querySelector("#" + elementSelector);
-      el?.addEventListener(event, (e) => {
+      el?.addEventListener(event, e => {
         callback(e);
       });
     } catch (e) {
-      document.querySelectorAll(elementSelector).forEach((x) => {
-        x.addEventListener(event, (e) => {
+      document.querySelectorAll(elementSelector).forEach(x => {
+        x.addEventListener(event, e => {
           callback(e);
         });
       });
@@ -783,7 +785,7 @@ class Winnetou_ {
      * Function to get json from API
      * @param {string} url API Endpoint
      */
-    const get = (url) => {
+    const get = url => {
       return new Promise((resolve, reject) => {
         fetch(url, {
           method: "GET",
@@ -807,7 +809,7 @@ class Winnetou_ {
     return new Promise(async (resolve, reject) => {
       if (!window.localStorage.getItem("lang")) return resolve(true);
 
-      const Config = await get("../../../win.config.json")
+      const Config = await get("../../../win.config.json");
 
       let This = class_;
 
@@ -847,7 +849,7 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
 
       // let file = JSON.parse(data);
 
-      Object.keys(data).map((key) => {
+      Object.keys(data).map(key => {
         let value = data[key];
 
         // replace all values of _strings.js object
@@ -863,7 +865,7 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
    * @param {string} lang string language
    * @param {boolean} [reload] boolean reload page, default is true
    */
-  changeLang(lang, reload=true) {
+  changeLang(lang, reload = true) {
     window.localStorage.setItem("lang", lang);
     reload && location.reload();
   }
@@ -892,7 +894,7 @@ The file '${Config.publicPath}/translations/${defaultLang}.json' was not found. 
       el = document.querySelectorAll("#" + output);
     }
 
-    el.forEach((item) => {
+    el.forEach(item => {
       // options
       if (options && options.clear) item.innerHTML = "";
       // @ts-ignore
