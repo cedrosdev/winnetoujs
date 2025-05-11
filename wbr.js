@@ -1426,7 +1426,8 @@ class Translator {
           }
           let file;
           try {
-            file = JSON.parse(data);
+            if (typeof data === "string") file = JSON.parse(data);
+            else throw new Error("data is not a string");
           } catch (e) {
             new Err().e007(
               e,
@@ -1636,15 +1637,7 @@ class Sass {
 }
 
 class Drawer {
-  drawLine = (size = 80) => {
-    let line = "";
-    for (let i = 0; i < size; i++) {
-      if (i == 1) line += " ";
-      else if (i == size - 2) line += " ";
-      else line += "=";
-    }
-    console.log(line);
-  };
+  drawLine = (size = 80) => {};
 
   /**
    * @typedef {object} params
@@ -1699,31 +1692,21 @@ class Drawer {
       }
     }
 
-    let line = "= " + color + text + "\x1b[0m";
+    let line = color + text + "\x1b[0m";
 
     if (params?.type === "add") {
-      line = "= \x1b[42m\x1b[37m success \x1b[0m " + color + text + "\x1b[0m";
+      line = "\x1b[42m\x1b[37m success \x1b[0m " + color + text + "\x1b[0m";
       text = " success  " + text;
     }
 
     if (params?.type === "change") {
-      line = "= \x1b[45m\x1b[37m changed \x1b[0m " + color + text + "\x1b[0m";
+      line = "\x1b[45m\x1b[37m changed \x1b[0m " + color + text + "\x1b[0m";
       text = " changed  " + text;
     }
 
     if (params?.type === "addError") {
-      line =
-        "= \x1b[5m\x1b[43m\x1b[37m fail \x1b[0m " + color + text + "\x1b[0m";
+      line = "\x1b[5m\x1b[43m\x1b[37m fail \x1b[0m " + color + text + "\x1b[0m";
       text = " fail  " + text;
-    }
-
-    let tamanho = text.length + 2;
-
-    let size = params?.size || 80;
-
-    for (let i = 0; i < size - tamanho; i++) {
-      if (i == size - tamanho - 1) line += "=";
-      else line += " ";
     }
 
     console.log(line);
@@ -1746,7 +1729,7 @@ class Drawer {
   };
 
   drawSpace = () => {
-    console.log("\n");
+    console.log();
   };
 
   /**
@@ -1856,21 +1839,11 @@ class Drawer {
   };
 
   drawWelcome = () => {
-    // console.clear();
-    this.drawLine();
     this.drawBlankLine();
-    this.drawBlankLine();
-    // this.drawText("WINNETOUJS ", { color: "dim" });
-    // this.drawBlankLine();
     this.drawText("WinnetouJs Bundle Releaser (WBR)", {
       color: "yellow",
     });
-    // this.drawBlankLine();
     this.drawText("Version " + winnetouPackage.version, { color: "yellow" });
-
-    this.drawBlankLine();
-    this.drawBlankLine();
-    this.drawLine();
     this.drawBlankLine();
     this.drawText("Find online help and docs", { color: "dim" });
     this.drawText("https://winnetoujs.org");
@@ -1878,15 +1851,13 @@ class Drawer {
     this.drawText("Fork on GitHub", { color: "dim" });
     this.drawText("https://github.com/cedrosdev/WinnetouJs.git");
     this.drawBlankLine();
-    // don't use new Date here, it needs to be manually updated
-    // to the last year of the project in order to
-    // ensure updates are being made
-    this.drawText(`(c) 2020 - 2024 Cedros Development (https://cedros.dev)`, {
-      color: "dim",
-    });
+    this.drawText(
+      `(c) 2020 - ${new Date().getFullYear()} Cedros Development (https://cedros.dev)`,
+      {
+        color: "dim",
+      }
+    );
 
-    this.drawBlankLine();
-    this.drawLine();
     this.drawBlankLine();
   };
 
