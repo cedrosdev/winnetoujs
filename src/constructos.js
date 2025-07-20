@@ -1,13 +1,24 @@
 import { Winnetou } from "./winnetou.js";
 
 export class Constructos {
-  _mutableToString(elements) {
-    if (elements) {
-      let jsonElements = JSON.parse(JSON.stringify(elements));
+  /**
+   *
+   * Digest all constructo props to find
+   * {mutable:"string"} pattern in order to
+   * change it to W.getMutable("string") value
+   * @param {object} constructoProps
+   * @protected
+   */
+  _mutableToString(constructoProps) {
+    if (constructoProps) {
+      let jsonElements = JSON.parse(JSON.stringify(constructoProps));
 
-      Object.keys(elements).forEach(item => {
-        if (typeof elements[item] === "object" && elements[item] !== null) {
-          let mutable = elements[item].mutable;
+      Object.keys(constructoProps).forEach(item => {
+        if (
+          typeof constructoProps[item] === "object" &&
+          constructoProps[item] !== null
+        ) {
+          let mutable = constructoProps[item].mutable;
 
           let val;
 
@@ -24,10 +35,21 @@ export class Constructos {
 
       return jsonElements;
     } else {
-      return elements;
+      return constructoProps;
     }
   }
 
+  /**
+   * Store constructos that using mutables
+   * in Winnetou.usingMutable var in order to
+   * update constructo when W.setMutable
+   * if triggered.
+   * @param {*} pureId
+   * @param {*} elements
+   * @param {*} options
+   * @param {*} method
+   * @protected
+   */
   _saveUsingMutable(pureId, elements, options, method) {
     if (elements) {
       Object.keys(elements).forEach(item => {
@@ -83,6 +105,7 @@ export class Constructos {
   }
 
   /**
+   * Generates a random identifier
    * @protected
    * @param  {string=} identifier
    */
@@ -92,17 +115,13 @@ export class Constructos {
   }
 
   /**
-   * Create Winnetou Constructo
-   * @param  {string} component The component to be inserted
-   * @param  {string | object} output The node or list of nodes where the component will be created
-   * @param  {object} [options] Options to control how the construct is inserted. Optional.
-   * @param  {boolean} [options.clear] Clean the node before inserting the construct
-   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
-   * @param {object} [options.vdom] Winnetou.vdom() fragment
-   * @param {boolean} [options.replace] Replace a constructo
+   * Insert a constructo into DOM tree
+   * @param {*} component
+   * @param {*} output
+   * @param {*} options
+   * @protected
    */
-
-  create(component, output, options) {
+  attachToDOM(component, output, options) {
     let frag;
 
     if (

@@ -1,4 +1,0 @@
-{
-  "welcome": "Congratulations! Your winnetoujs app is health and running.",
-  "text":"To start coding, edit <i>app.js</i> file and run <b>node wbr --bundleRelease</b> in your terminal."
-}
