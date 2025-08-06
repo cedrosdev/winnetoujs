@@ -22,6 +22,11 @@ module.exports = class ConstructosParser {
     this.idList = new Array();
   }
 
+  async singleParse(file_name) {
+    this.idList = [];
+    this.transpileConstructo(file_name);
+  }
+
   async parse() {
     // Parsing logic here
     // read src folder to find all wcto.html files
@@ -52,7 +57,7 @@ module.exports = class ConstructosParser {
     return new Promise((resolve, reject) => {
       try {
         fs.readFile(filePath, "utf8", (err, data) => {
-          let dom = htmlParser.parse(data);
+          let dom = htmlParser.parse(data.toString());
           let components = dom.querySelectorAll("winnetou");
           let finalReturn = "";
           let constructos = [];
@@ -124,22 +129,44 @@ module.exports = class ConstructosParser {
               hasPropElements = true;
               matches.forEach(async match => {
                 let el = match.replace("{{", "").replace("}}", "");
-                let elArr = el.split("%");
-                let required = elArr[0].indexOf("?") === -1;
-                let propName = elArr[0].replace("?", "").trim();
+                let colonSeparatorArray = el.split(":");
+                let roundBracketsSeparatorArray =
+                  colonSeparatorArray[0].split("(");
+
+                let type = colonSeparatorArray[1] || "";
+
+                let required = colonSeparatorArray[0].indexOf("?") === -1;
+                if (required) requiredElement = true;
+
+                let propName = roundBracketsSeparatorArray[0]
+                  .replace("?", "")
+                  .trim();
                 propNames.push(propName);
-                let commentary = elArr[1] || "";
-                jsdoc2 += `\t* @param {any} elements.${propName}  ${commentary.trim()}\n`;
+
+                let commentary = roundBracketsSeparatorArray[1] || "";
+                commentary = commentary.replace(")", "");
+
+                jsdoc2 += `\t* @param {${type ? type : "any"}} ${
+                  required ? `elements.${propName}` : `[elements.${propName}]`
+                }  ${commentary.trim()}\n`;
+
                 let escapedString = escapeStringRegexp(match);
-                // Use prop access from "props" (which is digestedPropsToString in code)
+
                 constructo = constructo.replace(
                   new RegExp(escapedString, "g"),
                   `\${props?.${propName}}`
                 );
               });
             }
-            if (hasPropElements) jsdoc += "\t* @param {object} elements\n";
+
+            if (hasPropElements && requiredElement)
+              jsdoc += "\t* @param {object} elements\n";
+
+            if (hasPropElements && !requiredElement)
+              jsdoc += "\t* @param {object} [elements]\n";
+
             jsdoc += jsdoc2;
+
             jsdoc += "\t* @param {object} [options]\n";
             jsdoc += "\t* @param {string} [options.identifier]\n";
             jsdoc += "\t*/\n";

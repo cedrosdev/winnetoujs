@@ -1,6 +1,7 @@
 const esbuild = require("esbuild");
 const fs = require("fs");
 const path = require("path");
+const watch = require("node-watch");
 const constructosParser = require("winnetoujs/wbr_modules/constructosParser");
 
 /**
@@ -65,6 +66,18 @@ module.exports = class BundleRelease {
       verbose: this.verbose,
     });
     await constructosParserInstance.parse();
+    // watch constructos
+    if (this.watch)
+      watch
+        .default(this.constructosSourceFolder, {
+          recursive: true,
+          filter: f => f.endsWith(".wcto.htm") || f.endsWith("wcto.html"),
+        })
+        .on("change", (ev, file_name) => {
+          this.verbose &&
+            console.log("\n\n\x1b[32mConstructo updated: " + file_name + "\x1b[0m");
+          constructosParserInstance.singleParse(file_name);
+        });
     // compile bundle
     const result = await this.esbuild();
     return result;
