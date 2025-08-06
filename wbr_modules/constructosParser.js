@@ -121,7 +121,7 @@ module.exports = class ConstructosParser {
               "$1-win-${this.identifier}"
             );
 
-            // Parse {{prop}} and {{prop%comment}}
+            // Parse {{prop}}
             let regex = new RegExp("{{\\s*?(.*?)\\s*?}}", "g");
             let matches = constructo.match(regex);
             let propNames = [];
@@ -162,7 +162,7 @@ module.exports = class ConstructosParser {
             if (hasPropElements && requiredElement)
               jsdoc += "\t* @param {object} elements\n";
 
-            if (hasPropElements && !requiredElement)
+           else
               jsdoc += "\t* @param {object} [elements]\n";
 
             jsdoc += jsdoc2;
