@@ -42,19 +42,6 @@ module.exports = class BundleRelease {
   }
 
   /**
-   * Clears the output directory by removing all files except CSS files
-   * @param {string} dir - The directory path to clear
-   */
-  clearOutputDir(dir) {
-    fs.readdirSync(dir).forEach(file => {
-      const filePath = path.join(dir, file);
-      if (!file.includes("css")) {
-        fs.unlinkSync(filePath);
-      }
-    });
-  }
-
-  /**
    * Builds the bundle using esbuild and starts watching for changes
    * @async
    * @returns {Promise<"watching"|"done">} - Returns a promise that resolves when the build is complete or watching is started
@@ -75,7 +62,9 @@ module.exports = class BundleRelease {
         })
         .on("change", (ev, file_name) => {
           this.verbose &&
-            console.log("\n\n\x1b[32mConstructo updated: " + file_name + "\x1b[0m");
+            console.log(
+              "\n\n\x1b[32mConstructo updated: " + file_name + "\x1b[0m"
+            );
           constructosParserInstance.singleParse(file_name);
         });
     // compile bundle
@@ -85,9 +74,6 @@ module.exports = class BundleRelease {
 
   async esbuild() {
     const outputDir = this.outputDir;
-    if (fs.existsSync(outputDir)) {
-      this.clearOutputDir(outputDir);
-    }
     let es = await esbuild.context({
       entryPoints: this.entryFile,
       bundle: true,
@@ -98,7 +84,7 @@ module.exports = class BundleRelease {
       sourcemap: !this.production,
       target: ["chrome90"],
       entryNames: "[name].winnetouBundle.min",
-      chunkNames: this.production ? "[hash].lazyBundle" : "[name].lazyBundle",
+      chunkNames: this.production ? "[hash].lazyBundle" : "[name]-[hash].lazyBundle",
       loader: { ".ts": "ts" },
       plugins: [
         {
