@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.8",
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
@@ -15,19 +15,8 @@
     "ncp": "2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10",
-    "typescript": "^4.5.0"
+    "@types/node": "^24.0.10"
   },
-  "files": [
-    "src/",
-    "modules/",
-    "wbr_modules/",
-    "types/",
-    "*.d.ts",
-    "LICENSE",
-    "README.md",
-    "package.json"
-  ],
   "scripts": {
     "wbr:dev": "node wbr -b -v",
     "wbr": "node wbr -b -v -p",
@@ -50,7 +39,7 @@
     "framework",
     "frontend"
   ],
-  "author": "Cedros Development",
+  "author": "Pamela Sedrez",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cedrosdev/winnetoujs/issues"
