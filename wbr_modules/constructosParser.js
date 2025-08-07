@@ -154,7 +154,7 @@ module.exports = class ConstructosParser {
 
                 constructo = constructo.replace(
                   new RegExp(escapedString, "g"),
-                  `\${props?.${propName}}`
+                  `\${props?.${propName} || ""}`
                 );
               });
             }
