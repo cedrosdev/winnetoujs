@@ -3,6 +3,7 @@
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
+  "types": "index.d.ts",
   "dependencies": {
     "commander": "^14.0.0",
     "esbuild": "^0.25.5",
@@ -13,15 +14,28 @@
     "node-watch": "^0.7.4"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10"
+    "@types/node": "^24.0.10",
+    "typescript": "^4.5.0"
   },
+  "files": [
+    "src/",
+    "modules/",
+    "wbr_modules/",
+    "types/",
+    "*.d.ts",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "wbr:dev": "node wbr -b -v",
     "wbr": "node wbr -b -v -p",
     "wbr:quiet": "node wbr -b -p",
     "wbr:watch": "node wbr -b -v -p --watch",
     "build-fs": "node buildWBR.js",
-    "postinstall": "npm run-script build-fs"
+    "postinstall": "npm run-script build-fs",
+    "type-check": "tsc --noEmit",
+    "build-types": "tsc --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
