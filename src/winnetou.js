@@ -65,12 +65,10 @@ class Winnetou_ {
 
         if (old_ == null) return;
 
-        let a = new item.method().constructo;
-
         let new_ = document
           .createRange()
           .createContextualFragment(
-            a(item.elements, item.options).constructoString()
+            new item.method(item.elements, item.options).constructoString()
           );
 
         this.replace(new_, old_);
