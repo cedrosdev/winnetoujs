@@ -3,30 +3,15 @@
 
 declare class Winnetou_ {
   /**
-   * Incrementally id when no specific identifier is given
-   */
-  constructoId: number;
-
-  /**
    * Variable that stores mutables who should not have been
    * persistent when updating the application
    */
   protected mutable: Record<string, any>;
 
   /**
-   * List of constructos that are subscribed to the mutable listener
-   */
-  usingMutable: Record<string, any[]>;
-
-  /**
    * Stored events
    */
   private storedEvents: any[];
-
-  /**
-   * Internationalization strings
-   */
-  strings: Record<string, string>;
 
   /**
    * Mutation observer for watching DOM changes

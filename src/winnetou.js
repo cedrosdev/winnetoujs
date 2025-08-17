@@ -35,12 +35,6 @@ class Winnetou_ {
     this.observer;
   }
 
-  /**
-   * Sets the value of passed winnetou mutable
-   * @param {string} mutable string that represents a winnetou mutable
-   * @param {string} value string value to be associated to mutable
-   * @param {"notPersistent"|boolean} [localStorage] bool to save the state on the machine at the user, true by default. Use 'notPersistent' to be clear (and verbose).
-   */
   setMutable(mutable, value, localStorage = true) {
     if (localStorage && localStorage !== "notPersistent") {
       window.localStorage.setItem(`mutable_${mutable}`, value);
@@ -76,14 +70,6 @@ class Winnetou_ {
     }
   }
 
-  /**
-   * initMutable initiates a mutable with
-   * unique name saving it in
-   * notPersistent mode and returning it name.
-   * @param {string} value The string value of
-   * mutable
-   * @returns {string} unique name of mutable
-   */
   initMutable(value) {
     let name = (new Date().getMilliseconds() * Math.random() * 10000).toFixed(
       0
@@ -94,22 +80,10 @@ class Winnetou_ {
     return name;
   }
 
-  /**
-   * Decorator for setMutable with notPersistent behavior.
-   * Sets the value of passed winnetou mutable
-   * Usually used for temporary mutables with initMutable
-   * @param {string} mutable string that represents a winnetou mutable
-   * @param {string} value string value to be associated to mutable
-   */
   setMutableNotPersistent(mutable, value) {
     this.setMutable(mutable, value, "notPersistent");
   }
 
-  /**
-   * Gets the value of passed winnetou mutable
-   * @param {string} mutable string that represents a winnetou mutable
-   * @returns {string|null} value or null if not exists
-   */
   getMutable(mutable) {
     if (
       window.localStorage.getItem(`mutable_${mutable}`) ||
@@ -193,12 +167,6 @@ class Winnetou_ {
     },
   };
 
-  /**
-   * @private
-   * Method to replace a constructo
-   * @param {Element|DocumentFragment} new_ DOM Element
-   * @param {Element|DocumentFragment} old_ DOM Element
-   */
   replace(new_, old_) {
     if (old_ && old_.parentNode) {
       let ele_ = old_.parentNode;
@@ -206,29 +174,11 @@ class Winnetou_ {
     }
   }
 
-  /**
-   * Winnetou function storage method. If you provide this, use quotes.
-   * @param  {function} function_ Function to be called when event fires
-   * @param  {...string} args A list of arguments comma separated
-   * @example
-   * ```
-   let div3 = myFirstDiv(
-    {
-      sub_title_txt: "subtitle 3",
-      title_txt: "title 3",
-      onclick: Winnetou.fx(el => (el.style.color = "white"), "this"),
-    },
-    { identifier: "2" }
-   ).create("#app").ids.myFirstDiv;
-  ```
-   */
   fx(function_, ...args) {
     let name =
       "winnetouFx" +
       (new Date().getMilliseconds() * Math.random() * 10000).toFixed(0);
     window[name] = function_;
-    if (args[0] === "this") return `${name}(this)`;
-    if (args.length === 1) return `${name}('${args[0]}')`;
     return `${name}(${args
       .map(x => (x === "this" ? `this` : `'${x}'`))
       .join(",")})`;
