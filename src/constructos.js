@@ -115,77 +115,87 @@ export class Constructos {
   }
 
   /**
-   * Insert a constructo into DOM tree
-   * @param {*} component
-   * @param {*} output
-   * @param {*} options
+   * Utility to attach an HTML string into the DOM.
+   * Supports special cases for table elements, replacement, clearing, and reverse insertion.
    * @protected
    */
-  attachToDOM(component, output, options) {
-    let frag;
+  attachToDOM(component, output, options = {}) {
+    // Check if the component is a table-related element (tr, td, table, etc.)
+    const isTableElement = component.match(
+      /^\s*?<tr|^\s*?<td|^\s*?<table|^\s*?<th|^\s*?<tbody|^\s*?<thead|^\s*?<tfoot/
+    );
 
-    if (
-      component.match(
-        /^\s*?<tr|^\s*?<td|^\s*?<table|^\s*?<th|^\s*?<tbody|^\s*?<thead|^\s*?<tfoot/
-      )
-    ) {
+    /**
+     * Handle insertion when dealing with table-related elements
+     */
+    function handleTableElements() {
+      // Try to query DOM nodes by selector
       let el = document.querySelectorAll(output);
+
+      // If nothing found, try again using #id
       if (el.length === 0) {
         el = document.querySelectorAll("#" + output);
       }
 
+      // For each matched element in the DOM
       el.forEach(item => {
-        // options
-        if (options && options.clear) item.innerHTML = "";
-        // @ts-ignore
-        if (options && options.reverse)
+        // Clear content if option is set
+        if (options.clear) item.innerHTML = "";
+
+        // If reverse, put component before existing content
+        if (options.reverse) {
           item.innerHTML = component + item.innerHTML;
-        else {
+        } else {
+          // Otherwise, append to the end
           item.innerHTML += component;
         }
       });
-    } else {
-      frag = document.createRange().createContextualFragment(component);
+    }
 
+    /**
+     * Handle insertion when dealing with non-table elements
+     */
+    function handleNormalElements() {
+      // Create a document fragment from the HTML string
+      const frag = document.createRange().createContextualFragment(component);
+
+      // If output is a selector (string)
       if (typeof output !== "object") {
-        let el;
+        let el = document.querySelectorAll(output);
 
-        if (options && options.vdom) {
-          el = options.vdom.querySelectorAll(output);
+        // If nothing found, try again using #id
+        if (el.length === 0) el = document.querySelectorAll("#" + output);
 
-          if (el.length === 0) {
-            el = options.vdom.querySelectorAll("#" + output);
-          }
-        } else {
-          el = document.querySelectorAll(output);
-
-          if (el.length === 0) {
-            el = document.querySelectorAll("#" + output);
-          }
-        }
-
+        // For each element found
         el.forEach(item => {
-          if (options && options.replace) {
-            Winnetou.replace(frag, item);
+          // Clear existing content if option is set
+          if (options.clear) item.innerHTML = "";
 
-            return;
-          }
-
-          if (options && options.clear) item.innerHTML = "";
-          // @ts-ignore
-          if (options && options.reverse) item.prepend(frag);
-          else {
+          // Insert at the beginning if reverse option is set
+          if (options.reverse) {
+            item.prepend(frag);
+          } else {
+            // Otherwise, append at the end
             item.appendChild(frag);
           }
         });
       } else {
-        if (options && options.clear) output.innerHTML = "";
-        // @ts-ignore
-        if (options && options.reverse) output.prepend(frag);
-        else {
+        // If output is already a DOM element (object)
+        if (options.clear) output.innerHTML = "";
+
+        if (options.reverse) {
+          output.prepend(frag);
+        } else {
           output.appendChild(frag);
         }
       }
+    }
+
+    // Run correct handler depending on the type of HTML element
+    if (isTableElement) {
+      handleTableElements();
+    } else {
+      handleNormalElements();
     }
   }
 }

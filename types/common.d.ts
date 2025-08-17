@@ -16,8 +16,6 @@ declare namespace WinnetouJS {
     identifier?: string;
     clear?: boolean;
     reverse?: boolean;
-    vdom?: DocumentFragment;
-    replace?: boolean;
   }
 
   interface RouteOptions {
