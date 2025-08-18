@@ -19,14 +19,14 @@ if (!fs.existsSync(instructionsDir)) {
 }
 
 ncp(
-  path.join(__dirname, "./instructions/copilot-winnetoujs-instructions.md"),
+  path.join(__dirname, "./instructions/copilot-winnetoujs.instructions.md"),
   path.join(
     __dirname,
     "../../.github/instructions",
-    "copilot-winnetoujs-instructions.md"
+    "copilot-winnetoujs.instructions.md"
   ),
   function (err) {
-    err && console.log(err)
+    err && console.log(err);
   }
 );
 
@@ -34,6 +34,6 @@ ncp(
   path.join(__dirname, "./instructions/select.instructions.md"),
   path.join(__dirname, "../../.github/instructions", "select.instructions.md"),
   function (err) {
-    err && console.log(err)
+    err && console.log(err);
   }
 );
