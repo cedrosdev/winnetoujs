@@ -14,6 +14,11 @@ declare class Winnetou_ {
   private storedEvents: any[];
 
   /**
+   * Internationalization strings
+   */
+  strings: Record<string, string>;
+
+  /**
    * Mutation observer for watching DOM changes
    */
   private observer: MutationObserver | undefined;
