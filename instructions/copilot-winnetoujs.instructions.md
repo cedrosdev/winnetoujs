@@ -330,7 +330,17 @@ new $myBtn({
 }).create("#app");
 ```
 
-- fx can receive args, like:
+- fx do not receive default event. To refer to component itself, use "this" as param:
+
+```javascript
+new $myInput({
+  onchange: W.fx(self => {
+    self.style.color = "blue";
+  }, "this"),
+}).create("#app");
+```
+
+- fx can receive many args, like:
 
 ```javascript
 new $myBtn({
