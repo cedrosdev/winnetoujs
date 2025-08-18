@@ -3,15 +3,17 @@
 
 declare class ColorThemes {
   /**
-   * Apply the saved theme from localStorage
+   * Apply the saved theme from localStorage.
+   * Call this method on application startup.
    * @description This method applies the theme stored in localStorage to the document.
    * If no theme is found, it does nothing.
    */
-  applySavedTheme(): void;
+  static public applySavedTheme(): void;
 
   /**
    * Change application css
    * @param theme New theme object containing CSS custom properties
    */
-  newTheme(theme: Record<string, string>): void;
+  static public newTheme(theme: Record<string, string>): void;
 }
+export { ColorThemes };

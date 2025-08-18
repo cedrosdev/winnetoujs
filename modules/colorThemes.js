@@ -1,4 +1,4 @@
-class ColorThemes {
+export class ColorThemes {
   /**
    * Apply the saved theme from localStorage
    * @returns {void}
@@ -6,7 +6,7 @@ class ColorThemes {
    * If no theme is found, it does nothing.
    *
    */
-  applySavedTheme() {
+  static applySavedTheme() {
     let theme_ = window.localStorage.getItem("winnetou-theme");
     if (theme_) {
       let theme = JSON.parse(theme_);
@@ -20,7 +20,7 @@ class ColorThemes {
    * Change application css
    * @param  {object} theme New theme
    */
-  newTheme(theme) {
+  static newTheme(theme) {
     let root = document.documentElement;
     Object.keys(theme).forEach(function (item) {
       root.style.setProperty(item, theme[item]);
