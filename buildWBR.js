@@ -3,6 +3,7 @@
 // https://github.com/npm/cli/issues/3647#issuecomment-900859012
 const path = require("path");
 const ncp = require("ncp").ncp;
+const fs = require("fs");
 // @ts-ignore
 ncp.limit = 16;
 ncp(
@@ -11,6 +12,12 @@ ncp(
   function (err) {}
 );
 
+// Create .github/instructions directory if it doesn't exist
+const instructionsDir = path.join(__dirname, "../../.github/instructions");
+if (!fs.existsSync(instructionsDir)) {
+  fs.mkdirSync(instructionsDir, { recursive: true });
+}
+
 ncp(
   path.join(__dirname, "./instructions/copilot-winnetoujs-instructions.md"),
   path.join(
@@ -18,11 +25,15 @@ ncp(
     "../../.github/instructions",
     "copilot-winnetoujs-instructions.md"
   ),
-  function (err) {}
+  function (err) {
+    err && console.log(err)
+  }
 );
 
 ncp(
   path.join(__dirname, "./instructions/select.instructions.md"),
   path.join(__dirname, "../../.github/instructions", "select.instructions.md"),
-  function (err) {}
+  function (err) {
+    err && console.log(err)
+  }
 );
