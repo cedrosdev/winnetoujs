@@ -10,6 +10,25 @@ Use this guide to create WinnetouJs web applications.
 
 When WinnetouJs is installed, it provides a WBR.js file which is responsible to transpile wcto.html files into wcto.js files. User will write html components (called `constructos`) inside wcto.html file and WBR will compile it into reusable js classes which can be imported inside js/ts apps.
 
+## Starting up a WinnetouJs WEB Application
+
+**Ask user if he wants you to help him to create a basic WinnetouJs scaffolding project.**
+
+To help user to create basic WinnetouJs skeleton project, do the following:
+
+- add win.config.js
+- add rules in settings workspace
+- create jsconfig.js
+- create basic folder structure
+- add package.json scripts
+
+\*\*When finish the above tasks, ask user if he will use sass, if yes, add this config in `package.json` as well:
+
+```json
+    "sass:dev": "sass --embed-sources --watch --style expanded sass/main.scss:dist/css/main.css  --load-path='./src'",
+    "sass:prod": "sass sass/app.scss:dist/css/main.min.css --style compressed --no-source-map --quiet  --load-path='./src'"
+```
+
 ## Installation
 
 `npm i winnetoujs`

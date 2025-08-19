@@ -31,8 +31,12 @@ ncp(
 );
 
 ncp(
-  path.join(__dirname, "./instructions/select.instructions.md"),
-  path.join(__dirname, "../../.github/instructions", "select.instructions.md"),
+  path.join(__dirname, "./instructions/winnetoujs-select.instructions.md"),
+  path.join(
+    __dirname,
+    "../../.github/instructions",
+    "winnetoujs-select.instructions.md"
+  ),
   function (err) {
     err && console.log(err);
   }
