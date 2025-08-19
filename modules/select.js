@@ -377,7 +377,7 @@ export const setText = (selector, text) => {
  * @param {Function} handler - The event handler function
  * @param {object} [options] - Event listener options
  */
-export const addEventListener = (selector, event, handler, options) => {
+export const __addEventListener = (selector, event, handler, options) => {
   const elements = Array.isArray(selector) ? selector : getElements(selector);
   elements.forEach(item => {
     item.addEventListener(event, handler, options);
@@ -390,7 +390,7 @@ export const addEventListener = (selector, event, handler, options) => {
  * @param {string} event - The event type
  * @param {Function} handler - The event handler function
  */
-export const removeEventListener = (selector, event, handler) => {
+export const __removeEventListener = (selector, event, handler) => {
   const elements = Array.isArray(selector) ? selector : getElements(selector);
   elements.forEach(item => {
     item.removeEventListener(event, handler);
@@ -403,7 +403,7 @@ export const removeEventListener = (selector, event, handler) => {
  * @param {Function} handler - The click handler function
  */
 export const onClick = (selector, handler) => {
-  addEventListener(selector, "click", handler);
+  __addEventListener(selector, "click", handler);
 };
 
 /**
@@ -412,7 +412,7 @@ export const onClick = (selector, handler) => {
  * @param {Function} handler - The submit handler function
  */
 export const onSubmit = (selector, handler) => {
-  addEventListener(selector, "submit", handler);
+  __addEventListener(selector, "submit", handler);
 };
 
 /**
@@ -421,7 +421,7 @@ export const onSubmit = (selector, handler) => {
  * @param {Function} handler - The change handler function
  */
 export const onChange = (selector, handler) => {
-  addEventListener(selector, "change", handler);
+  __addEventListener(selector, "change", handler);
 };
 
 /**
@@ -430,7 +430,7 @@ export const onChange = (selector, handler) => {
  * @param {Function} handler - The input handler function
  */
 export const onInput = (selector, handler) => {
-  addEventListener(selector, "input", handler);
+  __addEventListener(selector, "input", handler);
 };
 
 /**
@@ -439,7 +439,7 @@ export const onInput = (selector, handler) => {
  * @param {Function} handler - The focus handler function
  */
 export const onFocus = (selector, handler) => {
-  addEventListener(selector, "focus", handler);
+  __addEventListener(selector, "focus", handler);
 };
 
 /**
@@ -448,7 +448,7 @@ export const onFocus = (selector, handler) => {
  * @param {Function} handler - The blur handler function
  */
 export const onBlur = (selector, handler) => {
-  addEventListener(selector, "blur", handler);
+  __addEventListener(selector, "blur", handler);
 };
 
 /**
@@ -457,7 +457,7 @@ export const onBlur = (selector, handler) => {
  * @param {Function} handler - The keypress handler function
  */
 export const onKeyPress = (selector, handler) => {
-  addEventListener(selector, "keypress", handler);
+  __addEventListener(selector, "keypress", handler);
 };
 
 /**
@@ -466,7 +466,7 @@ export const onKeyPress = (selector, handler) => {
  * @param {Function} handler - The keydown handler function
  */
 export const onKeyDown = (selector, handler) => {
-  addEventListener(selector, "keydown", handler);
+  __addEventListener(selector, "keydown", handler);
 };
 
 /**
@@ -475,7 +475,7 @@ export const onKeyDown = (selector, handler) => {
  * @param {Function} handler - The keyup handler function
  */
 export const onKeyUp = (selector, handler) => {
-  addEventListener(selector, "keyup", handler);
+  __addEventListener(selector, "keyup", handler);
 };
 
 /**
@@ -484,7 +484,7 @@ export const onKeyUp = (selector, handler) => {
  * @param {Function} handler - The mouseover handler function
  */
 export const onMouseOver = (selector, handler) => {
-  addEventListener(selector, "mouseover", handler);
+  __addEventListener(selector, "mouseover", handler);
 };
 
 /**
@@ -493,7 +493,7 @@ export const onMouseOver = (selector, handler) => {
  * @param {Function} handler - The mouseout handler function
  */
 export const onMouseOut = (selector, handler) => {
-  addEventListener(selector, "mouseout", handler);
+  __addEventListener(selector, "mouseout", handler);
 };
 
 /**
@@ -502,7 +502,7 @@ export const onMouseOut = (selector, handler) => {
  * @param {Function} handler - The mouseenter handler function
  */
 export const onMouseEnter = (selector, handler) => {
-  addEventListener(selector, "mouseenter", handler);
+  __addEventListener(selector, "mouseenter", handler);
 };
 
 /**
@@ -511,7 +511,7 @@ export const onMouseEnter = (selector, handler) => {
  * @param {Function} handler - The mouseleave handler function
  */
 export const onMouseLeave = (selector, handler) => {
-  addEventListener(selector, "mouseleave", handler);
+  __addEventListener(selector, "mouseleave", handler);
 };
 
 /**

@@ -253,7 +253,7 @@ export declare function setText(
  * @param handler The event handler function
  * @param options Event listener options
  */
-export declare function addEventListener(
+export declare function __addEventListener(
   selector: WinnetouJS.SelectorType,
   event: string,
   handler: EventListener,
@@ -266,7 +266,7 @@ export declare function addEventListener(
  * @param event The event type
  * @param handler The event handler function
  */
-export declare function removeEventListener(
+export declare function __removeEventListener(
   selector: WinnetouJS.SelectorType,
   event: string,
   handler: EventListener
