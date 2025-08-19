@@ -127,29 +127,13 @@ To maximize performance when compiling, add these settings to `package.json` fil
 application/
 ├── src/
 │   ├── app.ts
-│   ├── dashboard/
-│   │   ├── dashboard.wcto.html
-│   │   ├── _dashboard.scss
-│   │   └── dashboard.ts
-│   ├── chart-card/
-│   │   ├── chart-card.wcto.html
-│   │   ├── _chart-card.scss
-│   │   └── chart-card.ts
-│   ├── menu-item/
-│   │   ├── menu-item.wcto.html
-│   │   ├── _menu-item.scss
-│   │   └── menu-item.ts
-│   └── sidebar/
-│       ├── sidebar.wcto.html
-│       ├── _sidebar.scss
-│       └── sidebar.ts
-├── app/
-│   ├── en-us.ts
-│   └── router.ts
+│   ├── common-constructos/
+│   │   ├── common.wcto.html
+│   │   ├── _common.scss
+│   │   └── common.ts
+├── libs/
 ├── sass/
-│   ├── app.scss
-│   ├── login.scss
-│   └── _variables.scss
+│   ├── main.scss
 ├── package.json
 ├── wbr.config.json
 ├── wbr.js
