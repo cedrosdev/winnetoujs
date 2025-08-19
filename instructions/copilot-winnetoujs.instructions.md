@@ -26,7 +26,7 @@ To help user to create basic WinnetouJs skeleton project, do the following:
 
 ```json
     "sass:dev": "sass --embed-sources --watch --style expanded sass/main.scss:dist/css/main.css  --load-path='./src'",
-    "sass:prod": "sass sass/app.scss:dist/css/main.min.css --style compressed --no-source-map --quiet  --load-path='./src'"
+    "sass:prod": "sass sass/main.scss:dist/css/main.min.css --style compressed --no-source-map --quiet  --load-path='./src'"
 ```
 
 ## Installation
