@@ -36,7 +36,7 @@ class Winnetou_ {
   }
 
   setMutable(mutable, value, localStorage) {
-    if (locaStorage !== false && localStorage !== "notPersistent") {
+    if (localStorage !== false && localStorage !== "notPersistent") {
       // it must save in localstorage
       window.localStorage.setItem(`mutable_${mutable}`, value);
     }
