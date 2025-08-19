@@ -35,10 +35,14 @@ class Winnetou_ {
     this.observer;
   }
 
-  setMutable(mutable, value, localStorage = true) {
-    if (localStorage && localStorage !== "notPersistent") {
+  setMutable(mutable, value, localStorage) {
+    if (locaStorage !== false && localStorage !== "notPersistent") {
+      // it must save in localstorage
       window.localStorage.setItem(`mutable_${mutable}`, value);
-    } else {
+    }
+
+    if (localStorage === false || localStorage === "notPersistent") {
+      // it must save in ephemeral memory
       this.mutable[mutable] = value;
     }
 
