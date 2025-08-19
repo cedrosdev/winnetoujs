@@ -83,8 +83,10 @@ module.exports = class BundleRelease {
       minify: this.production,
       sourcemap: !this.production,
       target: ["chrome90"],
-      entryNames: "[name].winnetouBundle.min",
-      chunkNames: this.production ? "[hash].lazyBundle" : "[name]-[hash].lazyBundle",
+      entryNames: this.production ? "[name].winnetouBundle.min" : "[name]",
+      chunkNames: this.production
+        ? "[hash].lazyBundle"
+        : "[name]-[hash].lazyBundle",
       loader: { ".ts": "ts" },
       plugins: [
         {
