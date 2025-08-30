@@ -3,19 +3,29 @@
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
-  "types": "index.d.ts",
+  "type": "module",
+  "files": [
+    "dist/"
+  ],
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "dependencies": {
     "commander": "^14.0.0",
-    "esbuild": "^0.25.5",
     "escape-string-regexp": "^4.0.0",
     "js-beautify": "^1.15.4",
+    "ncp": "2.0.0",
     "node-html-parser": "^7.0.1",
-    "recursive-readdir": "^2.2.3",
     "node-watch": "^0.7.4",
-    "ncp": "2.0.0"
+    "recursive-readdir": "^2.2.3"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10"
+    "@types/node": "^24.0.10",
+    "esbuild": "^0.25.9"
   },
   "scripts": {
     "wbr:dev": "node wbr -b -v",
