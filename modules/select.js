@@ -1,3 +1,27 @@
+/*
+  ATTENTION: REFACTOR!
+  ----------------------------------
+
+  [] MODULES IS ALREADY TREE SHAKING, IT MUST BE NOT IN MODULES, 
+  BUT IN WINNETOU.JS ITSELF, BECAUSE AUTO IMPORTS IN 
+  VSCODE IS IMPORTING EVERYTHING FROM "WINNETOUJS"
+  AND CAUSING A LOT OF HEADACHES.
+
+  ------
+
+ [] selector method must be try-catch-ed
+
+ [] selector hideElements is not working.
+
+  -----
+
+  winnetou.d.ts
+    setMutableNotPersistent(mutable: string, value: any): void;
+    mutables not persistent can have any type
+
+
+*/
+
 /**
  * Gets elements from the DOM based on a selector string.
  * It supports various selector formats including IDs, classes, and tag names.
