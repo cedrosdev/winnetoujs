@@ -127,10 +127,6 @@ class Winnetou_ {
 const Winnetou = new Winnetou_();
 const W = Winnetou;
 const Win = Winnetou;
-export * from "../modules/colorThemes.ts";
-export * from "../modules/router.ts";
-export * from "../modules/translations.ts";
-export * from "../modules/select/index.ts";
 export {
   W,
   Win,
