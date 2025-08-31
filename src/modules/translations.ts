@@ -1,19 +1,12 @@
-/**
- * @file translations.js
- * @description This file handles the translations for the application.
- * It fetches the translation files based on the selected language and updates the strings accordingly.
- * @author Pamela Sedrez
- * 
- * @param {object} args
- * @param {object} args.stringsClass
- * @param {object} args.translationsPublicPath
- */
-export const updateTranslations = async args => {
-  /**
-   * Function to get json from API
-   * @param {string} url API Endpoint
-   */
-  const get = url => {
+interface UpdateTranslationsArgs {
+  stringsClass: Record<string, string>;
+  translationsPublicPath: string;
+}
+
+export const updateTranslations = async (
+  args: UpdateTranslationsArgs
+): Promise<boolean> => {
+  const get = (url: string): Promise<Record<string, string>> => {
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "GET",
@@ -38,7 +31,7 @@ export const updateTranslations = async args => {
     if (!window.localStorage.getItem("lang")) return resolve(true);
     const localLang = window.localStorage.getItem("lang");
     const file = `${args.translationsPublicPath}/${localLang}.json`;
-    let data;
+    let data: Record<string, string>;
     try {
       data = await get(file);
     } catch (e) {
@@ -49,6 +42,7 @@ export const updateTranslations = async args => {
       setTimeout(() => {
         location.reload();
       }, 200);
+      return;
     }
     Object.keys(data).map(key => {
       let value = data[key];
@@ -58,13 +52,7 @@ export const updateTranslations = async args => {
   });
 };
 
-/**
- * Changes the language of the application
- * 
- * @param {string} lang string language
- * @param {boolean} [reload] boolean reload page, default is true
- */
-export const changeLang = (lang, reload = true) => {
+export const changeLang = (lang: string, reload: boolean = true): void => {
   window.localStorage.setItem("lang", lang);
   reload && location.reload();
 };
