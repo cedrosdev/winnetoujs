@@ -15,7 +15,7 @@
  */
 
 const { Command } = require("commander");
-const BundleRelease = require("winnetoujs/wbr_modules/bundleRelease.js");
+const BundleRelease = require("./node_modules/winnetoujs/dist/wbr/bundleRelease.js");
 const path = require("path");
 const winConfig = require("./win.config.json");
 

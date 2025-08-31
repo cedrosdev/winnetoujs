@@ -2,7 +2,7 @@ const esbuild = require("esbuild");
 const fs = require("fs");
 const path = require("path");
 const watch = require("node-watch");
-const constructosParser = require("winnetoujs/wbr_modules/constructosParser");
+const constructosParser = require("./constructosParser.js");
 
 /**
  * BundleRelease class for building and managing JavaScript bundles using esbuild
