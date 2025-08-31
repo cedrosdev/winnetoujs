@@ -29,8 +29,8 @@
   },
   "dependencies": {
     "@types/node": "^24.0.10",
-    "esbuild": "^0.25.9",
     "commander": "^14.0.0",
+    "esbuild": "^0.25.9",
     "escape-string-regexp": "^4.0.0",
     "js-beautify": "^1.15.4",
     "ncp": "2.0.0",
@@ -38,13 +38,11 @@
     "node-watch": "^0.7.4",
     "recursive-readdir": "^2.2.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
   "scripts": {
     "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/",
-    "wbr:dev": "node wbr -b -v",
-    "wbr": "node wbr -b -v -p",
-    "wbr:quiet": "node wbr -b -p",
-    "wbr:watch": "node wbr -b -v -p --watch",
     "build-fs": "node ./dist/buildWBR.js",
     "postinstall": "npm run-script build-fs",
     "type-check": "tsc --noEmit",
