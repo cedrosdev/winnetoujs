@@ -10,9 +10,22 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+      "types": "./dist/core/winnetou.d.ts",
+      "import": "./dist/core/winnetou.js"
+    },
+    "./core/winnetou": "./dist/core/winnetou.js",
+    "./modules/colorThemes": "./dist/modules/colorThemes.js",
+    "./modules/router": "./dist/modules/router.js",
+    "./modules/select": "./dist/modules/select.js",
+    "./modules/select/animations": "./dist/modules/select/animations.js",
+    "./modules/select/attributes": "./dist/modules/select/attributes.js",
+    "./modules/select/dom-manipulation": "./dist/modules/select/dom-manipulation.js",
+    "./modules/select/events": "./dist/modules/select/events.js",
+    "./modules/select/index": "./dist/modules/select/index.js",
+    "./modules/select/navigation": "./dist/modules/select/navigation.js",
+    "./modules/select/positioning": "./dist/modules/select/positioning.js",
+    "./modules/select/selectors": "./dist/modules/select/selectors.js",
+    "./modules/translations": "./dist/modules/translations.js"
   },
   "dependencies": {
     "commander": "^14.0.0",
@@ -28,7 +41,7 @@
     "esbuild": "^0.25.9"
   },
   "scripts": {
-    "build": "esbuild src/core/winnetou.ts --bundle --outfile=dist/index.js --format=esm --platform=browser --target=es2020 --minify --sourcemap",
+    "build": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src",
     "wbr:dev": "node wbr -b -v",
     "wbr": "node wbr -b -v -p",
     "wbr:quiet": "node wbr -b -p",
