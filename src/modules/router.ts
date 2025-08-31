@@ -1,43 +1,37 @@
+interface RouteOptions {
+  onBack?: (route: string) => void;
+  onGo?: (route: string) => void;
+}
+
+interface RouteInfo {
+  root: string;
+  size: number;
+}
+
+type RouteFunction = (...params: string[]) => void;
+
 class WinnetouRouter_ {
+  protected routes: Record<string, RouteFunction> = {};
+  protected paramRoutes: RouteInfo[] = [];
+  protected routesOptions: RouteOptions = {};
+
   constructor() {
-    /**
-     * Object that will store routes on createRoutes
-     * @protected
-     * @type {object}
-     */
-    this.routes = {};
-
-    /**
-     * Object that will store the separated routes from createRoutes
-     * @protected
-     * @type {array}
-     */
-    this.paramRoutes = [];
-
-    /**
-     * Object that provides options when createRoutes, like
-     * a standard function to be called when onBack is pressed
-     * @protected
-     * @type {object}
-     */
-    this.routesOptions = {};
-
     this.addListeners();
   }
 
-  addListeners() {
-    document.addEventListener("keydown", event => {
+  addListeners(): void {
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.key === "Escape" || event.which === 27) {
         history.go(-1);
       }
     });
 
     if (window.history) {
-      window.onpopstate = event => {
+      window.onpopstate = (event: PopStateEvent) => {
         event.preventDefault();
 
         if (event.state == null) {
-          if(this.routes["/"]) {
+          if (this.routes["/"]) {
             this.routes["/"]();
           } else {
             console.error(
@@ -68,20 +62,16 @@ class WinnetouRouter_ {
     }
   }
 
-  /**
-   * Method for store dynamic Winnetou Routes
-   * @param  {object} obj
-   * @param  {object} [options]
-   * @param  {function=} options.onBack Function that will be called when user fires back button
-   * @param  {function=} options.onGo Function that will be called when user triggers a route
-   */
-  createRoutes(obj, options) {
+  createRoutes(
+    obj: Record<string, RouteFunction>,
+    options?: RouteOptions
+  ): void {
     this.routes = obj;
-    this.routesOptions = options;
+    this.routesOptions = options || {};
 
-    Object.keys(this.routes).forEach(route => {
-      let segment = route.split("/");
-      let size = segment.length;
+    Object.keys(this.routes).forEach((route: string) => {
+      const segment = route.split("/");
+      const size = segment.length;
       this.paramRoutes.push({
         root: route,
         size,
@@ -89,12 +79,7 @@ class WinnetouRouter_ {
     });
   }
 
-  /**
-   * Navigate between Winnetou routes
-   * @param {string} url Path already defined in createRoutes method
-   * @param {boolean} pushState To use navigate without change URL
-   */
-  navigate(url, pushState = true) {
+  navigate(url: string, pushState: boolean = true): void {
     if (window.history) {
       this.callRoute(url);
       pushState && this.pushState(url);
@@ -111,19 +96,13 @@ class WinnetouRouter_ {
     }
   }
 
-  /**
-   * Allows WinnetouJs to pass between pages on the app.
-   * Needs a valid const routes already set.
-   * Do not changes URL.
-   * @param {string} route function already set in createRoutes
-   */
-  pass(route) {
+  pass(route: string): void {
     if (window.history) {
       this.callRoute(route);
       this.pushStateInteraction(route);
       if (this.routesOptions?.onGo) {
         try {
-          this.routesOptions.onGo(route || "/"); // if url is undefined, it will be '/'
+          this.routesOptions.onGo(route || "/");
         } catch (e) {
           console.error(
             `Winnetou Error, id: CR001\nThe onGo option in createRoutes() is not valid. Please use a function. \n\nOriginal Error: `,
@@ -134,27 +113,26 @@ class WinnetouRouter_ {
     }
   }
 
-  /** @private */
-  pushStateInteraction(func) {
+  private pushStateInteraction(func: string): void {
     history.pushState(func, "");
   }
-  /** @private */
-  callRoute(url) {
-    try {
-      let splittedUrl = url.split("/");
-      let size = splittedUrl.length;
 
-      let filter = this.paramRoutes.filter(data => data.size === size);
+  private callRoute(url: string): void {
+    try {
+      const splittedUrl = url.split("/");
+      const size = splittedUrl.length;
+
+      const filter = this.paramRoutes.filter(data => data.size === size);
 
       if (filter.length === 0) {
         this.notFound();
       }
 
       for (let i = 0; i < filter.length; i++) {
-        let root = filter[i].root.split("/");
+        const root = filter[i].root.split("/");
 
         let correctMatch = true;
-        let paramStore = [];
+        const paramStore: string[] = [];
         for (let j = 0; j < root.length; j++) {
           if (root[j] !== splittedUrl[j]) {
             correctMatch = false;
@@ -181,8 +159,7 @@ class WinnetouRouter_ {
     }
   }
 
-  /** @private */
-  notFound() {
+  private notFound(): void {
     try {
       this.routes["/404"]();
     } catch (e) {
@@ -192,8 +169,7 @@ class WinnetouRouter_ {
     }
   }
 
-  /** @private */
-  pushState(url) {
+  private pushState(url: string): void {
     try {
       history.pushState(url, "", url);
     } catch (e) {

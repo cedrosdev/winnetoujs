@@ -28,6 +28,7 @@
     "esbuild": "^0.25.9"
   },
   "scripts": {
+    "build": "esbuild src/core/winnetou.ts --bundle --outfile=dist/index.js --format=esm --platform=browser --target=es2020 --minify --sourcemap",
     "wbr:dev": "node wbr -b -v",
     "wbr": "node wbr -b -v -p",
     "wbr:quiet": "node wbr -b -p",
