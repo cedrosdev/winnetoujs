@@ -40,7 +40,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "build": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js",
+    "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/",
     "wbr:dev": "node wbr -b -v",
     "wbr": "node wbr -b -v -p",
     "wbr:quiet": "node wbr -b -p",
