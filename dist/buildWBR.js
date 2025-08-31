@@ -7,7 +7,7 @@ const fs = require("fs");
 // @ts-ignore
 ncp.limit = 16;
 ncp(
-  path.join(__dirname, "./dist/wbr/wbr.js"),
+  path.join(__dirname, "./wbr/wbr.js"),
   path.join(__dirname, "../../../wbr.js"),
   function (err) {}
 );
@@ -19,10 +19,7 @@ if (!fs.existsSync(instructionsDir)) {
 }
 
 ncp(
-  path.join(
-    __dirname,
-    "./dist/instructions/copilot-winnetoujs.instructions.md"
-  ),
+  path.join(__dirname, "./instructions/copilot-winnetoujs.instructions.md"),
   path.join(
     __dirname,
     "../../../.github/instructions",
@@ -34,7 +31,7 @@ ncp(
 );
 
 ncp(
-  path.join(__dirname, "./dist/instructions/winnetoujs-select.instructions.md"),
+  path.join(__dirname, "./instructions/winnetoujs-select.instructions.md"),
   path.join(
     __dirname,
     "../../../.github/instructions",
