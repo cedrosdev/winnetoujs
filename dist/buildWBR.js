@@ -8,7 +8,7 @@ const fs = require("fs");
 ncp.limit = 16;
 ncp(
   path.join(__dirname, "./dist/wbr/wbr.js"),
-  path.join(__dirname, "../../../", "wbr.js"),
+  path.join(__dirname, "../../../wbr.js"),
   function (err) {}
 );
 
