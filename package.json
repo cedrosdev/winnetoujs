@@ -46,7 +46,7 @@
     "wbr": "node wbr -b -v -p",
     "wbr:quiet": "node wbr -b -p",
     "wbr:watch": "node wbr -b -v -p --watch",
-    "build-fs": "node buildWBR.js",
+    "build-fs": "node ./dist/buildWBR.js",
     "postinstall": "npm run-script build-fs",
     "type-check": "tsc --noEmit",
     "build-types": "tsc --emitDeclarationOnly"
