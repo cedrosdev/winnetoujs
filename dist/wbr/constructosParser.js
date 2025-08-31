@@ -193,7 +193,7 @@ module.exports = class ConstructosParser {
           });
           const out = beautify(
             `
-            import {Constructos} from "winnetoujs/core/constructos.js";
+            import {Constructos} from "winnetoujs/core/constructos";
             \n\n
             ${finalReturn}
           `,
