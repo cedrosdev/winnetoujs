@@ -7,22 +7,25 @@ const fs = require("fs");
 // @ts-ignore
 ncp.limit = 16;
 ncp(
-  path.join(__dirname, "./wbr/wbr.js"),
-  path.join(__dirname, "../../", "wbr.js"),
+  path.join(__dirname, "./dist/wbr/wbr.js"),
+  path.join(__dirname, "../../../", "wbr.js"),
   function (err) {}
 );
 
 // Create .github/instructions directory if it doesn't exist
-const instructionsDir = path.join(__dirname, "../../.github/instructions");
+const instructionsDir = path.join(__dirname, "../../../.github/instructions");
 if (!fs.existsSync(instructionsDir)) {
   fs.mkdirSync(instructionsDir, { recursive: true });
 }
 
 ncp(
-  path.join(__dirname, "./instructions/copilot-winnetoujs.instructions.md"),
   path.join(
     __dirname,
-    "../../.github/instructions",
+    "./dist/instructions/copilot-winnetoujs.instructions.md"
+  ),
+  path.join(
+    __dirname,
+    "../../../.github/instructions",
     "copilot-winnetoujs.instructions.md"
   ),
   function (err) {
@@ -31,10 +34,10 @@ ncp(
 );
 
 ncp(
-  path.join(__dirname, "./instructions/winnetoujs-select.instructions.md"),
+  path.join(__dirname, "./dist/instructions/winnetoujs-select.instructions.md"),
   path.join(
     __dirname,
-    "../../.github/instructions",
+    "../../../.github/instructions",
     "winnetoujs-select.instructions.md"
   ),
   function (err) {

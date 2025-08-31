@@ -161,9 +161,7 @@ module.exports = class ConstructosParser {
 
             if (hasPropElements && requiredElement)
               jsdoc += "\t* @param {object} elements\n";
-
-           else
-              jsdoc += "\t* @param {object} [elements]\n";
+            else jsdoc += "\t* @param {object} [elements]\n";
 
             jsdoc += jsdoc2;
 
@@ -195,7 +193,7 @@ module.exports = class ConstructosParser {
           });
           const out = beautify(
             `
-            import {Constructos} from "winnetoujs/src/constructos.js";
+            import {Constructos} from "winnetoujs/core/constructos.js";
             \n\n
             ${finalReturn}
           `,
