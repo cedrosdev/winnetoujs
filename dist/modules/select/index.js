@@ -1,8 +1,8 @@
-export * from "./selectors.ts";
-export * from "./dom-manipulation.ts";
-export * from "./events.ts";
-export * from "./attributes.ts";
-export * from "./positioning.ts";
-export * from "./navigation.ts";
-export * from "./animations.ts";
+export * from "./selectors";
+export * from "./dom-manipulation";
+export * from "./events";
+export * from "./attributes";
+export * from "./positioning";
+export * from "./navigation";
+export * from "./animations";
 //# sourceMappingURL=index.js.map

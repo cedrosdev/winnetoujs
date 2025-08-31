@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-beta.33",
+  "version": "3.0.0-beta.34",
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
@@ -12,20 +12,62 @@
       "types": "./dist/core/winnetou.d.ts",
       "import": "./dist/core/winnetou.js"
     },
-    "./core/constructos": "./dist/core/constructos.js",
-    "./core/winnetou": "./dist/core/winnetou.js",
-    "./modules/colorThemes": "./dist/modules/colorThemes.js",
-    "./modules/router": "./dist/modules/router.js",
-    "./modules/select": "./dist/modules/select.js",
-    "./modules/select/animations": "./dist/modules/select/animations.js",
-    "./modules/select/attributes": "./dist/modules/select/attributes.js",
-    "./modules/select/dom-manipulation": "./dist/modules/select/dom-manipulation.js",
-    "./modules/select/events": "./dist/modules/select/events.js",
-    "./modules/select/index": "./dist/modules/select/index.js",
-    "./modules/select/navigation": "./dist/modules/select/navigation.js",
-    "./modules/select/positioning": "./dist/modules/select/positioning.js",
-    "./modules/select/selectors": "./dist/modules/select/selectors.js",
-    "./modules/translations": "./dist/modules/translations.js"
+    "./core/constructos": {
+      "types": "./dist/core/constructos.d.ts",
+      "import": "./dist/core/constructos.js"
+    },
+    "./core/winnetou": {
+      "types": "./dist/core/winnetou.d.ts",
+      "import": "./dist/core/winnetou.js"
+    },
+    "./modules/colorThemes": {
+      "types": "./dist/modules/colorThemes.d.ts",
+      "import": "./dist/modules/colorThemes.js"
+    },
+    "./modules/router": {
+      "types": "./dist/modules/router.d.ts",
+      "import": "./dist/modules/router.js"
+    },
+    "./modules/select": {
+      "types": "./dist/modules/select.d.ts",
+      "import": "./dist/modules/select.js"
+    },
+    "./modules/select/animations": {
+      "types": "./dist/modules/select/animations.d.ts",
+      "import": "./dist/modules/select/animations.js"
+    },
+    "./modules/select/attributes": {
+      "types": "./dist/modules/select/attributes.d.ts",
+      "import": "./dist/modules/select/attributes.js"
+    },
+    "./modules/select/dom-manipulation": {
+      "types": "./dist/modules/select/dom-manipulation.d.ts",
+      "import": "./dist/modules/select/dom-manipulation.js"
+    },
+    "./modules/select/events": {
+      "types": "./dist/modules/select/events.d.ts",
+      "import": "./dist/modules/select/events.js"
+    },
+    "./modules/select/index": {
+      "types": "./dist/modules/select/index.d.ts",
+      "import": "./dist/modules/select/index.js"
+    },
+    "./modules/select/navigation": {
+      "types": "./dist/modules/select/navigation.d.ts",
+      "import": "./dist/modules/select/navigation.js"
+    },
+    "./modules/select/positioning": {
+      "types": "./dist/modules/select/positioning.d.ts",
+      "import": "./dist/modules/select/positioning.js"
+    },
+    "./modules/select/selectors": {
+      "types": "./dist/modules/select/selectors.d.ts",
+      "import": "./dist/modules/select/selectors.js"
+    },
+    "./modules/translations": {
+      "types": "./dist/modules/translations.d.ts",
+      "import": "./dist/modules/translations.js"
+    }
   },
   "dependencies": {
     "@types/node": "^24.0.10",
@@ -42,7 +84,7 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
-    "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/",
+    "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/ && npm run build-types",
     "build-fs": "node ./dist/buildWBR.js",
     "postinstall": "npm run-script build-fs",
     "type-check": "tsc --noEmit",

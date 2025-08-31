@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../../src/modules/select/index.ts"],
-  "sourcesContent": ["export * from \"./selectors.ts\";\nexport * from \"./dom-manipulation.ts\";\nexport * from \"./events.ts\";\nexport * from \"./attributes.ts\";\nexport * from \"./positioning.ts\";\nexport * from \"./navigation.ts\";\nexport * from \"./animations.ts\";\n"],
+  "sourcesContent": ["export * from \"./selectors\";\nexport * from \"./dom-manipulation\";\nexport * from \"./events\";\nexport * from \"./attributes\";\nexport * from \"./positioning\";\nexport * from \"./navigation\";\nexport * from \"./animations\";\n"],
   "mappings": "AAAA,cAAc;AACd,cAAc;AACd,cAAc;AACd,cAAc;AACd,cAAc;AACd,cAAc;AACd,cAAc;",
   "names": []
 }

@@ -1,4 +1,4 @@
-import { getElements } from "./selectors.ts";
+import { getElements } from "./selectors";
 const getParent = (selector) => {
   const elements = Array.isArray(selector) ? selector : getElements(selector);
   return elements[0] ? elements[0].parentElement : null;

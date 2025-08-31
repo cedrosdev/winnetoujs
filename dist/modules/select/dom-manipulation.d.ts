@@ -1,0 +1,19 @@
+type Selector = string | Element | Element[];
+export declare const removeElements: (selector: Selector) => void;
+export declare const setHtml: (selector: Selector, htmlContentString: string) => void;
+export declare const getHtml: (selector: Selector) => string;
+export declare const getText: (selector: Selector) => string | null;
+export declare const appendHtml: (selector: Selector, htmlContentString: string) => void;
+export declare const prependHtml: (selector: Selector, htmlContentString: string) => void;
+export declare const setCss: (selector: Selector, property: string, value: string | number) => void;
+export declare const toggleClass: (selector: Selector, className: string) => void;
+export declare const addClass: (selector: Selector, className: string) => void;
+export declare const removeClass: (selector: Selector, className: string) => void;
+export declare const hasClass: (selector: Selector, className: string) => boolean;
+export declare const setText: (selector: Selector, text: string) => void;
+export declare const cloneElements: (selector: Selector, deep?: boolean) => Element[];
+export declare const insertBefore: (selector: Selector, content: string | Element) => void;
+export declare const insertAfter: (selector: Selector, content: string | Element) => void;
+export declare const replaceElements: (selector: Selector, newContent: string | Element) => void;
+export {};
+//# sourceMappingURL=dom-manipulation.d.ts.map

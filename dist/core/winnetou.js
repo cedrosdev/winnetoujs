@@ -1,15 +1,12 @@
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 class Winnetou_ {
   constructor() {
-    __publicField(this, "constructoId", 0);
-    __publicField(this, "mutable", {});
-    __publicField(this, "usingMutable", {});
-    __publicField(this, "storedEvents", []);
-    __publicField(this, "strings", {});
-    __publicField(this, "observer", null);
-    __publicField(this, "mutations", {
+    this.constructoId = 0;
+    this.mutable = {};
+    this.usingMutable = {};
+    this.storedEvents = [];
+    this.strings = {};
+    this.observer = null;
+    this.mutations = {
       start: () => {
         if (this.observer) return false;
         this.observer = new MutationObserver(
@@ -71,7 +68,7 @@ class Winnetou_ {
           }
         }, 100);
       }
-    });
+    };
   }
   setMutable(mutable, value, localStorage) {
     if (localStorage !== false && localStorage !== "notPersistent") {

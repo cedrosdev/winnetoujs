@@ -1,4 +1,4 @@
-import { getElements } from "./selectors.ts";
+import { getElements } from "./selectors";
 const fadeIn = (selector, duration = 300) => {
   const elements = Array.isArray(selector) ? selector : getElements(selector);
   elements.forEach((item) => {

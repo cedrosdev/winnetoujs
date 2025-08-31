@@ -1,4 +1,4 @@
-import { getElements } from "./selectors.ts";
+import { getElements } from "./selectors";
 const hideElements = (selector) => {
   const elements = Array.isArray(selector) ? selector : getElements(selector);
   elements.forEach((item) => {

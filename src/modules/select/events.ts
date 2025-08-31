@@ -1,4 +1,4 @@
-import { getElements } from "./selectors.ts";
+import { getElements } from "./selectors";
 
 type Selector = string | Element | Element[];
 type EventHandler = (event: Event) => void;
