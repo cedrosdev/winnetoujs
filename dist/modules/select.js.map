@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/modules/select.ts"],
+  "sourcesContent": ["// Re-export all functions from the modular select library\nexport * from \"./select/index.ts\";\n"],
+  "mappings": "AACA,cAAc;",
+  "names": []
+}
