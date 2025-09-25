@@ -88,7 +88,10 @@
     "build-fs": "node ./dist/buildWBR.js",
     "postinstall": "npm run-script build-fs",
     "type-check": "tsc --noEmit",
-    "build-types": "tsc --emitDeclarationOnly"
+    "build-types": "tsc --emitDeclarationOnly",
+    "publish:beta": "npm publish --tag beta",
+    "publish:alpha": "npm publish --tag alpha",
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
