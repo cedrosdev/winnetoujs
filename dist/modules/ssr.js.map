@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/modules/ssr.ts"],
+  "sourcesContent": ["const ESC = {\n  \"&\": \"&amp;\",\n  \"<\": \"&lt;\",\n  \">\": \"&gt;\",\n  '\"': \"&quot;\",\n  \"'\": \"&#39;\",\n};\nexport const escapeHTML = (v: string): string =>\n  v.replace(/[&<>\"']/g, ch => ESC[ch as keyof typeof ESC]);\n\n// Join chunks and arrays into a single HTML string\nexport const ssr = (...parts: any[]) => parts.flat(Infinity).join(\"\");\n"],
+  "mappings": "AAAA,MAAM,MAAM;AAAA,EACV,KAAK;AAAA,EACL,KAAK;AAAA,EACL,KAAK;AAAA,EACL,KAAK;AAAA,EACL,KAAK;AACP;AACO,MAAM,aAAa,CAAC,MACzB,EAAE,QAAQ,YAAY,QAAM,IAAI,EAAsB,CAAC;AAGlD,MAAM,MAAM,IAAI,UAAiB,MAAM,KAAK,QAAQ,EAAE,KAAK,EAAE;",
+  "names": []
+}

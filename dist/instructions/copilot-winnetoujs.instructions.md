@@ -74,11 +74,9 @@ To obtain auto completions for constructos use this config in jsconfig.json (put
 ```json
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "nodenext",
     "target": "es2022",
     "checkJs": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
     "paths": {
       "@libs/*": ["./libs/*"]
     }
