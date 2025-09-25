@@ -67,6 +67,10 @@
     "./modules/translations": {
       "types": "./dist/modules/translations.d.ts",
       "import": "./dist/modules/translations.js"
+    },
+    "./modules/ssr": {
+      "types": "./dist/modules/ssr.d.ts",
+      "import": "./dist/modules/ssr.js"
     }
   },
   "dependencies": {
