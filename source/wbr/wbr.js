@@ -65,10 +65,11 @@ class WBR {
       .name("wbr")
       .description("Winnetou Bundle Runtime (WBR) - Version 3")
       .version("3.0.0")
-      .option("-w, --watch", "Watch mode")
       .option("-b,--bundleRelease", "Compile project")
+      .option("-w, --watch", "Watch mode")
       .option("-p, --production", "Production mode")
       .option("-v, --verbose", "Verbose output")
+      .option("-n, --node", "Node platform for server-side rendering (SSR)")
       .parse();
 
     const opts = program.opts();
@@ -81,6 +82,7 @@ class WBR {
     this.watch = opts.watch;
     this.bundleRelease = opts.bundleRelease;
     this.production = opts.production;
+    this.node = opts.node;
 
     if (this.bundleRelease) {
       new BundleRelease({
@@ -90,6 +92,7 @@ class WBR {
         production: this.production,
         verbose: opts.verbose,
         constructosSourceFolder: this.constructosSourceFolder,
+        node: this.node,
       })
         .build()
         .then(res => {

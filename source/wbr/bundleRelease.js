@@ -17,6 +17,7 @@ module.exports = class BundleRelease {
    * @param {boolean} args.watch - Whether to enable watch mode
    * @param {boolean} args.production - Whether to build for production
    * @param {boolean} args.verbose - Whether to enable verbose output
+   * @param {boolean} args.node - Whether to target Node.js platform (SSR)
    */
   constructor(args) {
     this.entryFile = args.entryFile;
@@ -25,6 +26,7 @@ module.exports = class BundleRelease {
     this.production = args.production;
     this.verbose = args.verbose;
     this.constructosSourceFolder = args.constructosSourceFolder;
+    this.node = args.node;
     // Verbose output
     if (this.verbose) {
       console.log("production mode:", this.production);
@@ -76,6 +78,7 @@ module.exports = class BundleRelease {
     const outputDir = this.outputDir;
     let es = await esbuild.context({
       entryPoints: this.entryFile,
+      platform: this.node ? "node" : "browser",
       bundle: true,
       outdir: this.outputDir,
       splitting: true,
