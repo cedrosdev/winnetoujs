@@ -1,3 +1,6 @@
+import path from "path";
+import fs from "fs";
+
 const ESC = {
   "&": "&amp;",
   "<": "&lt;",
@@ -10,3 +13,17 @@ export const escapeHTML = (v: string): string =>
 
 // Join chunks and arrays into a single HTML string
 export const ssr = (...parts: any[]) => parts.flat(Infinity).join("");
+
+const partials = new Map();
+export function loadPartial(fileName: string): string {
+  if (!partials.has(fileName)) {
+    console.log(`Loading partial from disk: ${fileName}`);
+    partials.set(
+      fileName,
+      fs.readFileSync(path.join(__dirname, fileName), "utf8")
+    );
+  } else {
+    console.log(`Using cached partial: ${fileName}`);
+  }
+  return partials.get(fileName);
+}
