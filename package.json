@@ -1,5 +1,15 @@
 {
-  "version": "3.0.0-beta.42",
+  "version": "3.0.0-beta.43",
+  "scripts": {
+    "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/ && npm run build-types",
+    "build-fs": "node ./dist/buildWBR.js",
+    "postinstall": "npm run-script build-fs",
+    "type-check": "tsc --noEmit",
+    "build-types": "tsc --emitDeclarationOnly",
+    "publish:alpha": "npm publish --tag alpha",
+    "publish:beta": "npm publish --tag beta",
+    "publish": "npm publish"
+  },
   "name": "winnetoujs",
   "description": "The indie javascript constructor",
   "main": "src/winnetou.js",
@@ -86,16 +96,6 @@
   },
   "devDependencies": {
     "typescript": "^5.9.2"
-  },
-  "scripts": {
-    "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/ && npm run build-types",
-    "build-fs": "node ./dist/buildWBR.js",
-    "postinstall": "npm run-script build-fs",
-    "type-check": "tsc --noEmit",
-    "build-types": "tsc --emitDeclarationOnly",
-    "publish:alpha": "npm publish --tag alpha",
-    "publish:beta": "npm publish --tag beta",
-    "publish": "npm publish"
   },
   "repository": {
     "type": "git",

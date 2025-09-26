@@ -11,10 +11,7 @@ const ssr = (...parts) => parts.flat(Infinity).join("");
 const partials = /* @__PURE__ */ new Map();
 function loadPartial(fileName) {
   if (!partials.has(fileName)) {
-    console.log(`Loading partial from disk: ${fileName}`);
     partials.set(fileName, fs.readFileSync(fileName, "utf8"));
-  } else {
-    console.log(`Using cached partial: ${fileName}`);
   }
   return partials.get(fileName);
 }
