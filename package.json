@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-beta.44",
+  "version": "3.0.0-beta.45",
   "scripts": {
     "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/ && npm run build-types",
     "build-fs": "node ./dist/buildWBR.js",
