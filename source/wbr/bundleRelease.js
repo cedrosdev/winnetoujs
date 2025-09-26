@@ -29,8 +29,18 @@ module.exports = class BundleRelease {
     this.node = args.node;
     // Verbose output
     if (this.verbose) {
-      console.log("production mode:", this.production);
-      console.log("watch mode:", this.watch);
+      console.log(
+        "production mode:",
+        this.production ? "\x1b[32myes\x1b[0m" : "\x1b[31mno\x1b[0m"
+      );
+      console.log(
+        "watch mode:",
+        this.watch ? "\x1b[32myes\x1b[0m" : "\x1b[31mno\x1b[0m"
+      );
+      console.log(
+        "node mode (SSR):",
+        this.node ? "\x1b[32myes\x1b[0m" : "\x1b[31mno\x1b[0m"
+      );
       console.log("output directory:", this.outputDir);
       console.log("entry file:", this.entryFile);
       console.log("constructos source folder:", args.constructosSourceFolder);
