@@ -7,13 +7,29 @@ const ESC = {
   '"': "&quot;",
   "'": "&#39;",
 };
+/**
+ * Escape HTML special characters in a string.
+ * @param {string} v - The input string.
+ * @returns {string} - The escaped string.
+ */
 export const escapeHTML = (v: string): string =>
   v.replace(/[&<>"']/g, ch => ESC[ch as keyof typeof ESC]);
 
-// Join chunks and arrays into a single HTML string
+/**
+ * Simple SSR template literal tag function
+ * @param {any[]} parts - Parts to join
+ * @returns {string}
+ */
 export const ssr = (...parts: any[]) => parts.flat(Infinity).join("");
 
 const partials = new Map();
+/**
+ * Load a partial file, caching its content for future use.
+ * @param {string} fileName - Path to the partial file
+ * @param {Object} [options]
+ * @param {boolean} [options.verbose] - Whether to log loading info
+ * @returns {string}
+ */
 export function loadPartial(
   fileName: string,
   options?: { verbose?: boolean }
