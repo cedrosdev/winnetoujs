@@ -114,10 +114,11 @@ class Winnetou_ {
         appElement.addEventListener(
           "constructoRemoved",
           (data: Event) => {
-            const customEvent = data as CustomEvent<{ removedId: string }>;
-            if (id === customEvent.detail.removedId) {
-              callback();
-              controller.abort();
+            if (data instanceof CustomEvent) {
+              if (id === data.detail.removedId) {
+                callback();
+                controller.abort();
+              }
             }
           },
           {
