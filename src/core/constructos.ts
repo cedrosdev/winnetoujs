@@ -92,7 +92,14 @@ export class Constructos {
     else return ++Winnetou.constructoId;
   }
 
-  attachToDOM(
+  /**
+   * Attach a component to the DOM
+   * @param component The component HTML string
+   * @param output The node or list of nodes where the component will be created
+   * @param options Options to control how the construct is inserted. Optional.
+   * @protected
+   */
+  protected attachToDOM(
     component: string,
     output: string | Element,
     options: { clear?: boolean; reverse?: boolean } = {}

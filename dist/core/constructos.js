@@ -62,6 +62,13 @@ class Constructos {
     if (identifier != "notSet") return identifier;
     else return ++Winnetou.constructoId;
   }
+  /**
+   * Attach a component to the DOM
+   * @param component The component HTML string
+   * @param output The node or list of nodes where the component will be created
+   * @param options Options to control how the construct is inserted. Optional.
+   * @protected
+   */
   attachToDOM(component, output, options = {}) {
     const isTableElement = component.match(
       /^\s*?<tr|^\s*?<td|^\s*?<table|^\s*?<th|^\s*?<tbody|^\s*?<thead|^\s*?<tfoot/
