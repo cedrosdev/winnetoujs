@@ -1,7 +1,10 @@
 {
-  "version": "3.0.0-beta.45",
+  "version": "3.0.0-beta.46",
   "scripts": {
-    "start": "esbuild 'src/**/*.ts' --outdir=dist --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src --resolve-extensions=.ts,.js && cp -r source/* dist/ && npm run build-types",
+    "start": "npm run core && npm run modules && npm run wbr && cp -r source/* dist/ && npm run build-types",
+    "core": "esbuild 'src/core/*.ts' --outdir=dist/core --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src/core --resolve-extensions=.ts,.js",
+    "modules": "esbuild 'src/modules/*.ts' --outdir=dist/modules --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src/modules --resolve-extensions=.ts,.js",
+    "wbr": "esbuild 'src/wbr/wbr.ts' --bundle --outfile=dist/wbr/wbr.js --format=esm --platform=node --target=es2020 --resolve-extensions=.ts,.js --packages=external --minify",
     "build-fs": "node ./dist/buildWBR.js",
     "postinstall": "npm run-script build-fs",
     "type-check": "tsc --noEmit",
@@ -95,6 +98,8 @@
     "recursive-readdir": "^2.2.3"
   },
   "devDependencies": {
+    "@types/js-beautify": "^1.14.3",
+    "@types/recursive-readdir": "^2.2.4",
     "typescript": "^5.9.2"
   },
   "repository": {

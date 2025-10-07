@@ -3,7 +3,7 @@
 
 </p>
 
-# WinnetouJs 2
+# WinnetouJs 3
 
 <p>
    <img src="https://img.shields.io/npm/v/winnetoujs?color=6b2575&style=plastic" />

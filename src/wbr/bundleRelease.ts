@@ -1,32 +1,45 @@
-const esbuild = require("esbuild");
-const fs = require("fs");
-const path = require("path");
-const watch = require("node-watch");
-const constructosParser = require("./constructosParser.js");
+import * as esbuild from "esbuild";
+import watch from "node-watch";
+import { ConstructosParser } from "./constructosParser";
+
+/**
+ * Configuration interface for BundleRelease
+ */
+interface BundleReleaseConfig {
+  entryFile: string[];
+  outputDir: string;
+  constructosSourceFolder: string;
+  watch: boolean;
+  production: boolean;
+  verbose?: boolean;
+  node?: boolean;
+}
 
 /**
  * BundleRelease class for building and managing JavaScript bundles using esbuild
  */
-module.exports = class BundleRelease {
+export class BundleRelease {
+  private entryFile: string[];
+  private outputDir: string;
+  private watch: boolean;
+  private production: boolean;
+  private verbose: boolean;
+  private constructosSourceFolder: string;
+  private node: boolean;
+
   /**
    * Creates an instance of BundleRelease
-   * @param {Object} args - Configuration arguments
-   * @param {string[]} args.entryFile - The entry point file for the bundle
-   * @param {string} args.outputDir - The output directory for the built bundle
-   * @param {string} args.constructosSourceFolder - The source folder for Constructos files
-   * @param {boolean} args.watch - Whether to enable watch mode
-   * @param {boolean} args.production - Whether to build for production
-   * @param {boolean} args.verbose - Whether to enable verbose output
-   * @param {boolean} args.node - Whether to target Node.js platform (SSR)
+   * @param args - Configuration arguments
    */
-  constructor(args) {
+  constructor(args: BundleReleaseConfig) {
     this.entryFile = args.entryFile;
     this.outputDir = args.outputDir;
     this.watch = args.watch;
     this.production = args.production;
-    this.verbose = args.verbose;
+    this.verbose = args.verbose || false;
     this.constructosSourceFolder = args.constructosSourceFolder;
-    this.node = args.node;
+    this.node = args.node || false;
+
     // Verbose output
     if (this.verbose) {
       console.log(
@@ -56,37 +69,38 @@ module.exports = class BundleRelease {
   /**
    * Builds the bundle using esbuild and starts watching for changes
    * @async
-   * @returns {Promise<"watching"|"done">} - Returns a promise that resolves when the build is complete or watching is started
+   * @returns - Returns a promise that resolves when the build is complete or watching is started
    */
-  async build() {
+  async build(): Promise<"watching" | "done"> {
     // transpile constructos
-    const constructosParserInstance = new constructosParser({
+    const constructosParserInstance = new ConstructosParser({
       constructosSourceFolder: this.constructosSourceFolder,
       verbose: this.verbose,
     });
     await constructosParserInstance.parse();
+
     // watch constructos
-    if (this.watch)
-      watch
-        .default(this.constructosSourceFolder, {
-          recursive: true,
-          filter: f => f.endsWith(".wcto.htm") || f.endsWith("wcto.html"),
-        })
-        .on("change", (ev, file_name) => {
-          this.verbose &&
-            console.log(
-              "\n\n\x1b[32mConstructo updated: " + file_name + "\x1b[0m"
-            );
-          constructosParserInstance.singleParse(file_name);
-        });
+    if (this.watch) {
+      watch(this.constructosSourceFolder, {
+        recursive: true,
+        filter: (f: string) =>
+          f.endsWith(".wcto.htm") || f.endsWith("wcto.html"),
+      }).on("change", (ev: string, fileName: string) => {
+        this.verbose &&
+          console.log(
+            "\n\n\x1b[32mConstructo updated: " + fileName + "\x1b[0m"
+          );
+        constructosParserInstance.singleParse(fileName);
+      });
+    }
+
     // compile bundle
     const result = await this.esbuild();
     return result;
   }
 
-  async esbuild() {
-    const outputDir = this.outputDir;
-    let es = await esbuild.context({
+  private async esbuild(): Promise<"watching" | "done"> {
+    const es = await esbuild.context({
       entryPoints: this.entryFile,
       platform: this.node ? "node" : "browser",
       bundle: true,
@@ -104,15 +118,15 @@ module.exports = class BundleRelease {
       plugins: [
         {
           name: "detailed-build-notifier",
-          setup: build => {
-            let startTime;
+          setup: (build: esbuild.PluginBuild) => {
+            let startTime: number;
 
             build.onStart(() => {
               startTime = performance.now();
               console.log(`🔄 Starting build...`);
             });
 
-            build.onEnd(result => {
+            build.onEnd((result: esbuild.BuildResult) => {
               const timestamp = new Date().toLocaleTimeString();
               const duration = startTime
                 ? `(${Math.round(performance.now() - startTime)}ms)`
@@ -120,14 +134,14 @@ module.exports = class BundleRelease {
 
               if (result.errors.length > 0) {
                 console.log(`❌ [${timestamp}] Build failed ${duration}`);
-                result.errors.forEach(error =>
+                result.errors.forEach((error: esbuild.Message) =>
                   console.log(`  Error: ${error.text}`)
                 );
               } else if (result.warnings.length > 0) {
                 console.log(
                   `⚠️  [${timestamp}] Build completed with warnings ${duration}`
                 );
-                result.warnings.forEach(warning =>
+                result.warnings.forEach((warning: esbuild.Message) =>
                   console.log(`  Warning: ${warning.text}`)
                 );
               } else {
@@ -140,12 +154,13 @@ module.exports = class BundleRelease {
         },
       ],
     });
+
     if (this.watch) {
-      es.watch();
+      await es.watch();
       return "watching";
     } else {
       await es.rebuild();
       return "done";
     }
   }
-};
+}
