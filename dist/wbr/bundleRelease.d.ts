@@ -9,6 +9,7 @@ interface BundleReleaseConfig {
     production: boolean;
     verbose?: boolean;
     node?: boolean;
+    "node-esm"?: boolean;
 }
 /**
  * BundleRelease class for building and managing JavaScript bundles using esbuild
@@ -21,6 +22,7 @@ export declare class BundleRelease {
     private verbose;
     private constructosSourceFolder;
     private node;
+    private nodeEsm;
     /**
      * Creates an instance of BundleRelease
      * @param args - Configuration arguments

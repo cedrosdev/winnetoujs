@@ -1,10 +1,9 @@
 {
-  "version": "3.0.1",
+  "version": "3.1.0",
   "scripts": {
-    "start": "npm run core && npm run modules && npm run modules:select && npm run wbr && cp -r source/* dist/ && npm run build-types",
+    "start": "npm run core && npm run modules && npm run wbr && cp -r source/* dist/ && npm run build-types",
     "core": "esbuild 'src/core/*.ts' --outdir=dist/core --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src/core --resolve-extensions=.ts,.js",
     "modules": "esbuild 'src/modules/*.ts' --outdir=dist/modules --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src/modules --resolve-extensions=.ts,.js",
-    "modules:select": "esbuild 'src/modules/select/*.ts' --outdir=dist/modules/select --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src/modules/select --resolve-extensions=.ts,.js",
     "wbr": "esbuild 'src/wbr/wbr.ts' --bundle --outfile=dist/wbr/wbr.js --format=cjs --platform=node --target=es2020 --resolve-extensions=.ts,.js --packages=external",
     "build-fs": "node ./dist/buildWBR.js",
     "postinstall": "npm run-script build-fs",
@@ -41,42 +40,6 @@
     "./modules/router": {
       "types": "./dist/modules/router.d.ts",
       "import": "./dist/modules/router.js"
-    },
-    "./modules/select": {
-      "types": "./dist/modules/select.d.ts",
-      "import": "./dist/modules/select.js"
-    },
-    "./modules/select/animations": {
-      "types": "./dist/modules/select/animations.d.ts",
-      "import": "./dist/modules/select/animations.js"
-    },
-    "./modules/select/attributes": {
-      "types": "./dist/modules/select/attributes.d.ts",
-      "import": "./dist/modules/select/attributes.js"
-    },
-    "./modules/select/dom-manipulation": {
-      "types": "./dist/modules/select/dom-manipulation.d.ts",
-      "import": "./dist/modules/select/dom-manipulation.js"
-    },
-    "./modules/select/events": {
-      "types": "./dist/modules/select/events.d.ts",
-      "import": "./dist/modules/select/events.js"
-    },
-    "./modules/select/index": {
-      "types": "./dist/modules/select/index.d.ts",
-      "import": "./dist/modules/select/index.js"
-    },
-    "./modules/select/navigation": {
-      "types": "./dist/modules/select/navigation.d.ts",
-      "import": "./dist/modules/select/navigation.js"
-    },
-    "./modules/select/positioning": {
-      "types": "./dist/modules/select/positioning.d.ts",
-      "import": "./dist/modules/select/positioning.js"
-    },
-    "./modules/select/selectors": {
-      "types": "./dist/modules/select/selectors.d.ts",
-      "import": "./dist/modules/select/selectors.js"
     },
     "./modules/translations": {
       "types": "./dist/modules/translations.d.ts",

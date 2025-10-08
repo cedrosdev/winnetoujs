@@ -322,6 +322,7 @@ var BundleRelease = class {
     this.verbose = args.verbose || false;
     this.constructosSourceFolder = args.constructosSourceFolder;
     this.node = args.node || false;
+    this.nodeEsm = args["node-esm"] || false;
     if (this.verbose) {
       console.log(
         "production mode:",
@@ -332,8 +333,12 @@ var BundleRelease = class {
         this.watch ? "\x1B[32myes\x1B[0m" : "\x1B[31mno\x1B[0m"
       );
       console.log(
-        "node mode (SSR):",
+        "node mode (SSR)(CJS):",
         this.node ? "\x1B[32myes\x1B[0m" : "\x1B[31mno\x1B[0m"
+      );
+      console.log(
+        "node mode (SSR)(ESM):",
+        this.nodeEsm ? "\x1B[32myes\x1B[0m" : "\x1B[31mno\x1B[0m"
       );
       console.log("output directory:", this.outputDir);
       console.log("entry file:", this.entryFile);
@@ -373,11 +378,11 @@ var BundleRelease = class {
   async esbuild() {
     const es = await esbuild.context({
       entryPoints: this.entryFile,
-      platform: this.node ? "node" : "browser",
+      platform: this.node || this.nodeEsm ? "node" : "browser",
       bundle: true,
       outdir: this.outputDir,
-      splitting: true,
-      format: "esm",
+      splitting: this.node ? false : true,
+      format: this.node ? "cjs" : "esm",
       minify: this.production,
       sourcemap: !this.production,
       target: ["chrome90"],
@@ -472,7 +477,7 @@ var WBR = class {
   }
   readArgs() {
     const program = new import_commander.Command();
-    program.name("wbr").description("Winnetou Bundle Runtime (WBR) - Version 3").version("3.0.0").option("-b,--bundleRelease", "Compile project").option("-w, --watch", "Watch mode").option("-p, --production", "Production mode").option("-v, --verbose", "Verbose output").option("-n, --node", "Node platform for server-side rendering (SSR)").parse();
+    program.name("wbr").description("Winnetou Bundle Runtime (WBR) - Version 3").version("3.0.0").option("-b,--bundleRelease", "Compile project").option("-w, --watch", "Watch mode").option("-p, --production", "Production mode").option("-v, --verbose", "Verbose output").option("-n, --node", "Node platform for server-side rendering (SSR)").option("-nesm, --node-esm", "Node platform with ESM support").parse();
     const opts = program.opts();
     if (Object.keys(opts).length === 0) {
       program.help();
@@ -482,6 +487,7 @@ var WBR = class {
     this.bundleRelease = !!opts.bundleRelease;
     this.production = !!opts.production;
     this.node = opts.node;
+    this.nodeEsm = opts["node-esm"];
     if (this.bundleRelease) {
       const config = {
         entryFile: this.entryFile,
@@ -490,7 +496,8 @@ var WBR = class {
         production: this.production,
         verbose: opts.verbose,
         constructosSourceFolder: this.constructosSourceFolder,
-        node: this.node
+        node: this.node,
+        "node-esm": this.nodeEsm
       };
       new BundleRelease(config).build().then((res) => {
         if (res === "watching") {
