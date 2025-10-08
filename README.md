@@ -3,7 +3,7 @@
 
 </p>
 
-# WinnetouJs 3
+# WinnetouJs 3 LTS
 
 <p>
    <img src="https://img.shields.io/npm/v/winnetoujs?color=6b2575&style=plastic" />
@@ -14,6 +14,23 @@
 
 WinnetouJs is a javascript framework that encompasses multi solutions for creating frontend web apps.
 
+## Example
+
+```html
+<!-- commons.wcto.html -->
+<winnetou>
+  <div id="[[simpleText]]">{{text}}</div>
+</winnetou>
+```
+
+```javascript
+// app.ts
+import { $simpleText } from "./commons.wcto";
+new $simpleText({ text: "Hello World!" }).create("#app");
+```
+
+This will render `Hello World!` inside the element with id `app`.
+
 ## Learn
 
 [Start with the documentation here.](https://winnetoujs.org/docs)
@@ -22,18 +39,9 @@ WinnetouJs is a javascript framework that encompasses multi solutions for creati
 
 Pull requests are welcome.
 
-### Pull requests guidelines
-
-1. Create a fork of WinnetouJs
-2. Clone forked one to your local machine
-3. Code and commit
-4. Send a pull request
-
 ## Authors
 
 - **Pamela Sedrez** - _Initial work_ - [GitHub](https://github.com/pamydev)
-
-See also the list of [contributors](https://github.com/cedrosdev/winnetoujs/contributors) who participated in this project.
 
 ## License
 
