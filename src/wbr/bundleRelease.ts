@@ -13,6 +13,7 @@ interface BundleReleaseConfig {
   production: boolean;
   verbose?: boolean;
   node?: boolean;
+  "node-esm"?: boolean;
 }
 
 /**
@@ -26,6 +27,7 @@ export class BundleRelease {
   private verbose: boolean;
   private constructosSourceFolder: string;
   private node: boolean;
+  private nodeEsm: boolean;
 
   /**
    * Creates an instance of BundleRelease
@@ -39,6 +41,7 @@ export class BundleRelease {
     this.verbose = args.verbose || false;
     this.constructosSourceFolder = args.constructosSourceFolder;
     this.node = args.node || false;
+    this.nodeEsm = args["node-esm"] || false;
 
     // Verbose output
     if (this.verbose) {
@@ -51,8 +54,12 @@ export class BundleRelease {
         this.watch ? "\x1b[32myes\x1b[0m" : "\x1b[31mno\x1b[0m"
       );
       console.log(
-        "node mode (SSR):",
+        "node mode (SSR)(CJS):",
         this.node ? "\x1b[32myes\x1b[0m" : "\x1b[31mno\x1b[0m"
+      );
+      console.log(
+        "node mode (SSR)(ESM):",
+        this.nodeEsm ? "\x1b[32myes\x1b[0m" : "\x1b[31mno\x1b[0m"
       );
       console.log("output directory:", this.outputDir);
       console.log("entry file:", this.entryFile);
@@ -102,11 +109,11 @@ export class BundleRelease {
   private async esbuild(): Promise<"watching" | "done"> {
     const es = await esbuild.context({
       entryPoints: this.entryFile,
-      platform: this.node ? "node" : "browser",
+      platform: this.node || this.nodeEsm ? "node" : "browser",
       bundle: true,
       outdir: this.outputDir,
-      splitting: true,
-      format: "esm",
+      splitting: this.node ? false : true,
+      format: this.node ? "cjs" : "esm",
       minify: this.production,
       sourcemap: !this.production,
       target: ["chrome90"],

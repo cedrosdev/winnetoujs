@@ -50,6 +50,7 @@ interface BundleReleaseConfig {
   verbose?: boolean;
   constructosSourceFolder: string;
   node?: boolean;
+  "node-esm"?: boolean;
 }
 
 /**
@@ -61,6 +62,7 @@ interface CommandOptions {
   production?: boolean;
   verbose?: boolean;
   node?: boolean;
+  "node-esm"?: boolean;
 }
 
 class WBR {
@@ -71,6 +73,7 @@ class WBR {
   private entryFile: string[] = [];
   private outputDir: string = "";
   private constructosSourceFolder: string = "";
+  private nodeEsm?: boolean;
 
   constructor() {
     console.log(
@@ -117,6 +120,7 @@ class WBR {
       .option("-p, --production", "Production mode")
       .option("-v, --verbose", "Verbose output")
       .option("-n, --node", "Node platform for server-side rendering (SSR)")
+      .option("-nesm, --node-esm", "Node platform with ESM support")
       .parse();
 
     const opts = program.opts() as CommandOptions;
@@ -130,6 +134,7 @@ class WBR {
     this.bundleRelease = !!opts.bundleRelease;
     this.production = !!opts.production;
     this.node = opts.node;
+    this.nodeEsm = opts["node-esm"];
 
     if (this.bundleRelease) {
       const config: BundleReleaseConfig = {
@@ -140,6 +145,7 @@ class WBR {
         verbose: opts.verbose,
         constructosSourceFolder: this.constructosSourceFolder,
         node: this.node,
+        "node-esm": this.nodeEsm,
       };
 
       new BundleRelease(config)
