@@ -120,7 +120,7 @@ class WBR {
       .option("-p, --production", "Production mode")
       .option("-v, --verbose", "Verbose output")
       .option("-n, --node", "Node platform for server-side rendering (SSR)")
-      .option("-nesm, --node-esm", "Node platform with ESM support")
+      .option("-e, --node-esm", "Node platform with ESM support")
       .parse();
 
     const opts = program.opts() as CommandOptions;

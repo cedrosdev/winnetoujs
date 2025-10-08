@@ -477,7 +477,7 @@ var WBR = class {
   }
   readArgs() {
     const program = new import_commander.Command();
-    program.name("wbr").description("Winnetou Bundle Runtime (WBR) - Version 3").version("3.0.0").option("-b,--bundleRelease", "Compile project").option("-w, --watch", "Watch mode").option("-p, --production", "Production mode").option("-v, --verbose", "Verbose output").option("-n, --node", "Node platform for server-side rendering (SSR)").option("-nesm, --node-esm", "Node platform with ESM support").parse();
+    program.name("wbr").description("Winnetou Bundle Runtime (WBR) - Version 3").version("3.0.0").option("-b,--bundleRelease", "Compile project").option("-w, --watch", "Watch mode").option("-p, --production", "Production mode").option("-v, --verbose", "Verbose output").option("-n, --node", "Node platform for server-side rendering (SSR)").option("-e, --node-esm", "Node platform with ESM support").parse();
     const opts = program.opts();
     if (Object.keys(opts).length === 0) {
       program.help();
