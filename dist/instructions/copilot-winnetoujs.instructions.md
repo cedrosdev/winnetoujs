@@ -259,6 +259,29 @@ new $div({
 }).create("#app");
 ```
 
+But be careful, in complex systems, it is better to create separated constructos and use constructos chaining (see below) to avoid confusion and code smell.
+
+## Constructos chaining
+
+To mix constructos in complex apps use their ids to attach them to other constructos.
+
+```html
+<winnetou>
+  <header id="[[header]]">I'm a header</header>
+  <footer id="[[footer]]">I'm a footer</footer>
+  <div id="[[page]]">I'm a page</div>
+</winnetou>
+```
+
+```javascript
+import { $header, $footer, $page } from "./components.wcto";
+const pageId = new $page().create("#app").ids.page;
+new $header().create(pageId);
+new $footer().create(pageId);
+```
+
+This ensures clean code and reusable constructos.
+
 ## Mutables
 
 Mutables are localstorage variables that can change constructos state.
