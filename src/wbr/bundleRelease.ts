@@ -1,7 +1,6 @@
 import * as esbuild from "esbuild";
 import watch from "node-watch";
 import { ConstructosParser } from "./constructosParser";
-import dtsPlugin from "esbuild-plugin-d.ts";
 
 /**
  * Configuration interface for BundleRelease
@@ -145,23 +144,6 @@ export class BundleRelease {
         });
       },
     });
-    if (this.node || this.nodeEsm) {
-      plugins.push(
-        dtsPlugin({
-          experimentalBundling: true,
-          tsconfig: {
-            compilerOptions: {
-              allowJs: true,
-              module: "nodenext",
-              moduleResolution: "nodenext",
-              declaration: true,
-              emitDeclarationOnly: true,
-              outDir: this.outputDir,
-            },
-          },
-        })
-      );
-    }
 
     const es = await esbuild.context({
       entryPoints: this.entryFile,

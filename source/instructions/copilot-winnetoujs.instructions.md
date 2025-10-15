@@ -554,6 +554,25 @@ WinnetouJs provides a module for server side rendering.
 
 `-e, --node-esm` to compile for node environment in esm format
 
+## Server tsconfig/jsconfig
+
+Do not forget to allowJs in tsconfig/jsconfig file, it's important to import wcto.js files in node server:
+
+```json
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "target": "es2022",
+    "checkJs": true,
+    "allowJs": true,
+    "paths": {
+      "@libs/*": ["./libs/*"]
+    }
+  },
+  "exclude": ["node_modules", "**/node_modules/*"]
+}
+```
+
 ## Concept
 
 Create a winnetou-ssr folder and create a standard winnetoujs project in it. `app.ts` will receive the constructos and export it in order to be used by node server.
