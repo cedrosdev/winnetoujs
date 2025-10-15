@@ -7,7 +7,7 @@ const ESC = {
   "'": "&#39;"
 };
 const escapeHTML = (v) => v.replace(/[&<>"']/g, (ch) => ESC[ch]);
-const ssr = (...parts) => parts.flat(Infinity).join("");
+const joinConstructos = (...parts) => parts.flat(Infinity).join("");
 const partials = /* @__PURE__ */ new Map();
 function loadPartial(fileName, options) {
   if (!partials.has(fileName)) {
@@ -24,7 +24,7 @@ function loadPartial(fileName, options) {
 }
 export {
   escapeHTML,
-  loadPartial,
-  ssr
+  joinConstructos,
+  loadPartial
 };
 //# sourceMappingURL=ssr.js.map

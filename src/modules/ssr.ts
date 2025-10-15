@@ -16,11 +16,12 @@ export const escapeHTML = (v: string): string =>
   v.replace(/[&<>"']/g, ch => ESC[ch as keyof typeof ESC]);
 
 /**
- * Simple SSR template literal tag function
+ * Flatten and join parts into a single string to return a final HTML string.
  * @param {any[]} parts - Parts to join
  * @returns {string}
  */
-export const ssr = (...parts: any[]) => parts.flat(Infinity).join("");
+export const joinConstructos = (...parts: any[]) =>
+  parts.flat(Infinity).join("");
 
 const partials = new Map();
 /**

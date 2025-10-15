@@ -1,6 +1,7 @@
 import * as esbuild from "esbuild";
 import watch from "node-watch";
 import { ConstructosParser } from "./constructosParser";
+import dtsPlugin from "esbuild-plugin-d.ts";
 
 /**
  * Configuration interface for BundleRelease
@@ -123,6 +124,7 @@ export class BundleRelease {
         : "[name]-[hash].lazyBundle",
       loader: { ".ts": "ts" },
       plugins: [
+        dtsPlugin(),
         {
           name: "detailed-build-notifier",
           setup: (build: esbuild.PluginBuild) => {

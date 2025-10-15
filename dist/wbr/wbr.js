@@ -309,6 +309,7 @@ var ConstructosParser = class {
 };
 
 // src/wbr/bundleRelease.ts
+var import_esbuild_plugin_d = __toESM(require("esbuild-plugin-d.ts"));
 var BundleRelease = class {
   /**
    * Creates an instance of BundleRelease
@@ -390,6 +391,7 @@ var BundleRelease = class {
       chunkNames: this.production ? "[hash].lazyBundle" : "[name]-[hash].lazyBundle",
       loader: { ".ts": "ts" },
       plugins: [
+        (0, import_esbuild_plugin_d.default)(),
         {
           name: "detailed-build-notifier",
           setup: (build) => {
@@ -477,7 +479,7 @@ var WBR = class {
   }
   readArgs() {
     const program = new import_commander.Command();
-    program.name("wbr").description("Winnetou Bundle Runtime (WBR) - Version 3").version("3.0.0").option("-b,--bundleRelease", "Compile project").option("-w, --watch", "Watch mode").option("-p, --production", "Production mode").option("-v, --verbose", "Verbose output").option("-n, --node", "Node platform for server-side rendering (SSR)").option("-e, --node-esm", "Node platform with ESM support").parse();
+    program.name("wbr").description("Winnetou Bundle Runtime (WBR) - Version 3").version("3.x").option("-b,--bundleRelease", "Compile project").option("-w, --watch", "Watch mode").option("-p, --production", "Production mode").option("-v, --verbose", "Verbose output").option("-n, --node", "Node platform for server-side rendering (SSR)").option("-e, --node-esm", "Node platform with ESM support").parse();
     const opts = program.opts();
     if (Object.keys(opts).length === 0) {
       program.help();

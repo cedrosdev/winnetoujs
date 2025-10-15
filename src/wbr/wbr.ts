@@ -114,7 +114,7 @@ class WBR {
     program
       .name("wbr")
       .description("Winnetou Bundle Runtime (WBR) - Version 3")
-      .version("3.0.0")
+      .version("3.x")
       .option("-b,--bundleRelease", "Compile project")
       .option("-w, --watch", "Watch mode")
       .option("-p, --production", "Production mode")

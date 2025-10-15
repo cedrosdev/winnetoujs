@@ -5,11 +5,11 @@
  */
 export declare const escapeHTML: (v: string) => string;
 /**
- * Simple SSR template literal tag function
+ * Flatten and join parts into a single string to return a final HTML string.
  * @param {any[]} parts - Parts to join
  * @returns {string}
  */
-export declare const ssr: (...parts: any[]) => string;
+export declare const joinConstructos: (...parts: any[]) => string;
 /**
  * Load a partial file, caching its content for future use.
  * @param {string} fileName - Path to the partial file

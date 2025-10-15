@@ -259,29 +259,6 @@ new $div({
 }).create("#app");
 ```
 
-But be careful, in complex systems, it is better to create separated constructos and use constructos chaining (see below) to avoid confusion and code smell.
-
-## Constructos chaining
-
-To mix constructos in complex apps use their ids to attach them to other constructos.
-
-```html
-<winnetou>
-  <header id="[[header]]">I'm a header</header>
-  <footer id="[[footer]]">I'm a footer</footer>
-  <div id="[[page]]">I'm a page</div>
-</winnetou>
-```
-
-```javascript
-import { $header, $footer, $page } from "./components.wcto";
-const pageId = new $page().create("#app").ids.page;
-new $header().create(pageId);
-new $footer().create(pageId);
-```
-
-This ensures clean code and reusable constructos.
-
 ## Mutables
 
 Mutables are localstorage variables that can change constructos state.
@@ -566,23 +543,154 @@ function darkTheme() {
 }
 ```
 
-## Select module
+# WinnetouJs Server Side Rendering (SSR)
 
-Select module is a wrapper for common javascript functions and methods.
+WinnetouJs provides a module for server side rendering.
 
-- use select module to improve readability and performance in winnetoujs apps.
+## WBR options for SSR
 
-- Refer to `select.instructions.md` for a complete guide to all winnetoujs select module.
+`-n, --node` to compile for node environment in commonjs format
+
+`-e, --node-esm` to compile for node environment in esm format
+
+## Concept
+
+Create a winnetou-ssr folder and create a standard winnetoujs project in it. `app.ts` will receive the constructos and export it in order to be used by node server.
+
+Node server will import the constructos compiled in app.js dist file and use it to render html in server side.
 
 ```javascript
-import { setCss } from "winnetoujs/modules/select";
+import {
+  joinConstructos,
+  escapeHTML,
+  loadPartial,
+} from "winnetoujs/modules/ssr";
 
-let btn = new $div2({
-  content: "settings",
-  onclick: W.fx(() => {
-    myRouter.methods.settings.go();
-  }),
-}).create("#app").ids.div2;
+import {
+  $html,
+  $navbar,
+  $menuItem,
+  $menuTitle,
+  $footer,
+  $searchCard,
+} from "./docs-template.wcto";
 
-setCss(btn, "color", "yellow");
+export {
+  joinConstructos,
+  escapeHTML,
+  loadPartial,
+  $searchCard,
+  $html,
+  $navbar,
+  $menuItem,
+  $menuTitle,
+  $footer,
+};
+```
+
+Then compile it using:
+`wbr -b -n -p`
+
+and use it in node server:
+
+```javascript
+const {
+  joinConstructos,
+  loadPartial,
+  $html,
+  $navbar,
+} = require("./winnetou-ssr/dist/app.js");
+// ...
+app.get("/", (req, res) => {
+  res.send(loadPartial("./Views/home/home.html"));
+});
+// ...
+app.get("/docs/:route", async (req, res) => {
+  let menu = await getMenu();
+  let fileFound = false;
+
+  // verify if route exists
+  // if not, return 404
+  for (const folder of menu) {
+    for (const file of folder.files) {
+      if (file.name === req.params.route) {
+        fileFound = true;
+
+        let renderedMenu = await renderMenu(folder.folder, file.name);
+
+        let navbar = new $navbar({
+          menu: renderedMenu.ssr,
+        }).constructoString();
+
+        const content = loadPartial(
+          path.join(__dirname, "../Views/docs/" + req.params.route + ".ejs")
+        );
+
+        let html = new $html({
+          content,
+          canonicalPath: "/docs/" + req.params.route,
+          metaDescription: removeHTMLTags(content.substring(0, 155)).replace(
+            /\n/g,
+            " "
+          ),
+          metaTitle: file.name + " - WinnetouJs",
+          title: "Documentation - " + file.name,
+          folder: folder.folder,
+          menu: renderedMenu.ssr,
+          navbar,
+          path: file.displayName,
+          footer: new $footer({
+            currentYear: new Date().getFullYear(),
+            editLink: file.url,
+            iconArrowRight: ArrowRight,
+            iconExternalLink: ExternalLink,
+            nextLink: renderedMenu.next ?? "/docsf",
+            nextText:
+              renderedMenu.next?.replace("/docs/", "").replace(/-/g, " ") ??
+              "Back to start",
+          }).constructoString(),
+        }).constructoString();
+
+        return res.send(html);
+      }
+    }
+  }
+
+  if (!fileFound) {
+    return res.status(404).send("Not found");
+  }
+});
+```
+
+## loadPartial
+
+- Use `loadPartial("path/to/file.html")` to load a html file from server side. It can parse any type of file, like ejs, hbs, txt, etc.
+
+You could use to load a html template file and put it inside a constructo:
+
+```javascript
+let content = loadPartial("./Views/home/home.html");
+let html = new $html({
+  content,
+  // other props...
+}).constructoString();
+```
+
+## escapeHTML
+
+- Use `escapeHTML("<div>test</div>")` to escape html tags to display as text in browser. It will return `&lt;div&gt;test&lt;/div&gt;`.
+
+## joinConstructos
+
+The `joinConstructos(...parts)` function flattens and joins multiple parts into a single string, which is particularly useful for combining constructos or HTML fragments in server-side rendering scenarios.
+
+- Use `joinConstructos(part1, part2, ...)` to join many parts into a single string.
+
+```javascript
+let combinedHTML = joinConstructos(
+  new $header({ title: "Welcome" }).constructoString(),
+  new $content({ text: "This is the main content." }).constructoString(),
+  new $footer({ year: 2024 }).constructoString()
+);
+res.send(combinedHTML);
 ```
