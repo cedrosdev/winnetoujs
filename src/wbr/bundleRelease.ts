@@ -151,6 +151,7 @@ export class BundleRelease {
           experimentalBundling: true,
           tsconfig: {
             compilerOptions: {
+              module: "nodenext",
               declaration: true,
               emitDeclarationOnly: true,
               outDir: this.outputDir,
