@@ -108,6 +108,58 @@ export class BundleRelease {
   }
 
   private async esbuild(): Promise<"watching" | "done"> {
+    const plugins: esbuild.Plugin[] = [];
+    plugins.push({
+      name: "detailed-build-notifier",
+      setup: (build: esbuild.PluginBuild) => {
+        let startTime: number;
+
+        build.onStart(() => {
+          startTime = performance.now();
+          console.log(`🔄 Starting build...`);
+        });
+
+        build.onEnd((result: esbuild.BuildResult) => {
+          const timestamp = new Date().toLocaleTimeString();
+          const duration = startTime
+            ? `(${Math.round(performance.now() - startTime)}ms)`
+            : "";
+
+          if (result.errors.length > 0) {
+            console.log(`❌ [${timestamp}] Build failed ${duration}`);
+            result.errors.forEach((error: esbuild.Message) =>
+              console.log(`  Error: ${error.text}`)
+            );
+          } else if (result.warnings.length > 0) {
+            console.log(
+              `⚠️  [${timestamp}] Build completed with warnings ${duration}`
+            );
+            result.warnings.forEach((warning: esbuild.Message) =>
+              console.log(`  Warning: ${warning.text}`)
+            );
+          } else {
+            console.log(
+              `✅ [${timestamp}] Bundle rebuilt successfully! ${duration}`
+            );
+          }
+        });
+      },
+    });
+    if (this.node || this.nodeEsm) {
+      plugins.push(
+        dtsPlugin({
+          experimentalBundling: true,
+          tsconfig: {
+            compilerOptions: {
+              declaration: true,
+              emitDeclarationOnly: true,
+              outDir: this.outputDir,
+            },
+          },
+        })
+      );
+    }
+
     const es = await esbuild.context({
       entryPoints: this.entryFile,
       platform: this.node || this.nodeEsm ? "node" : "browser",
@@ -123,45 +175,7 @@ export class BundleRelease {
         ? "[hash].lazyBundle"
         : "[name]-[hash].lazyBundle",
       loader: { ".ts": "ts" },
-      plugins: [
-        dtsPlugin(),
-        {
-          name: "detailed-build-notifier",
-          setup: (build: esbuild.PluginBuild) => {
-            let startTime: number;
-
-            build.onStart(() => {
-              startTime = performance.now();
-              console.log(`🔄 Starting build...`);
-            });
-
-            build.onEnd((result: esbuild.BuildResult) => {
-              const timestamp = new Date().toLocaleTimeString();
-              const duration = startTime
-                ? `(${Math.round(performance.now() - startTime)}ms)`
-                : "";
-
-              if (result.errors.length > 0) {
-                console.log(`❌ [${timestamp}] Build failed ${duration}`);
-                result.errors.forEach((error: esbuild.Message) =>
-                  console.log(`  Error: ${error.text}`)
-                );
-              } else if (result.warnings.length > 0) {
-                console.log(
-                  `⚠️  [${timestamp}] Build completed with warnings ${duration}`
-                );
-                result.warnings.forEach((warning: esbuild.Message) =>
-                  console.log(`  Warning: ${warning.text}`)
-                );
-              } else {
-                console.log(
-                  `✅ [${timestamp}] Bundle rebuilt successfully! ${duration}`
-                );
-              }
-            });
-          },
-        },
-      ],
+      plugins,
     });
 
     if (this.watch) {
