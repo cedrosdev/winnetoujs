@@ -77,6 +77,7 @@ To obtain auto completions for constructos use this config in jsconfig.json (put
     "module": "nodenext",
     "target": "es2022",
     "checkJs": true,
+    "allowJs": true,
     "paths": {
       "@libs/*": ["./libs/*"]
     }

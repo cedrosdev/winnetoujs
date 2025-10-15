@@ -415,7 +415,9 @@ var BundleRelease = class {
           experimentalBundling: true,
           tsconfig: {
             compilerOptions: {
+              allowJs: true,
               module: "nodenext",
+              moduleResolution: "nodenext",
               declaration: true,
               emitDeclarationOnly: true,
               outDir: this.outputDir
