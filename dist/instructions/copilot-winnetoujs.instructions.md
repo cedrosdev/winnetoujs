@@ -544,6 +544,67 @@ function darkTheme() {
 }
 ```
 
+## WStyle - WinnetouJs Style Module
+
+WinnetouJs provides a module for dynamic style manipulations. WStyle method will compile a js object into css styles and apply to element.
+
+### Setting up WStyle
+
+Import WStyle into a js/ts file:
+
+```javascript
+import { WStyle } from "winnetoujs/modules/wstyle";
+```
+
+### Using WStyle
+
+- Use `WStyle.setStyle(elementOrId, styles)` to set styles dynamically.
+
+```javascript
+// styles.ts
+
+const globalPadding = {
+  padding: "40px",
+  borderRadius: "50px",
+  border: "1px dashed #00f",
+};
+
+export const title = (color: string) => {
+  return {
+    color: color || "red",
+    "background-color": "lightgray",
+    "font-family": "mono, sans-serif",
+    "text-align": "right",
+    "text-transform": "uppercase",
+    "box-shadow": "2px 2px 5px rgba(0, 0, 0, 0.9)",
+    ...globalPadding,
+  };
+};
+```
+
+```javascript
+// app.ts
+
+import { wstyle } from "winnetoujs/modules/wstyle";
+import { title } from "./styles";
+import { $img, $welcome } from "./welcome/welcome.wcto";
+
+(() => {
+  new $welcome({
+    titleStyle: wstyle(title("green")),
+    logo: new $img({
+      alt: "WinnetouJs Logo",
+      src: "/dist/assets/official-logo.svg",
+      class: "logo",
+      height: "200",
+      width: "200",
+    }).constructoString(),
+  }).create("#app", {
+    clear: true,
+  });
+})();
+```
+
 # WinnetouJs Server Side Rendering (SSR)
 
 WinnetouJs provides a module for server side rendering.
