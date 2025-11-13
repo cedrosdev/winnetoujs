@@ -60,7 +60,8 @@ class Constructos {
   }
   _getIdentifier(identifier) {
     if (identifier != "notSet") return identifier;
-    else return ++Winnetou.constructoId;
+    else
+      return Math.floor(Math.random() * 1e4) + "-" + Math.floor(Math.random() * 1e4);
   }
   /**
    * Attach a component to the DOM

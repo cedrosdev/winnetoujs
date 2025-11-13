@@ -89,7 +89,10 @@ export class Constructos {
 
   protected _getIdentifier(identifier: string): string | number {
     if (identifier != "notSet") return identifier;
-    else return ++Winnetou.constructoId;
+    else
+      return (
+        Math.floor(Math.random() * 1e4) + "-" + Math.floor(Math.random() * 1e4)
+      );
   }
 
   /**
