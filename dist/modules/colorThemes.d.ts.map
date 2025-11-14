@@ -1,0 +1,1 @@
+{"version":3,"file":"colorThemes.d.ts","sourceRoot":"","sources":["../../src/modules/colorThemes.ts"],"names":[],"mappings":"AAAA,UAAU,KAAK;IACb,CAAC,GAAG,EAAE,MAAM,GAAG,MAAM,CAAC;CACvB;AAED,qBAAa,WAAW;IACtB,MAAM,CAAC,eAAe,IAAI,IAAI;IAW9B,MAAM,CAAC,QAAQ,CAAC,KAAK,EAAE,KAAK,GAAG,IAAI;CAOpC"}

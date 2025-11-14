@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/modules/colorThemes.ts"],
+  "sourcesContent": ["interface Theme {\n  [key: string]: string;\n}\n\nexport class ColorThemes {\n  static applySavedTheme(): void {\n    const theme_ = window.localStorage.getItem(\"winnetou-theme\");\n    if (theme_) {\n      const theme: Theme = JSON.parse(theme_);\n      const root = document.documentElement;\n      Object.keys(theme).forEach((item: string) => {\n        root.style.setProperty(item, theme[item]);\n      });\n    }\n  }\n\n  static newTheme(theme: Theme): void {\n    const root = document.documentElement;\n    Object.keys(theme).forEach((item: string) => {\n      root.style.setProperty(item, theme[item]);\n    });\n    window.localStorage.setItem(\"winnetou-theme\", JSON.stringify(theme));\n  }\n}\n"],
+  "mappings": "AAIO,MAAM,YAAY;AAAA,EACvB,OAAO,kBAAwB;AAC7B,UAAM,SAAS,OAAO,aAAa,QAAQ,gBAAgB;AAC3D,QAAI,QAAQ;AACV,YAAM,QAAe,KAAK,MAAM,MAAM;AACtC,YAAM,OAAO,SAAS;AACtB,aAAO,KAAK,KAAK,EAAE,QAAQ,CAAC,SAAiB;AAC3C,aAAK,MAAM,YAAY,MAAM,MAAM,IAAI,CAAC;AAAA,MAC1C,CAAC;AAAA,IACH;AAAA,EACF;AAAA,EAEA,OAAO,SAAS,OAAoB;AAClC,UAAM,OAAO,SAAS;AACtB,WAAO,KAAK,KAAK,EAAE,QAAQ,CAAC,SAAiB;AAC3C,WAAK,MAAM,YAAY,MAAM,MAAM,IAAI,CAAC;AAAA,IAC1C,CAAC;AACD,WAAO,aAAa,QAAQ,kBAAkB,KAAK,UAAU,KAAK,CAAC;AAAA,EACrE;AACF;",
+  "names": []
+}
