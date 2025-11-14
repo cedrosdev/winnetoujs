@@ -501,6 +501,100 @@ new $div2({
 }).create("#app");
 ```
 
+## Lucide Icons
+
+WinnetouJs recommends Lucide as icon library. Lucide provides 1000+ SVG icons with tree-shaking support.
+
+### Installation
+
+```bash
+npm install lucide
+```
+
+For SSR use:
+
+```bash
+npm install lucide-static
+```
+
+### Basic Usage
+
+- Import `createElement` function and icons from lucide
+- Convert icons to HTML using `.outerHTML`
+- Pass icon HTML to constructo props
+
+```javascript
+import { createElement, Home, Settings, User } from "lucide";
+
+const homeIcon = createElement(Home).outerHTML;
+const settingsIcon = createElement(Settings, { size: 20 }).outerHTML;
+
+new $menuItem({
+  icon: homeIcon,
+  text: "Home",
+}).create("#app");
+```
+
+### Icon Customization
+
+```javascript
+// Size
+createElement(Heart, { size: 24 }).outerHTML;
+
+// Stroke width
+createElement(Star, { strokeWidth: 3 }).outerHTML;
+
+// Multiple attributes
+createElement(AlertCircle, {
+  size: 24,
+  strokeWidth: 2,
+  color: "#e74c3c",
+  class: "alert-icon",
+}).outerHTML;
+```
+
+### Icon Library Pattern
+
+Create centralized icon library:
+
+```javascript
+// libs/icons.js
+import { createElement } from "lucide";
+import { Home, Settings, User, Menu, X } from "lucide";
+
+export const icons = {
+  home: (size = 24) => createElement(Home, { size }).outerHTML,
+  settings: (size = 24) => createElement(Settings, { size }).outerHTML,
+  user: (size = 24) => createElement(User, { size }).outerHTML,
+  menu: (size = 24) => createElement(Menu, { size }).outerHTML,
+  close: (size = 24) => createElement(X, { size }).outerHTML,
+};
+```
+
+Usage:
+
+```javascript
+import { icons } from "@libs/icons";
+new $menuItem({ icon: icons.home(20), text: "Home" }).create("#menu");
+```
+
+### Server-Side Rendering
+
+Use `lucide-static` for SSR. It returns raw SVG strings, no need for `createElement()` or `.outerHTML`:
+
+```javascript
+const { Home, Settings } = require("lucide-static");
+new $menuItem({ icon: Home, text: "Home" }).constructoString();
+```
+
+### Best Practices
+
+- Import only needed icons for tree-shaking
+- Use consistent sizes throughout app
+- Cache frequently used icons
+- Provide `aria-label` for icon-only buttons
+- Icons inherit text color by default
+
 ## Color Themes
 
 WinnetouJs provides a module for color theming.

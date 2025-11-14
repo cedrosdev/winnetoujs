@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/modules/wstyle.ts"],
-  "sourcesContent": ["export const wstyle = (object: Record<string, string | number>): string => {\n  return Object.entries(object)\n    .map(([key, value]) => `${key}: ${value}`)\n    .join(\"; \");\n};\n"],
-  "mappings": "AAAO,MAAM,SAAS,CAAC,WAAoD;AACzE,SAAO,OAAO,QAAQ,MAAM,EACzB,IAAI,CAAC,CAAC,KAAK,KAAK,MAAM,GAAG,GAAG,KAAK,KAAK,EAAE,EACxC,KAAK,IAAI;AACd;",
-  "names": []
-}
