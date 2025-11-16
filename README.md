@@ -31,7 +31,7 @@ new $simpleText({ text: "Hello World!" }).create("#app");
 
 This will render `Hello World!` inside the element with id `app`.
 
-## Winnetoujs is a AI Ready framework
+## Winnetoujs is an AI Ready framework
 
 WinnetouJs is built with AI integration in mind, making it easier to incorporate AI functionalities into your web applications. Whether you're looking to add chatbots, recommendation systems, or any other AI-driven features, WinnetouJs provides the tools and flexibility to do so seamlessly.
 
