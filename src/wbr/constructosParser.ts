@@ -321,7 +321,7 @@ export class ConstructosParser {
 
   /**
    * Create Winnetou Constructo
-   * @param  {object|string} output The node or list of nodes where the component will be created
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
    * @param  {object} [options] Options to control how the construct is inserted. Optional.
    * @param  {boolean} [options.clear] Clean the node before inserting the construct
    * @param  {boolean} [options.reverse] Place the construct in front of other constructs

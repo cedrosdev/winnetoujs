@@ -98,13 +98,13 @@ export class Constructos {
   /**
    * Attach a component to the DOM
    * @param component The component HTML string
-   * @param output The node or list of nodes where the component will be created
+   * @param output Id of element. It is query selector one.
    * @param options Options to control how the construct is inserted. Optional.
    * @protected
    */
   protected attachToDOM(
     component: string,
-    output: string | Element,
+    output: string,
     options: { clear?: boolean; reverse?: boolean } = {}
   ): void {
     // Check if the component is a table-related element (tr, td, table, etc.)
@@ -114,7 +114,7 @@ export class Constructos {
 
     function handleTableElements(): void {
       // Try to query DOM nodes by selector
-      let el = document.querySelectorAll(output as string);
+      let el = document.querySelectorAll(output);
 
       // If nothing found, try again using #id
       if (el.length === 0) {
@@ -140,36 +140,24 @@ export class Constructos {
       // Create a document fragment from the HTML string
       const frag = document.createRange().createContextualFragment(component);
 
-      // If output is a selector (string)
-      if (typeof output !== "object") {
-        let el = document.querySelectorAll(output);
+      let el = document.querySelectorAll(output);
 
-        // If nothing found, try again using #id
-        if (el.length === 0) el = document.querySelectorAll("#" + output);
+      // If nothing found, try again using #id
+      if (el.length === 0) el = document.querySelectorAll("#" + output);
 
-        // For each element found
-        el.forEach(item => {
-          // Clear existing content if option is set
-          if (options.clear) item.innerHTML = "";
+      // For each element found
+      el.forEach(item => {
+        // Clear existing content if option is set
+        if (options.clear) item.innerHTML = "";
 
-          // Insert at the beginning if reverse option is set
-          if (options.reverse) {
-            item.prepend(frag);
-          } else {
-            // Otherwise, append at the end
-            item.appendChild(frag);
-          }
-        });
-      } else {
-        // If output is already a DOM element (object)
-        if (options.clear) (output as Element).innerHTML = "";
-
+        // Insert at the beginning if reverse option is set
         if (options.reverse) {
-          (output as Element).prepend(frag);
+          item.prepend(frag);
         } else {
-          (output as Element).appendChild(frag);
+          // Otherwise, append at the end
+          item.appendChild(frag);
         }
-      }
+      });
     }
 
     // Run correct handler depending on the type of HTML element
