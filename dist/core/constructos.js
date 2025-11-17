@@ -66,7 +66,7 @@ class Constructos {
   /**
    * Attach a component to the DOM
    * @param component The component HTML string
-   * @param output The node or list of nodes where the component will be created
+   * @param output Id of element. It is query selector one.
    * @param options Options to control how the construct is inserted. Optional.
    * @protected
    */
@@ -90,25 +90,16 @@ class Constructos {
     }
     function handleNormalElements() {
       const frag = document.createRange().createContextualFragment(component);
-      if (typeof output !== "object") {
-        let el = document.querySelectorAll(output);
-        if (el.length === 0) el = document.querySelectorAll("#" + output);
-        el.forEach((item) => {
-          if (options.clear) item.innerHTML = "";
-          if (options.reverse) {
-            item.prepend(frag);
-          } else {
-            item.appendChild(frag);
-          }
-        });
-      } else {
-        if (options.clear) output.innerHTML = "";
+      let el = document.querySelectorAll(output);
+      if (el.length === 0) el = document.querySelectorAll("#" + output);
+      el.forEach((item) => {
+        if (options.clear) item.innerHTML = "";
         if (options.reverse) {
-          output.prepend(frag);
+          item.prepend(frag);
         } else {
-          output.appendChild(frag);
+          item.appendChild(frag);
         }
-      }
+      });
     }
     if (isTableElement) {
       handleTableElements();

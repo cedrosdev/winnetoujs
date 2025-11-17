@@ -5,11 +5,11 @@ export declare class Constructos {
     /**
      * Attach a component to the DOM
      * @param component The component HTML string
-     * @param output The node or list of nodes where the component will be created
+     * @param output Id of element. It is query selector one.
      * @param options Options to control how the construct is inserted. Optional.
      * @protected
      */
-    protected attachToDOM(component: string, output: string | Element, options?: {
+    protected attachToDOM(component: string, output: string, options?: {
         clear?: boolean;
         reverse?: boolean;
     }): void;

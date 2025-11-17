@@ -1,5 +1,5 @@
 {
-  "version": "3.1.7",
+  "version": "3.1.8",
   "scripts": {
     "start": "npm run core && npm run modules && npm run wbr && cp -r source/* dist/ && npm run build-types",
     "core": "esbuild 'src/core/*.ts' --outdir=dist/core --format=esm --platform=browser --target=es2020 --sourcemap --outbase=src/core --resolve-extensions=.ts,.js",
