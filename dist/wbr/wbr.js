@@ -135,7 +135,7 @@ var ConstructosParser = class {
               } else {
                 idsObj = "";
               }
-              let processedConstructo = constructo.replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}").replace(/`/g, "\\`");
+              let processedConstructo = constructo.replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
               const regex = new RegExp("{{\\s*?(.*?)\\s*?}}", "g");
               const matches = processedConstructo.match(regex);
               const propNames = [];
