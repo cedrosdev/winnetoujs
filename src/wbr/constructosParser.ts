@@ -146,10 +146,9 @@ export class ConstructosParser {
               }
 
               // Replace [[id]] with template strings
-              let processedConstructo = constructo.replace(
-                /\[\[\s*?(.*?)\s*?\]\]/g,
-                "$1-win-${this.identifier}"
-              );
+              let processedConstructo = constructo
+                .replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}")
+                .replace(/`/g, "\\`");
 
               // Parse {{prop}}
               const regex = new RegExp("{{\\s*?(.*?)\\s*?}}", "g");
