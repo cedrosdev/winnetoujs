@@ -9,7 +9,7 @@ ncp.limit = 16;
 ncp(
   path.join(__dirname, "./wbr/wbr.js"),
   path.join(__dirname, "../../../wbr.js"),
-  function (err) {}
+  function (err) {},
 );
 
 // Create .github/instructions directory if it doesn't exist
@@ -18,26 +18,26 @@ if (!fs.existsSync(instructionsDir)) {
   fs.mkdirSync(instructionsDir, { recursive: true });
 }
 
+// create ./claude/skills directory if it doesn't exist
+const claudeSkillsDir = path.join(__dirname, "../../../claude/skills");
+if (!fs.existsSync(claudeSkillsDir)) {
+  fs.mkdirSync(claudeSkillsDir, { recursive: true });
+}
+
+// Copy all files from ./instructions/ to ../../../.github/instructions/instructions
 ncp(
-  path.join(__dirname, "./instructions/copilot-winnetoujs.instructions.md"),
-  path.join(
-    __dirname,
-    "../../../.github/instructions",
-    "copilot-winnetoujs.instructions.md"
-  ),
+  path.join(__dirname, "./instructions/"),
+  path.join(__dirname, "../../../.github/instructions"),
   function (err) {
     err && console.log(err);
-  }
+  },
 );
 
+// Copy all files from ./skills/ to ../../../claude/skills
 ncp(
-  path.join(__dirname, "./instructions/winnetoujs-select.instructions.md"),
-  path.join(
-    __dirname,
-    "../../../.github/instructions",
-    "winnetoujs-select.instructions.md"
-  ),
+  path.join(__dirname, "./skills/"),
+  path.join(__dirname, "../../../claude/skills"),
   function (err) {
     err && console.log(err);
-  }
+  },
 );
