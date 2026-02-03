@@ -18,8 +18,8 @@ if (!fs.existsSync(instructionsDir)) {
   fs.mkdirSync(instructionsDir, { recursive: true });
 }
 
-// create ./claude/skills directory if it doesn't exist
-const claudeSkillsDir = path.join(__dirname, "../../../claude/skills");
+// create ./.claude/skills directory if it doesn't exist
+const claudeSkillsDir = path.join(__dirname, "../../../.claude/skills");
 if (!fs.existsSync(claudeSkillsDir)) {
   fs.mkdirSync(claudeSkillsDir, { recursive: true });
 }
