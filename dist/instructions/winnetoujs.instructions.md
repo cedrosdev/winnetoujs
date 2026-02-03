@@ -36,8 +36,3 @@ The following instructions provide guidelines for using Winnetou.js effectively 
 - Each part of the UI should be defined in its own folder for better modularity.
 - A single wcto.html constructo file can contain multiple constructos relative to its folder.
 - The sass file must be placed in the same folder as the constructo file.
-
-### 4. Skills
-
-- **ALWAYS** use provided skills when creating WinnetouJs applications.
-- Skills can be found in the `./claude/skills/` directory.
