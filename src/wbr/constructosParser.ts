@@ -66,7 +66,7 @@ export class ConstructosParser {
       console.log(
         "\x1b[34m" +
           `Parsed ${this.promisesConstructos.length} constructo files successfully.` +
-          "\x1b[0m"
+          "\x1b[0m",
       );
     }
     return true;
@@ -108,7 +108,7 @@ export class ConstructosParser {
                   console.error(
                     "\x1b[31m" +
                       `Error: Constructo ID not found in ${filePath}. Please ensure it is defined as [[id]].` +
-                      "\x1b[0m"
+                      "\x1b[0m",
                   );
                   return;
                 }
@@ -119,11 +119,11 @@ export class ConstructosParser {
 
               const pureId = id + "-win-${this.identifier}";
               const verify = this.idList.filter(
-                (data: IdListItem) => data.id === id
+                (data: IdListItem) => data.id === id,
               );
               if (verify.length > 0) {
                 console.error(
-                  `Error: Duplicate Constructo ID found in ${filePath}.`
+                  `Error: Duplicate Constructo ID found in ${filePath}.`,
                 );
               }
               this.idList.push({ file: filePath, id });
@@ -135,7 +135,7 @@ export class ConstructosParser {
               if (matchIds.length) {
                 idsObj = "ids: {";
                 const processedMatchIds = matchIds.map((item: string) =>
-                  item.replace("[[", "").replace("]]", "")
+                  item.replace("[[", "").replace("]]", ""),
                 );
                 processedMatchIds.forEach((item: string) => {
                   idsObj += `${item}: \`${item}-win-\${this.identifier}\`,`;
@@ -147,9 +147,9 @@ export class ConstructosParser {
 
               // Replace [[id]] with template strings
               let processedConstructo = constructo
-                .replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}")
                 .replace(/`/g, "\\`")
-                .replace(/\$\{/g, "\\${");
+                .replace(/\$\{/g, "\\${")
+                .replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}");
 
               // Parse {{prop}}
               const regex = new RegExp("{{\\s*?(.*?)\\s*?}}", "g");
@@ -183,7 +183,7 @@ export class ConstructosParser {
                   const escapedString = escapeStringRegexp(match);
                   processedConstructo = processedConstructo.replace(
                     new RegExp(escapedString, "g"),
-                    `\${props?.${propName} || ""}`
+                    `\${props?.${propName} || ""}`,
                   );
                 });
               }
@@ -206,7 +206,7 @@ export class ConstructosParser {
                 className,
                 id,
                 processedConstructo,
-                idsObj
+                idsObj,
               );
 
               finalReturn += classStr;
@@ -236,7 +236,7 @@ export class ConstructosParser {
                 space_after_named_function: true,
                 space_before_conditional: true,
                 space_in_paren: false,
-              }
+              },
             );
 
             const fileName = path.parse(filePath).name;
@@ -255,13 +255,13 @@ export class ConstructosParser {
                 }
                 if (this.verbose) {
                   console.log(
-                    `Constructo file ${fileName}.js created successfully in ${dir}.`
+                    `Constructo file ${fileName}.js created successfully in ${dir}.`,
                   );
                 }
                 resolve(true);
-              }
+              },
             );
-          }
+          },
         );
       } catch (e) {
         const error = e as Error;
@@ -285,7 +285,7 @@ export class ConstructosParser {
     className: string,
     id: string,
     constructo: string,
-    idsObj: string
+    idsObj: string,
   ): string {
     return `
     export class ${className} extends Constructos {
