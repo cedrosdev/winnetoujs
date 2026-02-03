@@ -7,7 +7,7 @@ RULES:
 
 - import: `import { ColorThemes } from "winnetoujs/modules/colorThemes"`
 - define CSS variables in `:root`
-- call `await ColorThemes.applySavedTheme()` before render
+- call `ColorThemes.applySavedTheme()` before render
 - switch theme via `ColorThemes.newTheme({ "--var": value })`
 - values are strings; include `--` in keys
 
@@ -30,7 +30,7 @@ STARTUP:
 ```ts
 import { ColorThemes } from "winnetoujs/modules/colorThemes";
 
-await ColorThemes.applySavedTheme();
+ColorThemes.applySavedTheme();
 startApp();
 ```
 
@@ -68,6 +68,6 @@ BEST PRACTICES:
 
 TROUBLESHOOT:
 
-- not persisting: ensure `applySavedTheme()` awaited
+- not persisting: ensure `applySavedTheme()` called before render
 - not applying: vars must be in `:root`, and CSS must use `var(--x)`
 - partial update: remove hard-coded colors

@@ -1,6 +1,6 @@
 ---
-name: winnetou-fx
-description: Guide for using WinnetouFx (`W.fx`) to handle events in constructos. Use this skill when you need to add event handlers to your Winnetou.js UI components.
+name: use-functions-inside-constructos
+description: Guide for using WinnetouFx (`W.fx`) to handle events in constructos. Use this skill when you need to add event handlers to your WinnetouJs UI components.
 ---
 
 RULES:
@@ -94,4 +94,4 @@ TROUBLESHOOT:
 PERF:
 
 - avoid creating new handlers inside loops; pass data as args
-- debounce frequent events (input/mousemove)
+- avoid to use `addEventListener` directly; use WinnetouFx instead

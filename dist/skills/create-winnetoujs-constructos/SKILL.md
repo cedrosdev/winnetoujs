@@ -1,6 +1,6 @@
 ---
 name: create-winnetoujs-constructos
-description: Guide for creating Winnetou.js constructos. Use this skill when you need to create UI components with Winnetou.js.
+description: Use this skill when you need to create or modify UI components in this project.
 ---
 
 RULES:
@@ -13,6 +13,7 @@ RULES:
 - first ID becomes exported class name: `$id`
 - props use `{{prop}}` (optional: `{{prop?}}`, typed: `{{prop:type}}`)
 - winnetoujs compiler is running in background, do not ask user to run it manually
+- **AVOID** use constructos create function directly to string ids, always use returned ids vars. - - Avoid `.create("#id")` in favor of `.create(constructo.ids.id)`, create method does not need `#` prefix when using returned ids.
 
 RENDER:
 
@@ -111,3 +112,7 @@ import { $helloTitle } from "./hello/hello.wcto";
 
 new $helloTitle({ text: "Hello Winnetou" }).create("#app");
 ```
+
+PERF:
+
+- When creating events listeners inside constructos, prefer using WinnetouFx (`W.fx`) instead of directly using `addEventListener`. Refer to the "use-functions-inside-constructos" skill for more details.
