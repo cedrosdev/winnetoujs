@@ -36,7 +36,7 @@ ncp(
 // Copy all files from ./skills/ to ../../../claude/skills
 ncp(
   path.join(__dirname, "./skills/"),
-  path.join(__dirname, "../../../claude/skills"),
+  path.join(__dirname, "../../../.claude/skills"),
   function (err) {
     err && console.log(err);
   },
