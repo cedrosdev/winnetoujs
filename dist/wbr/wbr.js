@@ -276,7 +276,7 @@ var ConstructosParser = class {
    * @protected
    */
   code(props) {
-    return \`${constructo}\`;
+    return String.raw\`${constructo}\`;
   }
 
   /**

@@ -316,7 +316,7 @@ export class ConstructosParser {
    * @protected
    */
   code(props) {
-    return \`${constructo}\`;
+    return String.raw\`${constructo}\`;
   }
 
   /**
