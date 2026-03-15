@@ -147,8 +147,8 @@ export class ConstructosParser {
 
               // Replace [[id]] with template strings
               let processedConstructo = constructo
-                .replace(/`/g, "\\`")
-                .replace(/\$\{/g, "\\${")
+                // .replace(/`/g, "\\`")
+                // .replace(/\$\{/g, "\\${")
                 .replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}");
 
               // Parse {{prop}}
