@@ -145,10 +145,17 @@ export class ConstructosParser {
                 idsObj = "";
               }
 
-              // Replace [[id]] with template strings
               let processedConstructo = constructo
-                // .replace(/`/g, "\\`")
-                // .replace(/\$\{/g, "\\${")
+                .replace(
+                  /(<script[\s\S]*?>)([\s\S]*?)(<\/script>)/gi,
+                  (_, openTag, scriptContent, closeTag) => {
+                    const escaped = scriptContent
+                      .replace(/\\/g, "\\\\") /* Regex escape */
+                      .replace(/`/g, "\\`") /* Escape backticks */
+                      .replace(/\$\{/g, "\\${"); /* Escape ${ */
+                    return openTag + escaped + closeTag;
+                  },
+                )
                 .replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}");
 
               // Parse {{prop}}
@@ -316,7 +323,7 @@ export class ConstructosParser {
    * @protected
    */
   code(props) {
-    return String.raw\`${constructo}\`;
+    return \`${constructo}\`;
   }
 
   /**

@@ -135,7 +135,13 @@ var ConstructosParser = class {
               } else {
                 idsObj = "";
               }
-              let processedConstructo = constructo.replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}");
+              let processedConstructo = constructo.replace(
+                /(<script[\s\S]*?>)([\s\S]*?)(<\/script>)/gi,
+                (_, openTag, scriptContent, closeTag) => {
+                  const escaped = scriptContent.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+                  return openTag + escaped + closeTag;
+                }
+              ).replace(/\[\[\s*?(.*?)\s*?\]\]/g, "$1-win-${this.identifier}");
               const regex = new RegExp("{{\\s*?(.*?)\\s*?}}", "g");
               const matches = processedConstructo.match(regex);
               const propNames = [];
@@ -276,7 +282,7 @@ var ConstructosParser = class {
    * @protected
    */
   code(props) {
-    return String.raw\`${constructo}\`;
+    return \`${constructo}\`;
   }
 
   /**
